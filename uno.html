@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UNO Mania Kids - Jogo de Cartas Divertido</title>
+  <style>
+    /* ==========================================================================
+       RESET E SISTEMA DE DESIGN VIBRANTE PARA CRIANÇAS
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      /* Cores Vibrantes do UNO */
+      --uno-red: #ef4444;
+      --uno-red-dark: #b91c1c;
+      --uno-blue: #3b82f6;
+      --uno-blue-dark: #1d4ed8;
+      --uno-green: #22c55e;
+      --uno-green-dark: #15803d;
+      --uno-yellow: #eab308;
+      --uno-yellow-dark: #a16207;
+      --uno-wild: #18181b;
+
+      /* Especiais */
+      --uno-gold: #f59e0b;
+      --uno-purple: #a855f7;
+      --uno-cyan: #06b6d4;
+
+      /* Fundo da Mesa de Jogos */
+      --bg-table: #090d16;
+      --bg-felt: radial-gradient(circle at 50% 50%, #172554 0%, #0c1322 70%, #030712 100%);
+      --panel-bg: rgba(15, 23, 42, 0.85);
+      --panel-border: rgba(255, 255, 255, 0.12);
+
+      /* Dimensões das Cartas */
+      --card-w: clamp(75px, 10vw, 110px);
+      --card-h: calc(var(--card-w) * 1.45);
+      --card-radius: 12px;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg-felt);
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       BARRA SUPERIOR (HEADER / CONTROLES)
+       ========================================================================== */
+    header.game-header {
+      width: 100%;
+      height: 52px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 15, 26, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--panel-border);
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ef4444 0%, #f59e0b 35%, #22c55e 70%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+      transform: skew(-6deg);
+    }
+
+    .brand-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #38bdf8;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .btn-header:active {
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       TABULEIRO / MESA DE JOGO PRINCIPAL
+       ========================================================================== */
+    main.game-board {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Área do Computador (Topo) */
+    .opponent-area {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .player-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 580px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 30px;
+      padding: 4px 14px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .player-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .avatar-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .avatar-icon.robot {
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      animation: robotBounce 2s infinite ease-in-out;
+    }
+
+    @keyframes robotBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .player-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .player-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .player-status {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .card-counter-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .card-counter-badge .number {
+      color: #facc15;
+      font-size: 1.1rem;
+    }
+
+    /* Balão de Fala do Robô ao falar UNO */
+    .robot-speech-bubble {
+      position: absolute;
+      top: -38px;
+      left: 10px;
+      background: #ef4444;
+      color: #fff;
+      font-family: 'Arial Black', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      z-index: 60;
+    }
+
+    .robot-speech-bubble.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .robot-speech-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 14px;
+      border-width: 6px 6px 0 6px;
+      border-style: solid;
+      border-color: #ef4444 transparent transparent transparent;
+    }
+
+    /* Mão do Robô (Verso das cartas compactadas) */
+    .opponent-hand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 60px;
+      overflow: visible;
+      perspective: 800px;
+    }
+
+    .card-back-mini {
+      width: 44px;
+      height: 62px;
+      background: #18181b;
+      border-radius: 6px;
+      border: 1.5px solid #fff;
+      margin-left: -22px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+
+    .card-back-mini:first-child {
+      margin-left: 0;
+    }
+
+    .card-back-mini-oval {
+      width: 32px;
+      height: 22px;
+      background: #ef4444;
+      border-radius: 50%;
+      transform: rotate(-25deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #facc15;
+      font-family: 'Arial Black', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 900;
+    }
+
+    /* ==========================================================================
+       ÁREA CENTRAL DA MESA (PILHAS DE MONTE E DESCARTE + BOTÃO UNO)
+       ========================================================================== */
+    .center-table {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 4vw, 40px);
+      position: relative;
+      margin: auto 0;
+      width: 100%;
+      max-width: 780px;
+    }
+
+    /* Monte de Compras */
+    .pile-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .draw-pile {
+      width: var(--card-w);
+      height: var(--card-h);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .draw-pile:hover {
+      transform: scale(1.05);
+    }
+
+    .draw-pile:active {
+      transform: scale(0.96);
+    }
+
+    .draw-pile-deck {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--card-radius);
+      background: #18181b;
+      border: 3px solid #fff;
+      box-shadow: 
+        0 8px 20px rgba(0,0,0,0.6),
+        3px 3px 0 #27272a,
+        6px 6px 0 #3f3f46;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .draw-pile-deck::before {
+      content: "";
+      position: absolute;
+      width: 82%;
+      height: 58%;
+      background: #ef4444;
+      border-radius: 50%;
+      transform: rotate(-25deg);
+      border: 2px solid #fff;
+    }
+
+    .draw-pile-deck span {
+      position: relative;
+      z-index: 2;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-style: italic;
+      color: #facc15;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      transform: rotate(-25deg);
+    }
+
+    .pile-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Pilha de Descarte */
+    .discard-pile {
+      width: var(--card-w);
+      height: var(--card-h);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .discard-spot {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--card-radius);
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      position: absolute;
+    }
+
+    /* Indicador da Cor Ativa */
+    .color-halo {
+      position: absolute;
+      inset: -10px;
+      border-radius: calc(var(--card-radius) + 8px);
+      border: 3px solid transparent;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(4px);
+      transition: all 0.3s ease;
+    }
+
+    .color-halo.red { border-color: var(--uno-red); box-shadow: 0 0 25px var(--uno-red); }
+    .color-halo.blue { border-color: var(--uno-blue); box-shadow: 0 0 25px var(--uno-blue); }
+    .color-halo.green { border-color: var(--uno-green); box-shadow: 0 0 25px var(--uno-green); }
+    .color-halo.yellow { border-color: var(--uno-yellow); box-shadow: 0 0 25px var(--uno-yellow); }
+
+    /* Indicador Visual de Cor Atual da Mesa */
+    .active-color-badge {
+      position: absolute;
+      top: -34px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 3px 12px;
+      border-radius: 14px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+    }
+    .color-dot.red { background: var(--uno-red); box-shadow: 0 0 8px var(--uno-red); }
+    .color-dot.blue { background: var(--uno-blue); box-shadow: 0 0 8px var(--uno-blue); }
+    .color-dot.green { background: var(--uno-green); box-shadow: 0 0 8px var(--uno-green); }
+    .color-dot.yellow { background: var(--uno-yellow); box-shadow: 0 0 8px var(--uno-yellow); }
+
+    /* ==========================================================================
+       SUPER BOTÃO DO UNO! (COM ANIMAÇÃO E CONTADOR)
+       ========================================================================== */
+    .uno-button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .btn-uno {
+      width: clamp(72px, 9vw, 92px);
+      height: clamp(72px, 9vw, 92px);
+      border-radius: 50%;
+      border: 4px solid #fff;
+      background: radial-gradient(circle at 35% 35%, #f87171 0%, #ef4444 50%, #991b1b 100%);
+      color: #facc15;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      font-style: italic;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      cursor: pointer;
+      box-shadow: 
+        0 6px 16px rgba(239, 68, 68, 0.5),
+        inset 0 3px 4px rgba(255, 255, 255, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .btn-uno:hover {
+      transform: scale(1.08);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.8);
+    }
+
+    .btn-uno:active {
+      transform: scale(0.95);
+    }
+
+    /* Estado de Alerta: Jogador precisa gritar UNO! */
+    .btn-uno.alert {
+      animation: unoAlarm 0.7s infinite alternate;
+      border-color: #facc15;
+    }
+
+    @keyframes unoAlarm {
+      from {
+        transform: scale(1);
+        box-shadow: 0 0 15px #ef4444, inset 0 0 10px #facc15;
+      }
+      to {
+        transform: scale(1.18);
+        box-shadow: 0 0 35px #facc15, 0 0 20px #ef4444;
+      }
+    }
+
+    .btn-uno-timer {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1px 6px;
+      border-radius: 8px;
+      margin-top: -2px;
+      display: none;
+    }
+
+    .btn-uno.alert .btn-uno-timer {
+      display: block;
+    }
+
+    /* Banner Central de Orientação para a Criança */
+    .game-announcement {
+      position: absolute;
+      bottom: -46px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: clamp(0.78rem, 1.6vw, 0.95rem);
+      font-weight: 700;
+      color: #f8fafc;
+      white-space: nowrap;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .turn-indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    .turn-indicator-dot.computer {
+      background: #eab308;
+      box-shadow: 0 0 8px #eab308;
+    }
+
+    /* ==========================================================================
+       ÁREA DO JOGADOR HUMANO (BASE)
+       ========================================================================== */
+    .player-area {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+
+    /* Container de Cartas na Mão do Jogador */
+    .player-hand-container {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      min-height: calc(var(--card-h) + 20px);
+      padding: 10px 10px 4px 10px;
+      overflow-x: auto;
+      overflow-y: visible;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+
+    .player-hand-container::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .player-hand-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .hand-cards-list {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.3s ease;
+      padding: 0 10px;
+    }
+
+    /* ==========================================================================
+       DESIGN DAS CARTAS DO UNO (ESTILO PREMIUM VETORIAL / 3D)
+       ========================================================================== */
+    .uno-card {
+      width: var(--card-w);
+      height: var(--card-h);
+      border-radius: var(--card-radius);
+      border: 3px solid #ffffff;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      perspective: 1000px;
+    }
+
+    /* Cores das Cartas */
+    .uno-card.red { background: linear-gradient(135deg, var(--uno-red) 0%, var(--uno-red-dark) 100%); }
+    .uno-card.blue { background: linear-gradient(135deg, var(--uno-blue) 0%, var(--uno-blue-dark) 100%); }
+    .uno-card.green { background: linear-gradient(135deg, var(--uno-green) 0%, var(--uno-green-dark) 100%); }
+    .uno-card.yellow { background: linear-gradient(135deg, var(--uno-yellow) 0%, var(--uno-yellow-dark) 100%); }
+    
+    /* Cartas Coringa / Especiais */
+    .uno-card.wild {
+      background: radial-gradient(circle at 50% 50%, #27272a 0%, #09090b 100%);
+      border-color: #f8fafc;
+    }
+
+    /* Ultra Carta: Baralho Todo (Efeito Cósmico com Borda Multicolorida) */
+    .uno-card.wild-all {
+      background: radial-gradient(circle at 50% 50%, #4c0519 0%, #1c1917 100%);
+      border: 3px solid #f43f5e;
+      animation: ultraCardPulse 1.5s infinite alternate;
+    }
+
+    @keyframes ultraCardPulse {
+      0% { border-color: #ef4444; box-shadow: 0 0 15px #ef4444; }
+      33% { border-color: #eab308; box-shadow: 0 0 20px #eab308; }
+      66% { border-color: #22c55e; box-shadow: 0 0 20px #22c55e; }
+      100% { border-color: #3b82f6; box-shadow: 0 0 25px #3b82f6; }
+    }
+
+    /* Carta Trocar de Mão */
+    .uno-card.wild-swap {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      border: 3px solid #a855f7;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+    }
+
+    /* Oval Branco Central Clássico do UNO */
+    .card-center-oval {
+      width: 76%;
+      height: 60%;
+      background: #ffffff;
+      border-radius: 50%;
+      transform: rotate(-24deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .uno-card.wild .card-center-oval,
+    .uno-card.wild-all .card-center-oval,
+    .uno-card.wild-swap .card-center-oval {
+      background: #09090b;
+      border: 2px solid #fff;
+    }
+
+    /* Conteúdo do Centro da Carta */
+    .card-symbol {
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+      font-weight: 900;
+      font-style: italic;
+      color: inherit;
+      line-height: 1;
+      transform: rotate(24deg); /* Desfaz a rotação do oval */
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .uno-card.red .card-symbol { color: var(--uno-red-dark); }
+    .uno-card.blue .card-symbol { color: var(--uno-blue-dark); }
+    .uno-card.green .card-symbol { color: var(--uno-green-dark); }
+    .uno-card.yellow .card-symbol { color: var(--uno-yellow-dark); }
+
+    /* Quadrantes Coloridos do Coringa */
+    .wild-quadrant {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      position: absolute;
+      inset: 0;
+      transform: rotate(24deg);
+    }
+
+    .quad-red { background: var(--uno-red); }
+    .quad-blue { background: var(--uno-blue); }
+    .quad-yellow { background: var(--uno-yellow); }
+    .quad-green { background: var(--uno-green); }
+
+    .card-symbol-wild {
+      position: relative;
+      z-index: 5;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: clamp(0.9rem, 2.2vw, 1.4rem);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 6px #000;
+      transform: rotate(24deg);
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    /* Cantos Notacionais das Cartas */
+    .card-corner {
+      position: absolute;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: clamp(0.65rem, 1.4vw, 0.85rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .card-corner.top-left {
+      top: 5px;
+      left: 6px;
+    }
+
+    .card-corner.bottom-right {
+      bottom: 5px;
+      right: 6px;
+      transform: rotate(180deg);
+    }
+
+    /* Cartas na Mão do Jogador (Visual Limpo e Natural - Tela Normal) */
+    .hand-cards-list .uno-card {
+      cursor: pointer;
+      transform: translateY(0);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+    }
+
+    .hand-cards-list .uno-card:hover {
+      transform: translateY(-16px) scale(1.05);
+      z-index: 30;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .hand-cards-list .uno-card:active {
+      transform: translateY(-8px) scale(1.02);
+    }
+
+    /* Efeito de sacudida caso tente jogar uma carta inválida */
+    @keyframes cardInvalidShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .uno-card.shake {
+      animation: cardInvalidShake 0.4s ease !important;
+    }
+
+    /* ==========================================================================
+       MODAIS (SELETOR DE CORES, COMO JOGAR, FIM DE PARTIDA)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 2px solid var(--panel-border);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transform: scale(0.9);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #fff;
+      text-align: center;
+    }
+
+    .modal-desc {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* Seletor de 4 Cores do Coringa */
+    .color-picker-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+      max-width: 340px;
+      margin: 8px 0;
+    }
+
+    .btn-color-pick {
+      height: 75px;
+      border-radius: 14px;
+      border: 3px solid #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 1rem;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-color-pick:hover {
+      transform: scale(1.08);
+    }
+
+    .btn-color-pick.red { background: linear-gradient(135deg, var(--uno-red), var(--uno-red-dark)); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+    .btn-color-pick.blue { background: linear-gradient(135deg, var(--uno-blue), var(--uno-blue-dark)); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    .btn-color-pick.green { background: linear-gradient(135deg, var(--uno-green), var(--uno-green-dark)); box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
+    .btn-color-pick.yellow { background: linear-gradient(135deg, var(--uno-yellow), var(--uno-yellow-dark)); color: #1e293b; box-shadow: 0 0 15px rgba(234, 179, 8, 0.5); }
+
+    /* Tela de Vitória / Derrota com Troféu */
+    .victory-badge-icon {
+      font-size: 4rem;
+      animation: victoryJump 1s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes victoryJump {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-10px) scale(1.1); }
+    }
+
+    .btn-primary-action {
+      background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+      border: 2px solid #86efac;
+      color: #fff;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 1.1rem;
+      padding: 12px 32px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary-action:hover {
+      transform: scale(1.06);
+      filter: brightness(1.1);
+    }
+
+    /* Alerta Notificação Flutuante na Tela */
+    .toast-alert {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid #38bdf8;
+      border-radius: 30px;
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      z-index: 120;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-alert.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Efeito de Cartas Voando pela tela */
+    .flying-card-particle {
+      position: fixed;
+      width: 60px;
+      height: 88px;
+      border-radius: 8px;
+      border: 2px solid #fff;
+      background: #18181b;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      z-index: 90;
+      pointer-events: none;
+      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Canvas de Confetes da Vitória */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 95;
+    }
+
+    /* ==========================================================================
+       RESPONSIVIDADE INTELIGENTE (CELULAR, TABLET, DESKTOP)
+       ========================================================================== */
+    @media (max-width: 600px) {
+      :root {
+        --card-w: 68px;
+        --card-radius: 8px;
+      }
+
+      .btn-header span {
+        display: none;
+      }
+
+      .center-table {
+        gap: 14px;
+      }
+
+      .game-announcement {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        bottom: -38px;
+      }
+
+      .player-hand-container {
+        padding: 6px 4px;
+      }
+
+      .hand-cards-list {
+        gap: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CANVAS DE CONFETES COMEMORATIVOS -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- NOTIFICAÇÃO FLUTUANTE (TOAST) -->
+  <div class="toast-alert" id="toastAlert">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg">Alerta</span>
+  </div>
+
+  <!-- HEADER COM LOGO E CONTROLES -->
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-logo">UNO!</div>
+      <div class="brand-tag">Mania Kids 🎈</div>
+    </div>
+    <div class="header-actions">
+      <!-- Áudio -->
+      <button class="btn-header" id="btnSoundToggle" title="Ligar/Desligar Som">
+        <span id="soundIcon">🔊</span>
+        <span>Som</span>
+      </button>
+      <!-- Regras / Ajuda -->
+      <button class="btn-header" id="btnHelp" title="Regras e Super Cartas">
+        <span>❓</span>
+        <span>Regras</span>
+      </button>
+      <!-- Reiniciar -->
+      <button class="btn-header" id="btnRestart" title="Começar Nova Partida">
+        <span>🔄</span>
+        <span>Reiniciar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MESA DE JOGO -->
+  <main class="game-board">
+
+    <!-- ÁREA SUPERIOR: ROBÔ / COMPUTADOR -->
+    <div class="opponent-area">
+      <!-- Balão de Fala do Robô ao falar UNO -->
+      <div class="robot-speech-bubble" id="robotSpeech">UNO! 🤖⚡</div>
+
+      <div class="player-hud">
+        <div class="player-profile">
+          <div class="avatar-icon robot" id="robotAvatar">🤖</div>
+          <div class="player-details">
+            <span class="player-title">Robô Amigo</span>
+            <span class="player-status" id="robotStatus">Aguardando a vez...</span>
+          </div>
+        </div>
+        <div class="card-counter-badge" title="Cartas na mão do Robô">
+          <span>Cartas:</span>
+          <span class="number" id="robotCardCount">7</span>
+        </div>
+      </div>
+
+      <!-- Verso das cartas na mão do robô -->
+      <div class="opponent-hand" id="robotCardsDisplay">
+        <!-- Gerado dinamicamente -->
+      </div>
+    </div>
+
+    <!-- ÁREA CENTRAL: PILHAS DE MONTE, DESCARTE E BOTÃO UNO! -->
+    <div class="center-table">
+
+      <!-- Monte de Compras -->
+      <div class="pile-container">
+        <div class="draw-pile" id="drawPile" title="Clique para comprar carta">
+          <div class="draw-pile-deck">
+            <span>UNO</span>
+          </div>
+        </div>
+        <div class="pile-label">
+          <span>Monte:</span>
+          <strong id="drawPileCount" style="color:#38bdf8;">80</strong>
+        </div>
+      </div>
+
+      <!-- Pilha de Descarte -->
+      <div class="pile-container">
+        <div class="discard-pile" id="discardPile">
+          <div class="discard-spot"></div>
+          <div class="color-halo" id="colorHalo"></div>
+          <div class="active-color-badge" id="activeColorBadge">
+            <span class="color-dot red" id="activeColorDot"></span>
+            <span id="activeColorText">VERMELHO</span>
+          </div>
+          <!-- A carta atual do topo é inserida aqui -->
+        </div>
+        <div class="pile-label">
+          <span>Mesa</span>
+        </div>
+      </div>
+
+      <!-- Botão Especial UNO! -->
+      <div class="uno-button-container">
+        <button class="btn-uno" id="btnUno" title="Grite UNO ao ficar com 1 carta!">
+          <span>UNO!</span>
+          <span class="btn-uno-timer" id="unoTimerBadge">4s</span>
+        </button>
+        <span class="pile-label">Grite!</span>
+      </div>
+
+      <!-- Banner Central de Instruções -->
+      <div class="game-announcement" id="gameAnnouncement">
+        <div class="turn-indicator-dot" id="turnDot"></div>
+        <span id="announcementText">Sua vez! Jogue uma carta que combine ou compre no monte.</span>
+      </div>
+
+    </div>
+
+    <!-- ÁREA INFERIOR: JOGADOR HUMANO (VOCÊ) -->
+    <div class="player-area">
+      <div class="player-hud">
+        <div class="player-profile">
+          <div class="avatar-icon">👦</div>
+          <div class="player-details">
+            <span class="player-title">Você</span>
+            <span class="player-status" id="playerStatus">Sua vez de jogar!</span>
+          </div>
+        </div>
+        <div class="card-counter-badge" title="Suas cartas">
+          <span>Suas Cartas:</span>
+          <span class="number" id="playerCardCount">7</span>
+        </div>
+      </div>
+
+      <!-- Cartas na Mão do Jogador -->
+      <div class="player-hand-container">
+        <div class="hand-cards-list" id="playerHand">
+          <!-- Cartas geradas dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: ESCOLHA DE COR (AO JOGAR CORINGA) -->
+  <div class="modal-overlay" id="colorPickerModal">
+    <div class="modal-box">
+      <h3 class="modal-title">🎨 Escolha a Nova Cor!</h3>
+      <p class="modal-desc">Qual cor você quer que continue a partida?</p>
+      <div class="color-picker-grid">
+        <button class="btn-color-pick red" data-color="red">
+          <span>🔴 Vermelho</span>
+        </button>
+        <button class="btn-color-pick blue" data-color="blue">
+          <span>🔵 Azul</span>
+        </button>
+        <button class="btn-color-pick green" data-color="green">
+          <span>🟢 Verde</span>
+        </button>
+        <button class="btn-color-pick yellow" data-color="yellow">
+          <span>🟡 Amarelo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AJUDA E SUPER CARTAS -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-box" style="max-width: 520px; text-align: left;">
+      <h3 class="modal-title">Como Jogar UNO Mania Kids 🎈</h3>
+      <div class="modal-desc" style="text-align: left; font-size: 0.82rem; line-height: 1.5; display:flex; flex-direction:column; gap:8px;">
+        <p><strong>🎯 Objetivo:</strong> Ser o primeiro a jogar todas as cartas da sua mão!</p>
+        <p><strong>🃏 Como Jogar:</strong> No seu turno, clique em uma carta que tenha a <strong>mesma cor</strong>, o <strong>mesmo número</strong> ou seja um <strong>Coringa</strong>. Se não tiver nenhuma, clique no <strong>Monte</strong> para comprar 1 carta.</p>
+        <p><strong>⚡ Super Cartas Incríveis:</strong></p>
+        <ul style="padding-left: 18px;">
+          <li><strong>+2:</strong> O adversário compra 2 cartas e perde a vez!</li>
+          <li><strong>🚫 Bloqueio / ⇄ Inverter:</strong> Pula a vez do adversário!</li>
+          <li><strong>🎨 Coringa +4:</strong> Escolhe a cor e faz o adversário comprar 4 cartas!</li>
+          <li><strong>💥 Coringa Baralho Todo (Ultra Carta):</strong> O adversário compra 25 a 30 cartas, enchendo a tela dele!</li>
+          <li><strong>🔄 Coringa Trocar de Mão:</strong> Você e o Robô trocam todas as cartas da mão imediatamente!</li>
+        </ul>
+        <p><strong>📢 Regra do UNO:</strong> Quando ficar com <strong>apenas 1 carta</strong>, clique rápido no botão vermelho <strong>"UNO!"</strong> antes do tempo acabar! Se esquecer, você compra 2 cartas de penalidade!</p>
+      </div>
+      <button class="btn-primary-action" id="btnCloseHelp" style="padding: 10px 24px; font-size: 0.95rem;">Entendi, Vamos Jogar!</button>
+    </div>
+  </div>
+
+  <!-- MODAL: FIM DE PARTIDA (VITÓRIA / DERROTA) -->
+  <div class="modal-overlay" id="victoryModal">
+    <div class="modal-box">
+      <div class="victory-badge-icon" id="victoryIcon">🏆</div>
+      <h3 class="modal-title" id="victoryTitle">Parabéns! Você Venceu!</h3>
+      <p class="modal-desc" id="victoryDesc">Você foi genial, zerou todas as suas cartas e derrotou o Robô Amigo com maestria!</p>
+      <button class="btn-primary-action" id="btnPlayAgain">
+        <span>🎮 Jogar Novamente</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT COMPLETO EMBUTIDO (ZERO DEPENDÊNCIAS EXTERNAS)
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. SINTETIZADOR DE ÁUDIO WEB AUDIO API (SONS VIBRANTES E DIVERTIDOS)
+       ========================================================================== */
+    class UnoAudio {
+      constructor() {
+        this.ctx = null;
+        this.muted = localStorage.getItem('uno_muted') === 'true';
+      }
+
+      initCtx() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      // Som de carta deslizando na mesa
+      playCardPlay() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(380, t);
+        osc.frequency.exponentialRampToValueAtTime(120, t + 0.08);
+
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.08);
+      }
+
+      // Som ao comprar carta
+      playDraw() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(240, t);
+        osc.frequency.exponentialRampToValueAtTime(480, t + 0.06);
+
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.06);
+      }
+
+      // Efeito sonoro de Coringa / Bloqueio / +2 / +4
+      playActionZap() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(600, t);
+        osc.frequency.exponentialRampToValueAtTime(180, t + 0.18);
+
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.18);
+      }
+
+      // Efeito Super Carta +15 (Fanfarra Triunfal)
+      playSuper15() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+          const noteTime = t + (idx * 0.09);
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, noteTime);
+
+          gain.gain.setValueAtTime(0.25, noteTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.25);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(noteTime);
+          osc.stop(noteTime + 0.25);
+        });
+      }
+
+      // Efeito Ultra Carta Baralho Todo (Estrondo Explosivo)
+      playAllDeck() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, t);
+        osc.frequency.exponentialRampToValueAtTime(30, t + 0.45);
+
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.45);
+      }
+
+      // Efeito Troca de Mãos (Magia Cósmica)
+      playSwap() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, t);
+        osc.frequency.linearRampToValueAtTime(800, t + 0.2);
+        osc.frequency.linearRampToValueAtTime(400, t + 0.35);
+
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.35);
+      }
+
+      // Som ao gritar UNO!
+      playUnoShout() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const noteTime = t + (i * 0.06);
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, noteTime);
+
+          gain.gain.setValueAtTime(0.28, noteTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.3);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(noteTime);
+          osc.stop(noteTime + 0.3);
+        });
+      }
+
+      // Som de penalidade (Wah-Wah de desenho animado)
+      playPenalty() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        [415.30, 392.00, 369.99, 311.13].forEach((freq, idx) => {
+          const noteTime = t + (idx * 0.14);
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, noteTime);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.9, noteTime + 0.12);
+
+          gain.gain.setValueAtTime(0.25, noteTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.13);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(noteTime);
+          osc.stop(noteTime + 0.13);
+        });
+      }
+
+      // Vitória (Grande celebração com arpejos alegres)
+      playVictory() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          const noteTime = t + (i * 0.1);
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, noteTime);
+
+          gain.gain.setValueAtTime(0.28, noteTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.5);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(noteTime);
+          osc.stop(noteTime + 0.5);
+        });
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        localStorage.setItem('uno_muted', this.muted);
+        return this.muted;
+      }
+    }
+
+    const audio = new UnoAudio();
+
+    /* ==========================================================================
+       2. SISTEMA DE CONFETES COMEMORATIVOS (CANVAS)
+       ========================================================================== */
+    class ConfettiEffect {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.animId = null;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      start(durationMs = 4000) {
+        this.particles = [];
+        const colors = ['#ef4444', '#3b82f6', '#22c55e', '#eab308', '#ec4899', '#8b5cf6'];
+
+        for (let i = 0; i < 140; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * -this.canvas.height * 0.5,
+            w: Math.random() * 10 + 6,
+            h: Math.random() * 14 + 8,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            vx: (Math.random() - 0.5) * 5,
+            vy: Math.random() * 4 + 3,
+            rot: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 10
+          });
+        }
+
+        if (this.animId) cancelAnimationFrame(this.animId);
+        const startTime = Date.now();
+
+        const loop = () => {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+          for (const p of this.particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rot += p.vRot;
+
+            this.ctx.save();
+            this.ctx.translate(p.x, p.y);
+            this.ctx.rotate((p.rot * Math.PI) / 180);
+            this.ctx.fillStyle = p.color;
+            this.ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            this.ctx.restore();
+
+            if (p.y > this.canvas.height) {
+              p.y = -20;
+              p.x = Math.random() * this.canvas.width;
+            }
+          }
+
+          if (Date.now() - startTime < durationMs) {
+            this.animId = requestAnimationFrame(loop);
+          } else {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          }
+        };
+
+        loop();
+      }
+
+      stop() {
+        if (this.animId) cancelAnimationFrame(this.animId);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+    }
+
+    /* ==========================================================================
+       3. REGRAS E BARALHO COMPLETO DE UNO (COM SUPER CARTAS ESPECIAIS)
+       ========================================================================== */
+    class UnoDeckManager {
+      constructor() {
+        this.colors = ['red', 'blue', 'green', 'yellow'];
+      }
+
+      // Gera um baralho completo padrão + super cartas pedidas pelo usuário
+      generateFullDeck() {
+        const deck = [];
+        let idCounter = 1;
+
+        const addCard = (color, type, value, label) => {
+          deck.push({ id: idCounter++, color, type, value, label });
+        };
+
+        for (const c of this.colors) {
+          // Carta 0 (uma por cor)
+          addCard(c, 'number', 0, '0');
+
+          // Cartas 1 a 9 (duas por cor)
+          for (let n = 1; n <= 9; n++) {
+            addCard(c, 'number', n, String(n));
+            addCard(c, 'number', n, String(n));
+          }
+
+          // Cartas de Ação Clássicas (duas por cor)
+          addCard(c, 'skip', 20, '🚫');
+          addCard(c, 'skip', 20, '🚫');
+
+          addCard(c, 'reverse', 20, '⇄');
+          addCard(c, 'reverse', 20, '⇄');
+
+          // 1. Comprar +2 (por cor - duas de cada)
+          addCard(c, 'draw2', 20, '+2');
+          addCard(c, 'draw2', 20, '+2');
+        }
+
+        // Cartas Coringa Especiais
+        // Coringa Clássico (4 cartas)
+        for (let i = 0; i < 4; i++) {
+          addCard('wild', 'wild', 50, '🎨');
+        }
+
+        // 2. Coringa Comprar +4 (4 cartas)
+        for (let i = 0; i < 4; i++) {
+          addCard('wild', 'wild4', 50, '+4');
+        }
+
+        // 3. Coringa Comprar o Baralho Todo (Ultra Carta - 2 cartas)
+        for (let i = 0; i < 2; i++) {
+          addCard('wild', 'wildAll', 100, 'TUDO');
+        }
+
+        // 4. Carta Trocar de Mão (Coringa Especial - 3 cartas)
+        for (let i = 0; i < 3; i++) {
+          addCard('wild', 'swapHands', 60, '🔄');
+        }
+
+        return this.shuffle(deck);
+      }
+
+      shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+    }
+
+    /* ==========================================================================
+       4. CONTROLADOR PRINCIPAL DO JOGO (GAME ENGINE)
+       ========================================================================== */
+    class UnoGame {
+      constructor() {
+        this.deckManager = new UnoDeckManager();
+        this.confetti = new ConfettiEffect('confettiCanvas');
+
+        // Estado do Jogo
+        this.drawPile = [];
+        this.discardPile = [];
+        this.playerHand = [];
+        this.robotHand = [];
+
+        this.currentColor = 'red';
+        this.currentTurn = 'player'; // 'player' ou 'robot'
+        this.isProcessingTurn = false;
+
+        // Regra do UNO
+        this.playerSaidUno = false;
+        this.unoTimer = null;
+        this.unoWindowSeconds = 4;
+        this.unoTimerInterval = null;
+
+        // Elementos do DOM
+        this.domPlayerHand = document.getElementById('playerHand');
+        this.domRobotCardsDisplay = document.getElementById('robotCardsDisplay');
+        this.domPlayerCount = document.getElementById('playerCardCount');
+        this.domRobotCount = document.getElementById('robotCardCount');
+        this.domDrawPileCount = document.getElementById('drawPileCount');
+        this.domDiscardPile = document.getElementById('discardPile');
+        this.domColorHalo = document.getElementById('colorHalo');
+        this.domActiveColorBadge = document.getElementById('activeColorBadge');
+        this.domActiveColorDot = document.getElementById('activeColorDot');
+        this.domActiveColorText = document.getElementById('activeColorText');
+        this.domAnnouncement = document.getElementById('announcementText');
+        this.domTurnDot = document.getElementById('turnDot');
+        this.domPlayerStatus = document.getElementById('playerStatus');
+        this.domRobotStatus = document.getElementById('robotStatus');
+        this.domRobotSpeech = document.getElementById('robotSpeech');
+        this.domRobotAvatar = document.getElementById('robotAvatar');
+
+        // Botão UNO
+        this.domBtnUno = document.getElementById('btnUno');
+        this.domUnoTimerBadge = document.getElementById('unoTimerBadge');
+
+        // Modais
+        this.domColorPicker = document.getElementById('colorPickerModal');
+        this.domHelpModal = document.getElementById('helpModal');
+        this.domVictoryModal = document.getElementById('victoryModal');
+        this.domToast = document.getElementById('toastAlert');
+        this.domToastMsg = document.getElementById('toastMsg');
+        this.domToastIcon = document.getElementById('toastIcon');
+
+        this.pendingWildCard = null; // Guarda a carta coringa pendente de escolha de cor
+
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        this.updateAudioButtonState();
+        this.startNewGame();
+      }
+
+      setupEventListeners() {
+        // Desbloqueia áudio ao primeiro toque/clique
+        const unlock = () => {
+          audio.initCtx();
+          window.removeEventListener('pointerdown', unlock);
+        };
+        window.addEventListener('pointerdown', unlock);
+
+        // Clique no Monte de Compras
+        document.getElementById('drawPile').addEventListener('click', () => {
+          if (this.currentTurn !== 'player' || this.isProcessingTurn) return;
+          this.handlePlayerDrawCard();
+        });
+
+        // Clique no Botão UNO!
+        this.domBtnUno.addEventListener('click', () => {
+          this.handlePlayerPressUno();
+        });
+
+        // Botões do Seletor de Cores
+        const colorBtns = this.domColorPicker.querySelectorAll('.btn-color-pick');
+        colorBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const chosen = btn.dataset.color;
+            this.confirmPlayerColorChoice(chosen);
+          });
+        });
+
+        // Controles do Topo
+        document.getElementById('btnSoundToggle').addEventListener('click', () => {
+          audio.toggleMute();
+          this.updateAudioButtonState();
+        });
+
+        document.getElementById('btnHelp').addEventListener('click', () => {
+          this.domHelpModal.classList.add('active');
+        });
+
+        document.getElementById('btnCloseHelp').addEventListener('click', () => {
+          this.domHelpModal.classList.remove('active');
+        });
+
+        document.getElementById('btnRestart').addEventListener('click', () => {
+          this.startNewGame();
+        });
+
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+          this.domVictoryModal.classList.remove('active');
+          this.startNewGame();
+        });
+      }
+
+      updateAudioButtonState() {
+        const icon = document.getElementById('soundIcon');
+        icon.textContent = audio.muted ? '🔇' : '🔊';
+      }
+
+      showToast(message, icon = '✨', durationMs = 2800) {
+        this.domToastMsg.textContent = message;
+        this.domToastIcon.textContent = icon;
+        this.domToast.classList.add('active');
+        clearTimeout(this.toastTimeout);
+        this.toastTimeout = setTimeout(() => {
+          this.domToast.classList.remove('active');
+        }, durationMs);
+      }
+
+      /* ==========================================================================
+         INÍCIO DE PARTIDA & DISTRIBUIÇÃO DAS CARTAS
+         ========================================================================== */
+      startNewGame() {
+        this.clearUnoTimer();
+        this.confetti.stop();
+        this.domVictoryModal.classList.remove('active');
+        this.domColorPicker.classList.remove('active');
+        this.pendingWildCard = null;
+        this.isProcessingTurn = false;
+        this.playerSaidUno = false;
+
+        // Gera e embaralha o baralho
+        this.drawPile = this.deckManager.generateFullDeck();
+        this.discardPile = [];
+        this.playerHand = [];
+        this.robotHand = [];
+
+        // Cada jogador começa com 7 cartas
+        for (let i = 0; i < 7; i++) {
+          this.playerHand.push(this.drawPile.pop());
+          this.robotHand.push(this.drawPile.pop());
+        }
+
+        // Pega uma carta inicial para a mesa que não seja Coringa especial
+        let initialCard = this.drawPile.pop();
+        while (initialCard.color === 'wild') {
+          this.drawPile.unshift(initialCard);
+          initialCard = this.drawPile.pop();
+        }
+
+        this.discardPile.push(initialCard);
+        this.currentColor = initialCard.color;
+        this.currentTurn = 'player'; // Jogador humano começa
+
+        audio.playVictory();
+        this.showToast('Nova partida iniciada! Boa sorte, campeão! 🎈', '🎉');
+
+        this.render();
+      }
+
+      // Garante que o monte de compras nunca fique sem cartas
+      ensureDrawPileHasCards(minimum = 10) {
+        if (this.drawPile.length < minimum) {
+          // Recicla a pilha de descarte
+          const topCard = this.discardPile.pop();
+          const recycled = this.deckManager.shuffle(this.discardPile);
+          this.discardPile = [topCard];
+          this.drawPile = this.drawPile.concat(recycled);
+
+          // Se ainda for insuficiente (ex: após um +30 cartas), gera um lote novo
+          if (this.drawPile.length < minimum) {
+            const extraDeck = this.deckManager.generateFullDeck();
+            this.drawPile = this.drawPile.concat(extraDeck);
+          }
+        }
+      }
+
+      /* ==========================================================================
+         REGRAS DE VALIDAÇÃO: UMA CARTA PODE SER JOGADA?
+         ========================================================================== */
+      isCardPlayable(card) {
+        if (!card) return false;
+        // Qualquer Coringa ou Especial é sempre jogável
+        if (card.color === 'wild') return true;
+
+        const topCard = this.getTopDiscardCard();
+        if (!topCard) return true;
+
+        // Mesma cor atual da mesa
+        if (card.color === this.currentColor) return true;
+
+        // Mesmo número ou mesmo símbolo da carta do topo
+        if (card.value === topCard.value && card.type === topCard.type) return true;
+        if (card.type === 'number' && topCard.type === 'number' && card.value === topCard.value) return true;
+
+        return false;
+      }
+
+      getTopDiscardCard() {
+        return this.discardPile[this.discardPile.length - 1];
+      }
+
+      /* ==========================================================================
+         AÇÃO DO JOGADOR HUMANO
+         ========================================================================== */
+      handleCardClick(cardIndex) {
+        if (this.currentTurn !== 'player' || this.isProcessingTurn) return;
+
+        const card = this.playerHand[cardIndex];
+        if (!this.isCardPlayable(card)) {
+          audio.playPenalty();
+          this.showToast('Esta carta não combina! Jogue da mesma cor, número ou um Coringa.', '⚠️');
+          const cardEls = this.domPlayerHand.querySelectorAll('.uno-card');
+          if (cardEls[cardIndex]) {
+            cardEls[cardIndex].classList.add('shake');
+            setTimeout(() => cardEls[cardIndex]?.classList.remove('shake'), 450);
+          }
+          return;
+        }
+
+        // Executa o lance da carta
+        this.isProcessingTurn = true;
+        this.playerHand.splice(cardIndex, 1);
+
+        // Se a carta for Coringa ou ação especial coringa, abre seletor de cores
+        if (card.color === 'wild') {
+          this.pendingWildCard = card;
+          this.domColorPicker.classList.add('active');
+          audio.playActionZap();
+          return;
+        }
+
+        // Carta colorida normal
+        this.playCardToDiscard(card, card.color, 'player');
+      }
+
+      confirmPlayerColorChoice(chosenColor) {
+        if (!this.pendingWildCard) return;
+
+        this.domColorPicker.classList.remove('active');
+        const card = this.pendingWildCard;
+        this.pendingWildCard = null;
+
+        this.playCardToDiscard(card, chosenColor, 'player');
+      }
+
+      handlePlayerDrawCard() {
+        audio.playDraw();
+        this.ensureDrawPileHasCards(1);
+        const drawn = this.drawPile.pop();
+        this.playerHand.push(drawn);
+
+        // Verifica se a carta comprada já pode ser jogada na hora
+        if (this.isCardPlayable(drawn)) {
+          this.showToast('Você comprou uma carta boa! Pode jogá-la agora.', '💡');
+        } else {
+          this.showToast('Você comprou 1 carta. Vez do Robô!', '⏭️');
+          this.render();
+          this.passTurnTo('robot', 900);
+          return;
+        }
+
+        this.render();
+      }
+
+      /* ==========================================================================
+         EXECUÇÃO DE JOGADA E EFEITOS ESPECIAIS
+         ========================================================================== */
+      playCardToDiscard(card, assignedColor, actor) {
+        this.discardPile.push(card);
+        this.currentColor = assignedColor;
+        audio.playCardPlay();
+
+        // Verifica a regra do UNO para quem jogou
+        this.checkUnoRuleAfterPlay(actor);
+
+        // Verifica condição de vitória imediata
+        if (actor === 'player' && this.playerHand.length === 0) {
+          this.handleGameOver('player');
+          return;
+        }
+        if (actor === 'robot' && this.robotHand.length === 0) {
+          this.handleGameOver('robot');
+          return;
+        }
+
+        // Aplica o efeito especial da carta jogada
+        this.resolveCardEffect(card, actor);
+      }
+
+      resolveCardEffect(card, actor) {
+        const opponent = actor === 'player' ? 'robot' : 'player';
+
+        switch (card.type) {
+          case 'skip':
+          case 'reverse': // No 1 contra 1, Inverter atua como Bloqueio!
+            audio.playActionZap();
+            this.showToast(`${actor === 'player' ? 'Você' : 'O Robô'} bloqueou a vez do adversário! Jogue de novo!`, '🚫');
+            this.render();
+            // Mantém a vez com quem jogou a carta
+            if (actor === 'player') {
+              this.isProcessingTurn = false;
+            } else {
+              setTimeout(() => this.executeRobotTurn(), 1200);
+            }
+            break;
+
+          case 'draw2':
+            audio.playActionZap();
+            this.showToast(`+2 cartas para ${opponent === 'player' ? 'você' : 'o Robô'}!`, '➕');
+            this.giveCardsTo(opponent, 2, () => {
+              // Adversário compra e perde a vez: quem jogou continua
+              if (actor === 'player') {
+                this.isProcessingTurn = false;
+                this.render();
+              } else {
+                this.render();
+                setTimeout(() => this.executeRobotTurn(), 1200);
+              }
+            });
+            break;
+
+          case 'wild4':
+            audio.playActionZap();
+            this.showToast(`Coringa +4! ${opponent === 'player' ? 'Você' : 'O Robô'} compra 4 cartas!`, '💥');
+            this.giveCardsTo(opponent, 4, () => {
+              if (actor === 'player') {
+                this.isProcessingTurn = false;
+                this.render();
+              } else {
+                this.render();
+                setTimeout(() => this.executeRobotTurn(), 1200);
+              }
+            });
+            break;
+
+          case 'wild15':
+            audio.playSuper15();
+            this.showToast(`SUPER CARTA +15! Chuva de cartas para ${opponent === 'player' ? 'você' : 'o Robô'}!`, '🌟', 3500);
+            this.triggerCardFlightAnimation(15);
+            this.giveCardsTo(opponent, 15, () => {
+              if (actor === 'player') {
+                this.isProcessingTurn = false;
+                this.render();
+              } else {
+                this.render();
+                setTimeout(() => this.executeRobotTurn(), 1500);
+              }
+            });
+            break;
+
+          case 'wildAll':
+            audio.playAllDeck();
+            this.showToast(`ULTRA CARTA! O BARALHO TODO para ${opponent === 'player' ? 'você' : 'o Robô'}!`, '⚡', 4000);
+            this.triggerCardFlightAnimation(25);
+            this.giveCardsTo(opponent, 25, () => {
+              if (actor === 'player') {
+                this.isProcessingTurn = false;
+                this.render();
+              } else {
+                this.render();
+                setTimeout(() => this.executeRobotTurn(), 1600);
+              }
+            });
+            break;
+
+          case 'swapHands':
+            audio.playSwap();
+            this.showToast(`🔄 TROCA DE MÃO! Todas as cartas foram trocadas!`, '🔄', 3000);
+            // Troca imediata dos arrays de cartas
+            const temp = this.playerHand;
+            this.playerHand = this.robotHand;
+            this.robotHand = temp;
+            this.render();
+            // Passa a vez normalmente para o oponente
+            this.passTurnTo(opponent, 1200);
+            break;
+
+          case 'wild':
+          case 'number':
+          default:
+            this.render();
+            this.passTurnTo(opponent, 800);
+            break;
+        }
+      }
+
+      giveCardsTo(target, count, onComplete) {
+        this.ensureDrawPileHasCards(count + 2);
+
+        let drawn = 0;
+        const interval = setInterval(() => {
+          if (drawn < count) {
+            this.ensureDrawPileHasCards(1);
+            const c = this.drawPile.pop();
+            if (target === 'player') {
+              this.playerHand.push(c);
+            } else {
+              this.robotHand.push(c);
+            }
+            audio.playDraw();
+            drawn++;
+            this.render();
+          } else {
+            clearInterval(interval);
+            if (onComplete) onComplete();
+          }
+        }, Math.min(80, 800 / count));
+      }
+
+      triggerCardFlightAnimation(count = 10) {
+        const table = document.querySelector('.center-table');
+        if (!table) return;
+        const center = table.getBoundingClientRect();
+        for (let i = 0; i < Math.min(count, 12); i++) {
+          setTimeout(() => {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'flying-card-particle';
+            cardEl.style.left = `${center.left + center.width / 2 - 30}px`;
+            cardEl.style.top = `${center.top + center.height / 2 - 44}px`;
+            document.body.appendChild(cardEl);
+
+            const destY = this.currentTurn === 'player' ? 60 : window.innerHeight - 120;
+            const destX = center.left + (Math.random() - 0.5) * 300;
+
+            requestAnimationFrame(() => {
+              cardEl.style.transform = `translate(${destX - center.left}px, ${destY - center.top}px) rotate(${(Math.random() - 0.5) * 60}deg) scale(0.7)`;
+              cardEl.style.opacity = '0';
+            });
+
+            setTimeout(() => cardEl.remove(), 700);
+          }, i * 50);
+        }
+      }
+
+      passTurnTo(nextTurn, delayMs = 600) {
+        setTimeout(() => {
+          this.currentTurn = nextTurn;
+          this.isProcessingTurn = false;
+          this.render();
+
+          if (this.currentTurn === 'robot') {
+            this.executeRobotTurn();
+          }
+        }, delayMs);
+      }
+
+      /* ==========================================================================
+         REGRA E MECÂNICA DE GRITAR "UNO!"
+         ========================================================================== */
+      checkUnoRuleAfterPlay(actor) {
+        if (actor === 'player') {
+          // Jogador ficou com exatamente 1 carta
+          if (this.playerHand.length === 1) {
+            this.playerSaidUno = false;
+            this.startUnoTimerWindow();
+          } else {
+            this.clearUnoTimer();
+          }
+        } else {
+          // Robô ficou com exatamente 1 carta
+          if (this.robotHand.length === 1) {
+            setTimeout(() => {
+              audio.playUnoShout();
+              this.domRobotSpeech.classList.add('active');
+              setTimeout(() => this.domRobotSpeech.classList.remove('active'), 2500);
+            }, 400);
+          }
+        }
+      }
+
+      startUnoTimerWindow() {
+        this.clearUnoTimer();
+        this.domBtnUno.classList.add('alert');
+        let remaining = this.unoWindowSeconds;
+        this.domUnoTimerBadge.textContent = `${remaining}s`;
+
+        audio.playUnoShout();
+        this.showToast('Grite UNO rápido antes do tempo acabar!', '🚨', 3000);
+
+        this.unoTimerInterval = setInterval(() => {
+          remaining--;
+          if (remaining > 0) {
+            this.domUnoTimerBadge.textContent = `${remaining}s`;
+          } else {
+            this.handleUnoPenalty();
+          }
+        }, 1000);
+      }
+
+      handlePlayerPressUno() {
+        if (this.playerHand.length === 1 && !this.playerSaidUno) {
+          this.playerSaidUno = true;
+          this.clearUnoTimer();
+          audio.playUnoShout();
+          this.showToast('🎉 VOCÊ GRITOU UNO A TEMPO! Incrível!', '🔥', 3000);
+        } else if (this.playerHand.length > 1) {
+          audio.playPenalty();
+          this.showToast('Você só pode gritar UNO quando tiver 1 carta!', 'ℹ️');
+        }
+      }
+
+      handleUnoPenalty() {
+        this.clearUnoTimer();
+        if (this.playerHand.length === 1 && !this.playerSaidUno) {
+          audio.playPenalty();
+          this.showToast('Esqueceu de falar UNO! 🙈 Penalidade: +2 cartas!', '❌', 3500);
+          this.giveCardsTo('player', 2, () => {
+            this.render();
+          });
+        }
+      }
+
+      clearUnoTimer() {
+        if (this.unoTimerInterval) {
+          clearInterval(this.unoTimerInterval);
+          this.unoTimerInterval = null;
+        }
+        this.domBtnUno.classList.remove('alert');
+      }
+
+      /* ==========================================================================
+         INTELIGÊNCIA ARTIFICIAL DO ROBÔ (1,5S DE PENSAMENTO DIDÁTICO)
+         ========================================================================== */
+      executeRobotTurn() {
+        if (this.currentTurn !== 'robot' || this.isProcessingTurn) return;
+
+        this.domRobotStatus.textContent = 'Pensando na jogada... 🤔';
+        this.domRobotAvatar.classList.add('robot');
+
+        setTimeout(() => {
+          // 1. Procura cartas jogáveis na mão do robô
+          const playableCards = [];
+          this.robotHand.forEach((card, index) => {
+            if (this.isCardPlayable(card)) {
+              playableCards.push({ card, index });
+            }
+          });
+
+          // 2. Se tiver carta jogável, escolhe estrategicamente
+          if (playableCards.length > 0) {
+            // IA amigável: se tiver carta normal de número que sirva, 65% de chance de jogar número
+            // Guarda super cartas para quando tiver poucas opções
+            let chosen = playableCards[0];
+            const numberCards = playableCards.filter(p => p.card.type === 'number');
+            if (numberCards.length > 0 && Math.random() < 0.65) {
+              chosen = numberCards[Math.floor(Math.random() * numberCards.length)];
+            } else {
+              // Escolhe aleatoriamente entre as cartas válidas
+              chosen = playableCards[Math.floor(Math.random() * playableCards.length)];
+            }
+
+            // Remove da mão do robô
+            this.robotHand.splice(chosen.index, 1);
+            this.domRobotStatus.textContent = 'Jogou uma carta!';
+
+            let assignedColor = chosen.card.color;
+            if (chosen.card.color === 'wild') {
+              // Robô escolhe a cor que ele tem em maior quantidade
+              assignedColor = this.getRobotsBestColor();
+            }
+
+            this.playCardToDiscard(chosen.card, assignedColor, 'robot');
+          } else {
+            // 3. Não tem carta: compra 1 do monte
+            this.domRobotStatus.textContent = 'Sem carta! Comprando do monte...';
+            this.ensureDrawPileHasCards(1);
+            const drawn = this.drawPile.pop();
+            this.robotHand.push(drawn);
+            audio.playDraw();
+            this.render();
+
+            // Se a carta comprada servir, joga imediatamente
+            setTimeout(() => {
+              if (this.isCardPlayable(drawn)) {
+                this.robotHand.pop();
+                let assignedColor = drawn.color;
+                if (drawn.color === 'wild') {
+                  assignedColor = this.getRobotsBestColor();
+                }
+                this.showToast('O Robô comprou e jogou na hora!', '🤖');
+                this.playCardToDiscard(drawn, assignedColor, 'robot');
+              } else {
+                this.showToast('O Robô comprou 1 carta e passou a vez.', '⏭️');
+                this.passTurnTo('player', 700);
+              }
+            }, 800);
+          }
+        }, 1500); // 1.5s natural para a criança acompanhar
+      }
+
+      getRobotsBestColor() {
+        const counts = { red: 0, blue: 0, green: 0, yellow: 0 };
+        for (const card of this.robotHand) {
+          if (counts[card.color] !== undefined) {
+            counts[card.color]++;
+          }
+        }
+        let best = 'red';
+        let max = -1;
+        for (const c of ['red', 'blue', 'green', 'yellow']) {
+          if (counts[c] > max) {
+            max = counts[c];
+            best = c;
+          }
+        }
+        return best;
+      }
+
+      /* ==========================================================================
+         TELA DE FIM DE PARTIDA (VITÓRIA / REVANCHE)
+         ========================================================================== */
+      handleGameOver(winner) {
+        this.clearUnoTimer();
+        this.isProcessingTurn = true;
+
+        const titleEl = document.getElementById('victoryTitle');
+        const descEl = document.getElementById('victoryDesc');
+        const iconEl = document.getElementById('victoryIcon');
+
+        if (winner === 'player') {
+          audio.playVictory();
+          this.confetti.start(6000);
+          iconEl.textContent = '🏆';
+          titleEl.textContent = 'PARABÉNS, CAMPEÃO! VOCÊ VENCEU! 🎉';
+          titleEl.style.color = '#22c55e';
+          descEl.textContent = 'Sensacional! Você zerou todas as suas cartas e foi o grande vencedor do UNO Mania Kids!';
+        } else {
+          audio.playPenalty();
+          iconEl.textContent = '🤖';
+          titleEl.textContent = 'O Robô Amigo venceu desta vez!';
+          titleEl.style.color = '#f59e0b';
+          descEl.textContent = 'Foi uma partida super disputada e divertida! Que tal jogar de novo e buscar a revanche?';
+        }
+
+        setTimeout(() => {
+          this.domVictoryModal.classList.add('active');
+        }, 800);
+      }
+
+      /* ==========================================================================
+         RENDERIZAÇÃO VISUAL COMPLETA DA MESA E DAS CARTAS
+         ========================================================================== */
+      render() {
+        // Atualiza contadores numéricos
+        this.domPlayerCount.textContent = this.playerHand.length;
+        this.domRobotCount.textContent = this.robotHand.length;
+        this.domDrawPileCount.textContent = this.drawPile.length;
+
+        // Atualiza cor atual da mesa
+        const colorNames = { red: 'Vermelho', blue: 'Azul', green: 'Verde', yellow: 'Amarelo' };
+        this.domActiveColorText.textContent = colorNames[this.currentColor] || 'ESCOLHA';
+        this.domActiveColorDot.className = `color-dot ${this.currentColor}`;
+        this.domColorHalo.className = `color-halo ${this.currentColor}`;
+
+        // Atualiza status dos turnos
+        if (this.currentTurn === 'player') {
+          this.domPlayerStatus.textContent = '👉 Sua vez de jogar!';
+          this.domRobotStatus.textContent = 'Aguardando sua jogada...';
+          this.domAnnouncement.textContent = 'Sua vez! Jogue uma carta compatível ou compre no monte.';
+          this.domTurnDot.className = 'turn-indicator-dot';
+        } else {
+          this.domPlayerStatus.textContent = 'Aguarde o Robô...';
+          this.domAnnouncement.textContent = 'O Robô Amigo está jogando... 🤖';
+          this.domTurnDot.className = 'turn-indicator-dot computer';
+        }
+
+        // Renderiza carta do topo da Pilha de Descarte
+        const topCard = this.getTopDiscardCard();
+        // Limpa carta anterior
+        const existingCardEl = this.domDiscardPile.querySelector('.uno-card');
+        if (existingCardEl) existingCardEl.remove();
+
+        if (topCard) {
+          const cardEl = this.createCardDOM(topCard, false);
+          this.domDiscardPile.appendChild(cardEl);
+        }
+
+        // Renderiza as cartas da mão do Robô (versos compactos)
+        this.domRobotCardsDisplay.innerHTML = '';
+        const robotCount = this.robotHand.length;
+        for (let i = 0; i < robotCount; i++) {
+          const backEl = document.createElement('div');
+          backEl.className = 'card-back-mini';
+          backEl.innerHTML = `<div class="card-back-mini-oval">UNO</div>`;
+          this.domRobotCardsDisplay.appendChild(backEl);
+        }
+
+        // Renderiza as cartas na mão do Jogador Humano
+        this.domPlayerHand.innerHTML = '';
+        this.playerHand.forEach((card, index) => {
+          const cardEl = this.createCardDOM(card, true);
+
+          cardEl.addEventListener('click', () => {
+            this.handleCardClick(index);
+          });
+
+          this.domPlayerHand.appendChild(cardEl);
+        });
+      }
+
+      // Constrói o HTML estilizado e detalhado de uma carta do UNO
+      createCardDOM(card, isInteractive = false) {
+        const cardEl = document.createElement('div');
+
+        let specialClass = '';
+        if (card.type === 'wildAll') specialClass = 'wild-all';
+        else if (card.type === 'swapHands') specialClass = 'wild-swap';
+
+        cardEl.className = `uno-card ${card.color} ${specialClass} ${isInteractive ? 'interactive' : ''}`;
+
+        let innerContent = '';
+
+        if (card.color === 'wild') {
+          // Quadrantes do Coringa
+          innerContent = `
+            <div class="card-corner top-left">${card.label}</div>
+            <div class="card-center-oval">
+              <div class="wild-quadrant">
+                <div class="quad-red"></div>
+                <div class="quad-blue"></div>
+                <div class="quad-yellow"></div>
+                <div class="quad-green"></div>
+              </div>
+              <div class="card-symbol-wild">${card.label}</div>
+            </div>
+            <div class="card-corner bottom-right">${card.label}</div>
+          `;
+        } else {
+          // Carta colorida comum ou ação
+          innerContent = `
+            <div class="card-corner top-left">${card.label}</div>
+            <div class="card-center-oval">
+              <div class="card-symbol">${card.label}</div>
+            </div>
+            <div class="card-corner bottom-right">${card.label}</div>
+          `;
+        }
+
+        cardEl.innerHTML = innerContent;
+        return cardEl;
+      }
+    }
+
+    // Inicialização da Aplicação após carregamento do DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      window.unoApp = new UnoGame();
+    });
+  </script>
+</body>
+</html>

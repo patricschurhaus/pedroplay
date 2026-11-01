@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Comissário de Bordo: Simulador de Cabine</title>
+  <style>
+    /* ==========================================================================
+       RESET E DESIGN ELEGANTE, TRANQUILO E DIVERTIDO
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --bg-dark: #080c14;
+      --panel-bg: rgba(14, 20, 34, 0.94);
+      --panel-border: rgba(255, 255, 255, 0.16);
+      --gold-vip: #fbbf24;
+      --gold-glow: rgba(251, 191, 36, 0.6);
+      --blue-eco: #38bdf8;
+      --green-ok: #22c55e;
+      --red-err: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: var(--font-family);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #gameWrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      max-width: 100vw;
+      max-height: 100vh;
+      object-fit: contain;
+      display: block;
+      background: #070b12;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+
+    /* ==========================================================================
+       HUD SUPERIOR
+       ========================================================================== */
+    #topHUD {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .hud-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      pointer-events: auto;
+    }
+
+    .hud-title-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hud-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Placar de Pontos (Aceita valores negativos) */
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .score-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .score-val {
+      font-size: 1.4rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .score-val.positive { color: #4ade80; }
+    .score-val.negative { color: #f87171; }
+
+    /* Rastreador de Voo */
+    .flight-tracker {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 220px;
+    }
+
+    .flight-route {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .flight-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .flight-bar-progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 4px;
+      transition: width 0.5s linear;
+    }
+
+    .flight-plane-icon {
+      position: absolute;
+      top: -7px;
+      left: 0%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      transition: left 0.5s linear;
+      filter: drop-shadow(0 0 4px #38bdf8);
+    }
+
+    /* Botões Auxiliares do HUD */
+    .hud-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      pointer-events: auto;
+    }
+
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .hud-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* ==========================================================================
+       RODAPÉ VISUAL COM A BANDEJA INSTANTÂNEA E TECLAS DE REFERÊNCIA
+       ========================================================================== */
+    #bottomDock {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 15, 26, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 18px;
+      padding: 8px 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      z-index: 30;
+      pointer-events: auto;
+    }
+
+    .dock-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-right: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .dock-title span {
+      color: #38bdf8;
+      font-size: 0.82rem;
+    }
+
+    .tray-item-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #fff;
+      transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+      touch-action: manipulation;
+    }
+
+    .tray-item-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
+    }
+
+    .tray-item-btn:active, .tray-item-btn.triggered {
+      transform: translateY(1px) scale(0.96);
+      background: rgba(56, 189, 248, 0.4);
+      border-color: #fff;
+    }
+
+    .key-badge {
+      background: #0f172a;
+      border: 1.5px solid #38bdf8;
+      border-bottom: 2.5px solid #0284c7;
+      color: #38bdf8;
+      font-size: 0.92rem;
+      font-weight: 900;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .tray-item-icon {
+      font-size: 1.5rem;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    }
+
+    .tray-item-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* ==========================================================================
+       MODAL DE POUSO / RESUMO DO VOO
+       ========================================================================== */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 9, 16, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .summary-card {
+      background: #141c2c;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .summary-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+
+    .summary-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 10px 0;
+    }
+
+    .summary-stat-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-stat-lbl {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .summary-stat-val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .btn-action-primary {
+      background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-action-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* Controles de Toque na Tela para Mobile / Tablet */
+    #mobileMovement {
+      position: absolute;
+      bottom: 84px;
+      left: 16px;
+      display: none;
+      gap: 12px;
+      pointer-events: auto;
+      z-index: 25;
+    }
+
+    .touch-btn {
+      width: 56px;
+      height: 56px;
+      background: rgba(16, 23, 38, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      touch-action: manipulation;
+    }
+
+    .touch-btn:active {
+      background: rgba(56, 189, 248, 0.4);
+      transform: scale(0.94);
+    }
+
+    @media (pointer: coarse) {
+      #mobileMovement {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .flight-tracker { display: none; }
+      #bottomDock {
+        padding: 6px 10px;
+        gap: 6px;
+        width: 96vw;
+        justify-content: space-around;
+      }
+      .tray-item-name { display: none; }
+      .tray-item-btn { padding: 6px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gameWrapper">
+    <!-- CANVAS PRINCIPAL DO JOGO -->
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+
+    <!-- HUD SUPERIOR -->
+    <header id="topHUD">
+      <div class="hud-card">
+        <div class="hud-title-box">
+          <span class="hud-title">✈️ AeroVoo 702</span>
+          <span class="hud-subtitle">Comissário de Bordo (Voo Tranquilo)</span>
+        </div>
+      </div>
+
+      <!-- Placar do Jogo (Aceita valores negativos: 0, -1, -2...) -->
+      <div class="hud-card">
+        <div class="score-badge">
+          <span class="score-label">Pontos</span>
+          <span class="score-val" id="scoreDisplay">0</span>
+        </div>
+      </div>
+
+      <!-- Rastreador de Voo -->
+      <div class="hud-card flight-tracker">
+        <div class="flight-route">
+          <span>GRU (São Paulo)</span>
+          <span id="flightTimerDisplay">03:00</span>
+          <span>CDG (Paris)</span>
+        </div>
+        <div class="flight-bar-bg">
+          <div class="flight-bar-progress" id="flightProgress"></div>
+          <span class="flight-plane-icon" id="flightPlaneIcon">✈️</span>
+        </div>
+      </div>
+
+      <!-- Botões de Ação do HUD -->
+      <div class="hud-card" style="padding: 6px 10px; gap: 6px;">
+        <button class="hud-btn" id="btnAudioToggle" title="Ligar/Desligar Som">
+          <span id="audioIcon">🔊</span>
+        </button>
+        <button class="hud-btn" id="btnHelpToggle" title="Ajuda & Teclas">
+          <span>❓</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- BOTÕES DIRECIONAIS TOUCH PARA CELULAR/TABLET -->
+    <div id="mobileMovement">
+      <button class="touch-btn" id="btnTouchLeft">◀</button>
+      <button class="touch-btn" id="btnTouchRight">▶</button>
+    </div>
+
+    <!-- RODAPÉ VISUAL: BANDEJA INSTANTÂNEA COM 5 ITENS & TECLAS GRANDES -->
+    <div id="bottomDock">
+      <div class="dock-title">
+        <span>BANDEJA</span>
+        PRONTA
+      </div>
+      <button class="tray-item-btn" data-key="b" id="btnServeB">
+        <div class="key-badge">B</div>
+        <span class="tray-item-icon">🍬</span>
+        <span class="tray-item-name">Balinha</span>
+      </button>
+      <button class="tray-item-btn" data-key="c" id="btnServeC">
+        <div class="key-badge">C</div>
+        <span class="tray-item-icon">☕</span>
+        <span class="tray-item-name">Café</span>
+      </button>
+      <button class="tray-item-btn" data-key="l" id="btnServeL">
+        <div class="key-badge">L</div>
+        <span class="tray-item-icon">🥪</span>
+        <span class="tray-item-name">Lanche</span>
+      </button>
+      <button class="tray-item-btn" data-key="s" id="btnServeS">
+        <div class="key-badge">S</div>
+        <span class="tray-item-icon">🥨</span>
+        <span class="tray-item-name">Snack</span>
+      </button>
+      <button class="tray-item-btn" data-key="r" id="btnServeR">
+        <div class="key-badge">R</div>
+        <span class="tray-item-icon">🥤</span>
+        <span class="tray-item-name">Bebida</span>
+      </button>
+    </div>
+
+    <!-- MODAL DE RESUMO DO VOO (POUSO) -->
+    <div class="modal-overlay" id="flightSummaryModal">
+      <div class="summary-card">
+        <h2 class="summary-title">🛬 Voo Pousou em Paris com Sucesso!</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem;">
+          Excelente atendimento e voo super tranquilo! Veja os resultados a bordo:
+        </p>
+
+        <div class="summary-stats-grid">
+          <div class="summary-stat-box">
+            <span class="summary-stat-lbl">Pontuação Final</span>
+            <span class="summary-stat-val" id="summaryFinalScore">0</span>
+          </div>
+          <div class="summary-stat-box">
+            <span class="summary-stat-lbl">Atendimentos Felizes</span>
+            <span class="summary-stat-val" id="summaryPerfect">0</span>
+          </div>
+          <div class="summary-stat-box">
+            <span class="summary-stat-lbl">VIPs Primeira Classe</span>
+            <span class="summary-stat-val" id="summaryVIPServed">0</span>
+          </div>
+          <div class="summary-stat-box">
+            <span class="summary-stat-lbl">Pilotos Atendidos</span>
+            <span class="summary-stat-val" id="summaryPilots">0</span>
+          </div>
+        </div>
+
+        <button class="btn-action-primary" id="btnRestartFlight">
+          <span>✈️</span> Decolar em Novo Voo
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL DE AJUDA & REGRAS -->
+    <div class="modal-overlay" id="helpModal">
+      <div class="summary-card" style="text-align: left; max-width: 520px;">
+        <h2 class="summary-title" style="text-align: center;">Comissário de Bordo: Manual Calmo</h2>
+        <div style="font-size: 0.84rem; line-height: 1.55; color: #cbd5e1; display: flex; flex-direction: column; gap: 10px;">
+          <p><strong>☁️ Voo Calmo e Tranquilo:</strong> Agora a barra de paciência dos passageiros desce bem devagar! Você tem tempo de sobra para andar com calma e olhar cada pedido.</p>
+          <p><strong>🍬 Tecla B:</strong> Balinha &bull; <strong>☕ Tecla C:</strong> Café &bull; <strong>🥪 Tecla L:</strong> Lanche &bull; <strong>🥨 Tecla S:</strong> Snack &bull; <strong>🥤 Tecla R:</strong> Bebida.</p>
+          <p><strong>🚶 Ande com calma:</strong> Aproxime-se do passageiro, veja o desenho e pressione a letra correspondente para entregar.</p>
+          <p><strong>👑 Primeira Classe (VIP):</strong> Entrega certa dá <strong>+10 pontos</strong>!</p>
+          <p><strong>✈️ Classe Econômica:</strong> Entrega certa dá <strong>+5 pontos</strong>. Erro ou tempo esgotado desconta <strong>-1 ponto</strong> (o placar aceita negativos).</p>
+          <p><strong>👨‍✈️ Cabine dos Pilotos (Frente):</strong> Os pilotos estão voando tranquilos! Na maioria das vezes estarão apenas curtindo o céu calmo e darão um "joia" 👍. De vez em quando, pedirão um café [C] ou pãozinho [L/S], rendendo <strong>+5 pontos</strong>!</p>
+          <p><strong>◀ ▶ Setas nas Bordas:</strong> Indicam onde há passageiros chamando fora da visão da tela.</p>
+        </div>
+        <button class="btn-action-primary" id="btnCloseHelp">Voltar ao Voo Tranquilo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT COMPLETO EMBUTIDO -->
+  <script>
+    /* ==========================================================================
+       1. MOTOR DE ÁUDIO SINTETIZADO (WEB AUDIO API - ZERO ARQUIVOS EXTERNOS)
+       ========================================================================== */
+    class FlightSoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.turbineGainNode = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+            this.startTurbineAmbience();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      startTurbineAmbience() {
+        if (!this.ctx || this.turbineGainNode) return;
+        try {
+          const bufferSize = this.ctx.sampleRate * 2;
+          const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const output = noiseBuffer.getChannelData(0);
+          let b0 = 0, b1 = 0, b2 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99 * b0 + white * 0.05;
+            b1 = 0.95 * b1 + white * 0.1;
+            b2 = 0.85 * b2 + white * 0.25;
+            output[i] = (b0 + b1 + b2) * 0.12;
+          }
+
+          const whiteNoise = this.ctx.createBufferSource();
+          whiteNoise.buffer = noiseBuffer;
+          whiteNoise.loop = true;
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(140, this.ctx.currentTime);
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(85, this.ctx.currentTime);
+
+          const turbineGain = this.ctx.createGain();
+          turbineGain.gain.setValueAtTime(this.muted ? 0 : 0.08, this.ctx.currentTime);
+
+          whiteNoise.connect(filter);
+          filter.connect(turbineGain);
+          osc.connect(turbineGain);
+          turbineGain.connect(this.ctx.destination);
+
+          whiteNoise.start();
+          osc.start();
+          this.turbineGainNode = turbineGain;
+        } catch (e) {
+          console.warn('Turbine sound setup ignored', e);
+        }
+      }
+
+      playCabinChime() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const gain1 = this.ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(698.46, t);
+        gain1.gain.setValueAtTime(0.2, t);
+        gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+        osc1.connect(gain1);
+        gain1.connect(this.ctx.destination);
+        osc1.start(t);
+        osc1.stop(t + 0.55);
+
+        const osc2 = this.ctx.createOscillator();
+        const gain2 = this.ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(523.25, t + 0.16);
+        gain2.gain.setValueAtTime(0.18, t + 0.16);
+        gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+        osc2.connect(gain2);
+        gain2.connect(this.ctx.destination);
+        osc2.start(t + 0.16);
+        osc2.stop(t + 0.8);
+      }
+
+      playDeliverItem() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(350, t);
+        osc.frequency.linearRampToValueAtTime(750, t + 0.08);
+
+        gain.gain.setValueAtTime(0.15, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.08);
+      }
+
+      playSuccess(isVIP) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const notes = isVIP ? [523.25, 659.25, 783.99, 1046.50] : [440, 554.37, 659.25];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t + idx * 0.08);
+          gain.gain.setValueAtTime(0.18, t + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.08 + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t + idx * 0.08);
+          osc.stop(t + idx * 0.08 + 0.35);
+        });
+      }
+
+      playError() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc1.type = 'sawtooth';
+        osc2.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(160, t);
+        osc2.frequency.setValueAtTime(168, t);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc1.start(t);
+        osc2.start(t);
+        osc1.stop(t + 0.28);
+        osc2.stop(t + 0.28);
+      }
+
+      playPilotRadio() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1250, t);
+        osc.frequency.setValueAtTime(850, t + 0.05);
+
+        gain.gain.setValueAtTime(0.1, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        if (this.turbineGainNode && this.ctx) {
+          this.turbineGainNode.gain.setValueAtTime(this.muted ? 0 : 0.08, this.ctx.currentTime);
+        }
+        return this.muted;
+      }
+    }
+
+    const sound = new FlightSoundEngine();
+
+    /* ==========================================================================
+       2. DEFINIÇÃO DOS 5 ITENS INSTANTÂNEOS DA BANDEJA
+       ========================================================================== */
+    const TRAY_ITEMS = {
+      b: { key: 'b', code: 'KeyB', name: 'Balinha', icon: '🍬', color: '#ec4899' },
+      c: { key: 'c', code: 'KeyC', name: 'Café', icon: '☕', color: '#92400e' },
+      l: { key: 'l', code: 'KeyL', name: 'Lanche', icon: '🥪', color: '#eab308' },
+      s: { key: 's', code: 'KeyS', name: 'Snack', icon: '🥨', color: '#f97316' },
+      r: { key: 'r', code: 'KeyR', name: 'Bebida', icon: '🥤', color: '#06b6d4' }
+    };
+
+    /* ==========================================================================
+       3. SIMULADOR DE CABINE TRANQUILO E EQUILIBRADO (CANVAS ENGINE)
+       ========================================================================== */
+    class NinjaFlightSimulator {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        // Dimensões do Mundo Virtual
+        this.worldWidth = 2600;
+        this.worldHeight = 720;
+        this.floorY = 560;
+
+        // Câmera
+        this.cameraX = 500;
+
+        // Jogador (Comissário Ágil e Preciso)
+        this.player = {
+          x: 1200,
+          y: this.floorY,
+          vx: 0,
+          speed: 480, // Movimentação confortável e rápida
+          facing: 1,
+          isWalking: false,
+          walkFrame: 0,
+          targetX: null
+        };
+
+        // Controles de Teclado
+        this.keys = { left: false, right: false };
+
+        // Pontuação e Progresso
+        this.score = 0;
+        this.flightDuration = 180; // 3 minutos de voo
+        this.flightTimeRemaining = this.flightDuration;
+        this.flightEnded = false;
+        this.stats = { perfect: 0, vipServed: 0, pilotsServed: 0 };
+
+        // Nuvens no Horizonte
+        this.clouds = [];
+        for (let i = 0; i < 24; i++) {
+          this.clouds.push({
+            x: Math.random() * this.worldWidth,
+            y: 80 + Math.random() * 220,
+            scale: 0.5 + Math.random() * 0.8,
+            speed: 40 + Math.random() * 45
+          });
+        }
+
+        // Passageiros do Avião
+        this.passengers = [
+          // Primeira Classe (VIP)
+          { id: 1, name: 'Dra. Helena', classType: 'vip', x: 620, seatNum: '1A', color: '#c084fc', order: null, eatingTimer: 0 },
+          { id: 2, name: 'Sr. Arthur', classType: 'vip', x: 790, seatNum: '2A', color: '#fbbf24', order: null, eatingTimer: 0 },
+          { id: 3, name: 'Clara VIP', classType: 'vip', x: 960, seatNum: '3A', color: '#f43f5e', order: null, eatingTimer: 0 },
+
+          // Classe Econômica
+          { id: 4, name: 'Léo', classType: 'eco', x: 1220, seatNum: '10A', color: '#38bdf8', order: null, eatingTimer: 0 },
+          { id: 5, name: 'Mariana', classType: 'eco', x: 1370, seatNum: '11A', color: '#34d399', order: null, eatingTimer: 0 },
+          { id: 6, name: 'Sr. Carlos', classType: 'eco', x: 1520, seatNum: '12A', color: '#fb923c', order: null, eatingTimer: 0 },
+          { id: 7, name: 'Sofia', classType: 'eco', x: 1670, seatNum: '13A', color: '#a78bfa', order: null, eatingTimer: 0 },
+          { id: 8, name: 'Lucas', classType: 'eco', x: 1820, seatNum: '14A', color: '#facc15', order: null, eatingTimer: 0 }
+        ];
+
+        // Pilotos (Cockpit) - Moderados e Calmos
+        this.pilots = {
+          x: 230,
+          requestedItem: null, // 'c' ou 'l' ou 's'
+          patience: 35,
+          maxPatience: 35,
+          cooldown: 45, // Pilotos começam em voo calmo por pelo menos 45s
+          servedAnimation: 0
+        };
+
+        // Temporizador de pedidos de passageiros
+        this.orderTimer = 4;
+
+        // Notificações Flutuantes (+10, +5, -1)
+        this.floatingTexts = [];
+
+        // Elementos de UI
+        this.scoreDisplay = document.getElementById('scoreDisplay');
+        this.flightProgress = document.getElementById('flightProgress');
+        this.flightPlaneIcon = document.getElementById('flightPlaneIcon');
+        this.flightTimerDisplay = document.getElementById('flightTimerDisplay');
+        this.flightSummaryModal = document.getElementById('flightSummaryModal');
+        this.helpModal = document.getElementById('helpModal');
+
+        this.lastTime = performance.now();
+        this.initEventListeners();
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      initEventListeners() {
+        // Áudio ao primeiro clique
+        const unlockAudio = () => {
+          sound.init();
+          window.removeEventListener('pointerdown', unlockAudio);
+          window.removeEventListener('keydown', unlockAudio);
+        };
+        window.addEventListener('pointerdown', unlockAudio);
+        window.addEventListener('keydown', unlockAudio);
+
+        // Teclado (Movimento e Entrega Instantânea)
+        window.addEventListener('keydown', (e) => {
+          if (e.repeat) return;
+          const k = e.key.toLowerCase();
+
+          // Movimento
+          if (e.key === 'ArrowLeft' || k === 'a') this.keys.left = true;
+          if (e.key === 'ArrowRight' || k === 'd') this.keys.right = true;
+
+          // Teclas Rápidas de Entrega da Bandeja (B, C, L, S, R)
+          if (['b', 'c', 'l', 's', 'r'].includes(k)) {
+            this.triggerServeItem(k);
+          }
+
+          // Barra de Espaço para interagir com pilotos ou passageiro à frente
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            this.triggerSmartDeliver();
+          }
+
+          if (e.key === 'Escape') {
+            this.helpModal.classList.remove('active');
+          }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          const k = e.key.toLowerCase();
+          if (e.key === 'ArrowLeft' || k === 'a') this.keys.left = false;
+          if (e.key === 'ArrowRight' || k === 'd') this.keys.right = false;
+        });
+
+        // Botões da Bandeja Inferior
+        document.querySelectorAll('.tray-item-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const itemKey = btn.dataset.key;
+            this.triggerServeItem(itemKey);
+          });
+        });
+
+        // Clique no Canvas para andar até o ponto ou atender direto
+        this.canvas.addEventListener('pointerdown', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const scaleX = this.canvas.width / rect.width;
+          const clickX = (e.clientX - rect.left) * scaleX + this.cameraX;
+
+          // Se clicou diretamente em um passageiro com pedido
+          const targetPass = this.passengers.find(p => Math.abs(p.x - clickX) < 85 && p.order);
+          if (targetPass) {
+            if (Math.abs(this.player.x - targetPass.x) < 95) {
+              this.triggerServeItem(targetPass.order.itemKey);
+              return;
+            } else {
+              this.player.targetX = targetPass.x;
+              return;
+            }
+          }
+
+          // Se clicou nos pilotos
+          if (clickX < 420) {
+            if (this.pilots.requestedItem) {
+              if (Math.abs(this.player.x - 230) < 130) {
+                this.triggerServeItem(this.pilots.requestedItem);
+                return;
+              } else {
+                this.player.targetX = 230;
+                return;
+              }
+            } else {
+              // Pilotos tranquilos
+              this.player.targetX = 230;
+              return;
+            }
+          }
+
+          // Caminhada
+          this.player.targetX = Math.max(120, Math.min(2420, clickX));
+        });
+
+        // Botões Touch de Movimento
+        const btnLeft = document.getElementById('btnTouchLeft');
+        const btnRight = document.getElementById('btnTouchRight');
+        btnLeft.addEventListener('pointerdown', (e) => { e.preventDefault(); this.keys.left = true; });
+        btnLeft.addEventListener('pointerup', () => { this.keys.left = false; });
+        btnRight.addEventListener('pointerdown', (e) => { e.preventDefault(); this.keys.right = true; });
+        btnRight.addEventListener('pointerup', () => { this.keys.right = false; });
+
+        // HUD Buttons
+        document.getElementById('btnAudioToggle').addEventListener('click', () => {
+          const isMuted = sound.toggleMute();
+          document.getElementById('audioIcon').textContent = isMuted ? '🔇' : '🔊';
+        });
+
+        document.getElementById('btnHelpToggle').addEventListener('click', () => {
+          this.helpModal.classList.add('active');
+        });
+
+        document.getElementById('btnCloseHelp').addEventListener('click', () => {
+          this.helpModal.classList.remove('active');
+        });
+
+        document.getElementById('btnRestartFlight').addEventListener('click', () => {
+          this.restartFlight();
+        });
+      }
+
+      /* ==========================================================================
+         ENTREGA INSTANTÂNEA E VERIFICAÇÃO DE ITENS (B, C, L, S, R)
+         ========================================================================== */
+      triggerServeItem(itemKey) {
+        if (this.flightEnded) return;
+
+        // Efeito visual no botão da bandeja
+        const btn = document.querySelector(`.tray-item-btn[data-key="${itemKey}"]`);
+        if (btn) {
+          btn.classList.add('triggered');
+          setTimeout(() => btn.classList.remove('triggered'), 180);
+        }
+
+        sound.playDeliverItem();
+
+        // 1. Verifica se está no Cockpit (x < 420)
+        if (this.player.x < 420) {
+          if (this.pilots.requestedItem) {
+            if (this.pilots.requestedItem === itemKey) {
+              // Acerto para os Pilotos!
+              this.score += 5;
+              this.stats.pilotsServed++;
+              this.pilots.requestedItem = null;
+              this.pilots.cooldown = 60 + Math.random() * 30; // Longo descanso antes do próximo pedido
+              this.pilots.servedAnimation = 100;
+              this.addFloatingText('+5 PILOTOS AGRADECEM! 👍', this.player.x, this.player.y - 120, '#38bdf8');
+              sound.playPilotRadio();
+              sound.playSuccess(false);
+            } else {
+              // Tecla errada
+              this.score -= 1;
+              this.addFloatingText('-1 TECLA ERRADA!', this.player.x, this.player.y - 120, '#ef4444');
+              sound.playError();
+            }
+          } else {
+            // Pilotos estão tranquilos
+            this.addFloatingText('Pilotos: Voo 100% tranquilo! 👍', 230, this.floorY - 130, '#38bdf8');
+            sound.playPilotRadio();
+          }
+          return;
+        }
+
+        // 2. Verifica se está próximo a um Passageiro com pedido
+        const targetPass = this.passengers.find(p => Math.abs(p.x - this.player.x) < 95 && p.order);
+        if (targetPass) {
+          const isVIP = targetPass.classType === 'vip';
+
+          if (targetPass.order.itemKey === itemKey) {
+            // ACERTO PERFEITO TRANQUILO!
+            const pts = isVIP ? 10 : 5;
+            this.score += pts;
+            this.stats.perfect++;
+            if (isVIP) this.stats.vipServed++;
+
+            const txt = isVIP ? '+10 VIP PERFEITO!' : '+5 PERFEITO!';
+            const col = isVIP ? '#fbbf24' : '#22c55e';
+            this.addFloatingText(txt, targetPass.x, this.floorY - 140, col);
+
+            sound.playSuccess(isVIP);
+            targetPass.order = null;
+            targetPass.eatingTimer = 70; // Animação comendo
+          } else {
+            // TECLA ERRADA!
+            this.score -= 1;
+            this.addFloatingText('-1 TECLA ERRADA!', targetPass.x, this.floorY - 140, '#ef4444');
+            sound.playError();
+            targetPass.order = null;
+          }
+          return;
+        }
+
+        // Se apertou tecla sem ninguém por perto
+        this.addFloatingText('Ninguém chamando aqui!', this.player.x, this.player.y - 100, '#94a3b8');
+      }
+
+      // Entrega inteligente com barra de espaço
+      triggerSmartDeliver() {
+        if (this.player.x < 420) {
+          if (this.pilots.requestedItem) {
+            this.triggerServeItem(this.pilots.requestedItem);
+          } else {
+            this.addFloatingText('Piloto: Céu limpo e voo calmo! ✈️', 230, this.floorY - 130, '#38bdf8');
+            sound.playPilotRadio();
+          }
+          return;
+        }
+        const targetPass = this.passengers.find(p => Math.abs(p.x - this.player.x) < 95 && p.order);
+        if (targetPass) {
+          this.triggerServeItem(targetPass.order.itemKey);
+        }
+      }
+
+      /* ==========================================================================
+         GERAÇÃO DE PEDIDOS CALMA E TRANQUILA (BARRINHA LENTA)
+         ========================================================================== */
+      spawnOrder() {
+        const itemKeys = ['b', 'c', 'l', 's', 'r'];
+
+        // 1. Pilotos pedem BEM RARAMENTE (com cooldown de descanso e moderação)
+        if (this.pilots.cooldown <= 0 && !this.pilots.requestedItem && Math.random() < 0.12) {
+          // Intercala entre Café e Pãozinho / Lanche
+          const pilotOptions = ['c', 'l', 's'];
+          this.pilots.requestedItem = pilotOptions[Math.floor(Math.random() * pilotOptions.length)];
+          this.pilots.patience = 35; // 35 segundos super calmo para os pilotos
+          this.pilots.maxPatience = 35;
+          sound.playCabinChime();
+          return;
+        }
+
+        // 2. Limita a no máximo 2 pedidos ativos simultâneos para nunca sobrecarregar a criança
+        const activeCount = this.passengers.filter(p => p.order).length;
+        if (activeCount >= 2) {
+          this.orderTimer = 4;
+          return;
+        }
+
+        // Passageiro livre
+        const available = this.passengers.filter(p => !p.order && p.eatingTimer <= 0);
+        if (available.length === 0) return;
+
+        const target = available[Math.floor(Math.random() * available.length)];
+        const isVIP = target.classType === 'vip';
+        const chosenKey = itemKeys[Math.floor(Math.random() * itemKeys.length)];
+
+        // BARRINHA DE TEMPO BEM MAIS TRANQUILA E LENTA (24 a 32 segundos de sobra!)
+        const duration = isVIP ? (28 + Math.random() * 6) : (24 + Math.random() * 6);
+
+        target.order = {
+          itemKey: chosenKey,
+          item: TRAY_ITEMS[chosenKey],
+          patience: duration,
+          maxPatience: duration
+        };
+
+        sound.playCabinChime();
+      }
+
+      addFloatingText(text, x, y, color) {
+        this.floatingTexts.push({ text, x, y, color, life: 1.0 });
+      }
+
+      /* ==========================================================================
+         LOOP PRINCIPAL E ATUALIZAÇÃO
+         ========================================================================== */
+      gameLoop(timestamp) {
+        const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
+        this.lastTime = timestamp;
+
+        this.update(dt);
+        this.render();
+
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      update(dt) {
+        if (this.flightEnded) return;
+
+        // 1. Progresso do Voo
+        this.flightTimeRemaining -= dt;
+        const progressPct = Math.min(100, ((this.flightDuration - this.flightTimeRemaining) / this.flightDuration) * 100);
+        this.flightProgress.style.width = `${progressPct}%`;
+        this.flightPlaneIcon.style.left = `${progressPct}%`;
+
+        const mins = String(Math.floor(Math.max(0, this.flightTimeRemaining) / 60)).padStart(2, '0');
+        const secs = String(Math.floor(Math.max(0, this.flightTimeRemaining) % 60)).padStart(2, '0');
+        this.flightTimerDisplay.textContent = `${mins}:${secs}`;
+
+        if (this.flightTimeRemaining <= 0) {
+          this.endFlight();
+          return;
+        }
+
+        // 2. Movimento Ágil e Suave do Jogador
+        let moving = false;
+        this.player.vx = 0;
+
+        if (this.keys.left) {
+          this.player.vx = -this.player.speed;
+          this.player.facing = -1;
+          this.player.targetX = null;
+          moving = true;
+        } else if (this.keys.right) {
+          this.player.vx = this.player.speed;
+          this.player.facing = 1;
+          this.player.targetX = null;
+          moving = true;
+        } else if (this.player.targetX !== null) {
+          const diff = this.player.targetX - this.player.x;
+          if (Math.abs(diff) > 8) {
+            this.player.vx = Math.sign(diff) * this.player.speed;
+            this.player.facing = Math.sign(diff);
+            moving = true;
+          } else {
+            this.player.targetX = null;
+          }
+        }
+
+        this.player.x = Math.max(120, Math.min(2420, this.player.x + this.player.vx * dt));
+        this.player.isWalking = moving;
+        if (moving) this.player.walkFrame += dt * 14;
+
+        // 3. Câmera Suave
+        const targetCamX = Math.max(0, Math.min(this.worldWidth - this.canvas.width, this.player.x - this.canvas.width / 2));
+        this.cameraX += (targetCamX - this.cameraX) * 0.15;
+
+        // 4. Nuvens calmas passando pelas janelas
+        this.clouds.forEach(c => {
+          c.x -= c.speed * dt;
+          if (c.x < -150) c.x = this.worldWidth + 100;
+        });
+
+        // 5. Cooldown dos Pilotos
+        if (this.pilots.cooldown > 0) {
+          this.pilots.cooldown -= dt;
+        }
+
+        // 6. Ritmo Calmo de Pedidos
+        this.orderTimer -= dt;
+        if (this.orderTimer <= 0) {
+          this.spawnOrder();
+          this.orderTimer = 6 + Math.random() * 5; // Intervalo calmo de 6 a 11 segundos
+        }
+
+        // Paciência dos passageiros esvaziando bem devagar
+        this.passengers.forEach(p => {
+          if (p.eatingTimer > 0) p.eatingTimer -= dt * 60;
+          if (p.order) {
+            p.order.patience -= dt;
+            if (p.order.patience <= 0) {
+              // Tempo esgotado
+              this.addFloatingText('Tempo Esgotado! -1', p.x, this.floorY - 140, '#f87171');
+              this.score -= 1;
+              sound.playError();
+              p.order = null;
+            }
+          }
+        });
+
+        if (this.pilots.requestedItem) {
+          this.pilots.patience -= dt;
+          if (this.pilots.patience <= 0) {
+            this.addFloatingText('Pilotos Desapontados! -1', 230, this.floorY - 140, '#f87171');
+            this.score -= 1;
+            sound.playError();
+            this.pilots.requestedItem = null;
+            this.pilots.cooldown = 40;
+          }
+        }
+
+        if (this.pilots.servedAnimation > 0) {
+          this.pilots.servedAnimation -= dt * 60;
+        }
+
+        // 7. Textos Flutuantes
+        for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+          const ft = this.floatingTexts[i];
+          ft.y -= 40 * dt;
+          ft.life -= dt * 0.95;
+          if (ft.life <= 0) this.floatingTexts.splice(i, 1);
+        }
+
+        // 8. Placar
+        this.scoreDisplay.textContent = this.score;
+        this.scoreDisplay.className = `score-val ${this.score > 0 ? 'positive' : this.score < 0 ? 'negative' : ''}`;
+      }
+
+      endFlight() {
+        this.flightEnded = true;
+        document.getElementById('summaryFinalScore').textContent = this.score;
+        document.getElementById('summaryPerfect').textContent = this.stats.perfect;
+        document.getElementById('summaryVIPServed').textContent = this.stats.vipServed;
+        document.getElementById('summaryPilots').textContent = this.stats.pilotsServed;
+        this.flightSummaryModal.classList.add('active');
+        sound.playCabinChime();
+      }
+
+      restartFlight() {
+        this.score = 0;
+        this.flightTimeRemaining = this.flightDuration;
+        this.flightEnded = false;
+        this.stats = { perfect: 0, vipServed: 0, pilotsServed: 0 };
+        this.passengers.forEach(p => { p.order = null; p.eatingTimer = 0; });
+        this.pilots.requestedItem = null;
+        this.pilots.cooldown = 45;
+        this.player.x = 1200;
+        this.flightSummaryModal.classList.remove('active');
+      }
+
+      /* ==========================================================================
+         4. RENDERIZAÇÃO GRÁFICA DO AVIÃO E SETAS DE ALERTA
+         ========================================================================== */
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.ctx.save();
+        this.ctx.translate(-Math.floor(this.cameraX), 0);
+
+        // 1. Céu e Nuvens pelas Janelas
+        this.renderSkyAndClouds();
+
+        // 2. Estrutura do Avião
+        this.renderFuselageStructure();
+
+        // 3. Cabine dos Pilotos (Cockpit)
+        this.renderCockpit();
+
+        // 4. Cabine de Passageiros
+        this.renderCabinSections();
+
+        // 5. Cozinha / Galley
+        this.renderGalleyArea();
+
+        // 6. Comissário de Bordo
+        this.renderFlightAttendant();
+
+        // 7. Balões de Pedidos com Desenhos Grandes Sem Texto
+        this.renderOrderBubbles();
+
+        // 8. Efeitos e Textos Flutuantes
+        this.renderFloatingEffects();
+
+        this.ctx.restore();
+
+        // 9. SETAS INDICADORAS DE ALERTA NAS BORDAS DA TELA
+        this.renderOffScreenAlertArrows();
+      }
+
+      renderSkyAndClouds() {
+        const skyGrad = this.ctx.createLinearGradient(0, 0, 0, 420);
+        skyGrad.addColorStop(0, '#0284c7');
+        skyGrad.addColorStop(0.6, '#38bdf8');
+        skyGrad.addColorStop(1, '#bae6fd');
+        this.ctx.fillStyle = skyGrad;
+        this.ctx.fillRect(0, 80, this.worldWidth, 340);
+
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        this.clouds.forEach(c => {
+          this.ctx.beginPath();
+          this.ctx.arc(c.x, c.y, 25 * c.scale, 0, Math.PI * 2);
+          this.ctx.arc(c.x + 22 * c.scale, c.y - 12 * c.scale, 30 * c.scale, 0, Math.PI * 2);
+          this.ctx.arc(c.x + 50 * c.scale, c.y, 24 * c.scale, 0, Math.PI * 2);
+          this.ctx.fill();
+        });
+      }
+
+      renderFuselageStructure() {
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(0, 0, this.worldWidth, 120);
+
+        // LED azul neon
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.shadowColor = '#38bdf8';
+        this.ctx.shadowBlur = 12;
+        this.ctx.fillRect(0, 118, this.worldWidth, 4);
+        this.ctx.shadowBlur = 0;
+
+        // Molduras ovais de janelas
+        this.ctx.fillStyle = '#f1f5f9';
+        for (let x = 480; x < 2100; x += 150) {
+          this.ctx.save();
+          this.ctx.fillStyle = '#e2e8f0';
+          this.ctx.beginPath();
+          this.ctx.roundRect(x, 150, 70, 110, 35);
+          this.ctx.fill();
+          this.ctx.strokeStyle = '#94a3b8';
+          this.ctx.lineWidth = 6;
+          this.ctx.stroke();
+
+          this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+          this.ctx.beginPath();
+          this.ctx.moveTo(x + 10, 160);
+          this.ctx.lineTo(x + 50, 250);
+          this.ctx.lineTo(x + 40, 250);
+          this.ctx.lineTo(x + 5, 170);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+
+        // Bagageiros
+        this.ctx.fillStyle = '#334155';
+        this.ctx.fillRect(450, 122, 1550, 24);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        for (let bx = 450; bx < 2000; bx += 120) {
+          this.ctx.strokeRect(bx, 122, 120, 24);
+        }
+
+        // Piso e Carpete
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(0, 560, this.worldWidth, 160);
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(0, 568, this.worldWidth, 152);
+        this.ctx.fillStyle = '#0284c7';
+        this.ctx.fillRect(0, 570, this.worldWidth, 3);
+      }
+
+      renderCockpit() {
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(440, 120, 16, 440);
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.font = 'bold 10px sans-serif';
+        this.ctx.fillText('COCKPIT ✈️', 360, 140);
+
+        this.ctx.save();
+        this.ctx.fillStyle = '#090d16';
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, 80);
+        this.ctx.lineTo(440, 80);
+        this.ctx.lineTo(440, 560);
+        this.ctx.lineTo(0, 560);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Para-brisa frontal dos pilotos
+        const windGrad = this.ctx.createLinearGradient(30, 130, 280, 260);
+        windGrad.addColorStop(0, '#38bdf8');
+        windGrad.addColorStop(1, '#bae6fd');
+        this.ctx.fillStyle = windGrad;
+        this.ctx.beginPath();
+        this.ctx.moveTo(30, 140);
+        this.ctx.lineTo(260, 140);
+        this.ctx.lineTo(280, 270);
+        this.ctx.lineTo(50, 270);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#475569';
+        this.ctx.lineWidth = 8;
+        this.ctx.stroke();
+
+        // Nuvens frontais calmas
+        const t = performance.now() * 0.001;
+        const cloudX = 260 - ((t * 60) % 250);
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        this.ctx.beginPath();
+        this.ctx.arc(cloudX, 190, 20, 0, Math.PI * 2);
+        this.ctx.arc(cloudX + 18, 185, 26, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Painel e telas de voo
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(40, 280, 270, 130);
+        this.ctx.strokeStyle = '#0284c7';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(40, 280, 270, 130);
+
+        // Tela PFD
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(55, 295, 60, 50);
+        this.ctx.fillStyle = '#0284c7';
+        this.ctx.fillRect(55, 295, 60, 25);
+        this.ctx.fillStyle = '#854d0e';
+        this.ctx.fillRect(55, 320, 60, 25);
+        this.ctx.fillStyle = '#22c55e';
+        this.ctx.fillRect(75, 318, 20, 3);
+
+        // Tela Radar ND
+        this.ctx.fillStyle = '#022c22';
+        this.ctx.fillRect(135, 295, 60, 50);
+        this.ctx.strokeStyle = '#10b981';
+        this.ctx.beginPath();
+        this.ctx.arc(165, 320, 20, 0, Math.PI * 2);
+        this.ctx.stroke();
+        const radarAngle = t * 2.5;
+        this.ctx.beginPath();
+        this.ctx.moveTo(165, 320);
+        this.ctx.lineTo(165 + Math.cos(radarAngle) * 20, 320 + Math.sin(radarAngle) * 20);
+        this.ctx.stroke();
+
+        // LEDs piscando
+        for (let row = 0; row < 2; row++) {
+          for (let col = 0; col < 6; col++) {
+            const ledColor = (Math.sin(t * 3 + col + row) > 0) ? '#22c55e' : (col % 2 === 0 ? '#eab308' : '#ef4444');
+            this.ctx.fillStyle = ledColor;
+            this.ctx.beginPath();
+            this.ctx.arc(220 + col * 12, 305 + row * 18, 3, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
+        }
+
+        // Manches
+        this.ctx.fillStyle = '#334155';
+        this.ctx.fillRect(100, 420, 10, 50);
+        this.ctx.fillRect(75, 415, 60, 10);
+        this.ctx.fillRect(220, 420, 10, 50);
+        this.ctx.fillRect(195, 415, 60, 10);
+
+        // Pilotos
+        this.renderPilot(140, 470, this.pilots.servedAnimation > 0);
+        this.renderPilot(250, 470, this.pilots.servedAnimation > 0);
+
+        // BALÃO DO COCKPIT
+        if (this.pilots.requestedItem) {
+          // Chamado ocasional dos pilotos
+          const item = TRAY_ITEMS[this.pilots.requestedItem];
+          const isNear = Math.abs(this.player.x - 230) < 130;
+          this.renderArcadeCallBubble(230, 330, item.icon, item.key.toUpperCase(), this.pilots.patience / this.pilots.maxPatience, isNear, '#38bdf8');
+        } else if (Math.abs(this.player.x - 230) < 160) {
+          // Quando o jogador visita o cockpit em voo calmo: Aceno de "joia" e céu calmo
+          this.ctx.save();
+          this.ctx.fillStyle = 'rgba(10, 15, 26, 0.95)';
+          this.ctx.beginPath();
+          this.ctx.roundRect(140, 260, 180, 50, 12);
+          this.ctx.fill();
+          this.ctx.strokeStyle = '#38bdf8';
+          this.ctx.lineWidth = 2;
+          this.ctx.stroke();
+
+          this.ctx.fillStyle = '#fff';
+          this.ctx.font = 'bold 11px sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText('Voo 100% tranquilo! 👍', 230, 282);
+          this.ctx.fillStyle = '#94a3b8';
+          this.ctx.font = '10px sans-serif';
+          this.ctx.fillText('Céu limpo e tudo calmo ✈️', 230, 298);
+          this.ctx.restore();
+        }
+
+        this.ctx.restore();
+      }
+
+      renderPilot(x, y, isCelebrating) {
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(x - 18, y - 50, 36, 60);
+
+        // Dragonas
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.fillRect(x - 18, y - 50, 8, 4);
+        this.ctx.fillRect(x + 10, y - 50, 8, 4);
+
+        // Camisa e gravata
+        this.ctx.fillStyle = '#fff';
+        this.ctx.beginPath();
+        this.ctx.moveTo(x - 8, y - 50);
+        this.ctx.lineTo(x + 8, y - 50);
+        this.ctx.lineTo(x, y - 32);
+        this.ctx.fill();
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(x - 2, y - 48, 4, 16);
+
+        // Cabeça
+        this.ctx.fillStyle = '#fed7aa';
+        this.ctx.beginPath();
+        this.ctx.arc(x, y - 68, 14, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Quepe
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(x - 14, y - 82, 28, 10);
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.fillRect(x - 4, y - 80, 8, 4);
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(x - 16, y - 73, 32, 4);
+
+        // Óculos Aviador
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(x - 10, y - 70, 8, 5);
+        this.ctx.fillRect(x + 2, y - 70, 8, 5);
+        this.ctx.strokeStyle = '#fbbf24';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(x - 10, y - 70, 8, 5);
+        this.ctx.strokeRect(x + 2, y - 70, 8, 5);
+
+        // Aceno de joia constante ou comemoração
+        if (isCelebrating) {
+          this.ctx.font = '18px sans-serif';
+          this.ctx.fillText('👍☕', x + 12, y - 72);
+        } else if (Math.abs(this.player.x - 230) < 160) {
+          // Joia amigável mostrando que o voo está tranquilo!
+          this.ctx.font = '15px sans-serif';
+          this.ctx.fillText('👍', x + 12, y - 66);
+        }
+      }
+
+      renderCabinSections() {
+        // Placa Primeira Classe
+        this.ctx.fillStyle = 'rgba(251, 191, 36, 0.15)';
+        this.ctx.fillRect(470, 130, 540, 24);
+        this.ctx.strokeStyle = '#fbbf24';
+        this.ctx.strokeRect(470, 130, 540, 24);
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.font = 'bold 11px sans-serif';
+        this.ctx.fillText('👑 PRIMEIRA CLASSE VIP (BÔNUS +10)', 640, 146);
+
+        // Placa Econômica
+        this.ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+        this.ctx.fillRect(1060, 130, 880, 24);
+        this.ctx.strokeStyle = '#38bdf8';
+        this.ctx.strokeRect(1060, 130, 880, 24);
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.font = 'bold 11px sans-serif';
+        this.ctx.fillText('✈️ CLASSE ECONÔMICA (+5 / -1)', 1400, 146);
+
+        // Cortina
+        this.ctx.fillStyle = '#1e1b4b';
+        this.ctx.fillRect(1030, 120, 18, 440);
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.fillRect(1036, 260, 6, 80);
+
+        this.passengers.forEach(p => {
+          const isVIP = p.classType === 'vip';
+
+          if (isVIP) {
+            this.ctx.fillStyle = '#1e1b4b';
+            this.ctx.fillRect(p.x - 30, 390, 60, 170);
+            this.ctx.strokeStyle = '#fbbf24';
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeRect(p.x - 30, 390, 60, 170);
+
+            this.ctx.fillStyle = '#312e81';
+            this.ctx.fillRect(p.x - 22, 350, 44, 40);
+            this.ctx.fillStyle = '#fbbf24';
+            this.ctx.font = 'bold 9px sans-serif';
+            this.ctx.fillText(p.seatNum, p.x - 7, 342);
+          } else {
+            this.ctx.fillStyle = '#334155';
+            this.ctx.fillRect(p.x - 22, 410, 44, 150);
+            this.ctx.fillStyle = '#0284c7';
+            this.ctx.fillRect(p.x - 18, 380, 36, 30);
+            this.ctx.fillStyle = '#94a3b8';
+            this.ctx.font = '8px sans-serif';
+            this.ctx.fillText(p.seatNum, p.x - 6, 375);
+          }
+
+          // Corpo do Passageiro
+          this.ctx.fillStyle = p.color;
+          this.ctx.fillRect(p.x - 14, 450, 28, 65);
+
+          // Cabeça
+          this.ctx.fillStyle = '#fed7aa';
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, 430, 13, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          this.ctx.fillStyle = isVIP ? '#78350f' : '#1e293b';
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, 423, 14, Math.PI, Math.PI * 2);
+          this.ctx.fill();
+
+          this.ctx.fillStyle = '#000';
+          this.ctx.beginPath();
+          this.ctx.arc(p.x + 4, 429, 2, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          // Comendo feliz
+          if (p.eatingTimer > 0) {
+            this.ctx.font = '16px sans-serif';
+            this.ctx.fillText('😋✨', p.x - 12, 405);
+          }
+
+          this.ctx.fillStyle = '#cbd5e1';
+          this.ctx.fillRect(p.x + 8, 480, 32, 6);
+        });
+      }
+
+      renderGalleyArea() {
+        const gx = 2000;
+        this.ctx.fillStyle = '#334155';
+        this.ctx.fillRect(gx, 120, 600, 440);
+
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.font = 'bold 12px sans-serif';
+        this.ctx.fillText('🍳 COZINHA DE BORDO (GALLEY)', gx + 20, 144);
+
+        for (let i = 0; i < 2; i++) {
+          const tx = gx + 40 + i * 85;
+          this.ctx.fillStyle = '#94a3b8';
+          this.ctx.fillRect(tx, 430, 65, 130);
+          this.ctx.strokeStyle = '#cbd5e1';
+          this.ctx.strokeRect(tx, 430, 65, 130);
+          this.ctx.fillStyle = '#64748b';
+          this.ctx.fillRect(tx + 6, 440, 53, 110);
+          this.ctx.fillStyle = '#0f172a';
+          this.ctx.beginPath();
+          this.ctx.arc(tx + 14, 563, 6, 0, Math.PI * 2);
+          this.ctx.arc(tx + 51, 563, 6, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+
+        // Cafeteira com vapor
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(gx + 240, 380, 70, 80);
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.fillRect(gx + 250, 420, 50, 35);
+        this.ctx.fillStyle = '#78350f';
+        this.ctx.fillRect(gx + 253, 430, 44, 22);
+
+        const t = performance.now() * 0.005;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        for (let s = 0; s < 3; s++) {
+          const sy = 370 - ((t * 20 + s * 15) % 40);
+          this.ctx.beginPath();
+          this.ctx.arc(gx + 265 + Math.sin(t + s) * 5, sy, 4 + s, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+
+        this.ctx.fillStyle = '#cbd5e1';
+        this.ctx.fillRect(gx + 220, 460, 240, 100);
+        this.ctx.strokeStyle = '#94a3b8';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeRect(gx + 220, 460, 240, 100);
+
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.font = 'bold 11px sans-serif';
+        this.ctx.fillText('ESTAÇÃO DE SERVIÇO', gx + 265, 495);
+      }
+
+      renderFlightAttendant() {
+        const p = this.player;
+        const x = p.x;
+        const y = p.y;
+        const walkCycle = Math.sin(p.walkFrame);
+
+        this.ctx.save();
+        this.ctx.translate(x, y);
+
+        // Sombra
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 2, 22, 6, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Pernas
+        const legSwing = p.isWalking ? walkCycle * 14 : 0;
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(-9 + legSwing, -35, 7, 36);
+        this.ctx.fillRect(2 - legSwing, -35, 7, 36);
+
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(-11 + legSwing, -3, 11, 5);
+        this.ctx.fillRect(0 - legSwing, -3, 11, 5);
+
+        // Uniforme
+        this.ctx.fillStyle = '#1e3a8a';
+        this.ctx.beginPath();
+        this.ctx.roundRect(-14, -85, 28, 52, 6);
+        this.ctx.fill();
+
+        // Botões dourados
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.beginPath();
+        this.ctx.arc(0, -68, 2, 0, Math.PI * 2);
+        this.ctx.arc(0, -56, 2, 0, Math.PI * 2);
+        this.ctx.arc(0, -44, 2, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Lenço vermelho
+        this.ctx.fillStyle = '#dc2626';
+        this.ctx.beginPath();
+        this.ctx.moveTo(-4, -85);
+        this.ctx.lineTo(4, -85);
+        this.ctx.lineTo(0, -70);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Cabeça
+        this.ctx.fillStyle = '#fed7aa';
+        this.ctx.beginPath();
+        this.ctx.arc(0, -98, 14, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        this.ctx.fillStyle = '#451a03';
+        this.ctx.beginPath();
+        this.ctx.arc(0, -103, 15, Math.PI, Math.PI * 2);
+        this.ctx.fill();
+
+        this.ctx.fillStyle = '#1e3a8a';
+        this.ctx.fillRect(-10, -114, 20, 6);
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.font = '8px sans-serif';
+        this.ctx.fillText('✈️', -4, -114);
+
+        const faceDir = p.facing * 3;
+        this.ctx.fillStyle = '#000';
+        this.ctx.beginPath();
+        this.ctx.arc(faceDir + 3, -99, 1.8, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#dc2626';
+        this.ctx.lineWidth = 1.2;
+        this.ctx.beginPath();
+        this.ctx.arc(faceDir + 2, -94, 3, 0, Math.PI);
+        this.ctx.stroke();
+
+        // Bandeja / Carrinho móvel de bordo
+        const cartX = p.facing * 20;
+        const cartY = -55;
+
+        this.ctx.fillStyle = '#cbd5e1';
+        this.ctx.fillRect(cartX - 18, cartY, 40, 5);
+        this.ctx.strokeStyle = '#64748b';
+        this.ctx.strokeRect(cartX - 18, cartY, 40, 5);
+
+        // Ícones em miniatura na bandeja
+        this.ctx.font = '10px sans-serif';
+        this.ctx.fillText('🍬☕🥪', cartX - 16, cartY - 3);
+
+        this.ctx.restore();
+      }
+
+      /* ==========================================================================
+         BALÕES DE PEDIDOS COM DESENHO GRANDE E BARRINHA LENTA TRANQUILA
+         ========================================================================== */
+      renderOrderBubbles() {
+        this.passengers.forEach(p => {
+          if (p.order) {
+            const isNear = Math.abs(p.x - this.player.x) < 95;
+            const patiencePct = Math.max(0, p.order.patience / p.order.maxPatience);
+            const borderColor = p.classType === 'vip' ? '#fbbf24' : '#38bdf8';
+
+            this.renderArcadeCallBubble(p.x, 340, p.order.item.icon, p.order.item.key.toUpperCase(), patiencePct, isNear, borderColor);
+          }
+        });
+      }
+
+      renderArcadeCallBubble(x, y, icon, keyChar, patiencePct, isNear, borderColor) {
+        this.ctx.save();
+
+        const width = 84;
+        const height = 74;
+        const bx = x - width / 2;
+        const by = y - height;
+
+        // Fundo escuro com borda brilhante
+        this.ctx.fillStyle = 'rgba(10, 15, 26, 0.95)';
+        this.ctx.beginPath();
+        this.ctx.roundRect(bx, by, width, height, 14);
+        this.ctx.fill();
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = isNear ? 3.5 : 2;
+        this.ctx.shadowColor = borderColor;
+        this.ctx.shadowBlur = isNear ? 12 : 6;
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+
+        // Pontinha do balão apontando para o passageiro
+        this.ctx.fillStyle = 'rgba(10, 15, 26, 0.95)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(x - 8, by + height);
+        this.ctx.lineTo(x, by + height + 8);
+        this.ctx.lineTo(x + 8, by + height);
+        this.ctx.fill();
+
+        // BARRINHA DE TEMPO CALMA E TRANQUILA (Verde por muito tempo!)
+        const barW = width - 16;
+        const barH = 5;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        this.ctx.fillRect(bx + 8, by + 8, barW, barH);
+
+        const pColor = patiencePct > 0.4 ? '#22c55e' : patiencePct > 0.2 ? '#eab308' : '#ef4444';
+        this.ctx.fillStyle = pColor;
+        this.ctx.fillRect(bx + 8, by + 8, barW * patiencePct, barH);
+
+        // DESENHO CLARO E GRANDE DO ALIMENTO
+        this.ctx.font = '28px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(icon, x, by + 44);
+
+        // BADGE DA LETRA DO TECLADO
+        this.ctx.fillStyle = isNear ? '#38bdf8' : '#1e293b';
+        this.ctx.strokeStyle = isNear ? '#fff' : '#64748b';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.beginPath();
+        this.ctx.roundRect(x - 14, by + 50, 28, 18, 5);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = isNear ? '#000' : '#38bdf8';
+        this.ctx.font = 'bold 12px sans-serif';
+        this.ctx.fillText(keyChar, x, by + 63);
+
+        this.ctx.restore();
+      }
+
+      /* ==========================================================================
+         SETAS INDICADORAS DE ALERTA NAS BORDAS DA TELA (OFF-SCREEN RADAR)
+         ========================================================================== */
+      renderOffScreenAlertArrows() {
+        const leftLimit = this.cameraX;
+        const rightLimit = this.cameraX + this.canvas.width;
+        const screenMargin = 32;
+        const t = performance.now() * 0.005;
+        const pulse = 1 + Math.sin(t) * 0.12;
+
+        // 1. Verifica pedidos de passageiros fora da visão da câmera
+        this.passengers.forEach(p => {
+          if (p.order) {
+            const item = p.order.item;
+            const isVIP = p.classType === 'vip';
+            const color = isVIP ? '#fbbf24' : '#38bdf8';
+
+            if (p.x < leftLimit) {
+              // Passageiro chamando à ESQUERDA da tela
+              this.drawAlertArrow(screenMargin, 260, 'left', item.icon, item.key.toUpperCase(), color, pulse);
+            } else if (p.x > rightLimit) {
+              // Passageiro chamando à DIREITA da tela
+              this.drawAlertArrow(this.canvas.width - screenMargin, 260, 'right', item.icon, item.key.toUpperCase(), color, pulse);
+            }
+          }
+        });
+
+        // 2. Verifica se os Pilotos estão chamando fora da tela
+        if (this.pilots.requestedItem) {
+          const item = TRAY_ITEMS[this.pilots.requestedItem];
+          if (this.pilots.x < leftLimit) {
+            this.drawAlertArrow(screenMargin, 200, 'left', item.icon, item.key.toUpperCase(), '#38bdf8', pulse);
+          }
+        }
+      }
+
+      drawAlertArrow(x, y, dir, icon, keyChar, color, pulse) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.scale(pulse, pulse);
+
+        this.ctx.fillStyle = 'rgba(10, 15, 26, 0.92)';
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 2.5;
+        this.ctx.shadowColor = color;
+        this.ctx.shadowBlur = 12;
+
+        const w = 54;
+        const h = 48;
+        this.ctx.beginPath();
+        this.ctx.roundRect(-w / 2, -h / 2, w, h, 10);
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+
+        this.ctx.font = '16px sans-serif';
+        this.ctx.textAlign = 'center';
+        if (dir === 'left') {
+          this.ctx.fillText(`◀ ${icon}`, 0, 0);
+        } else {
+          this.ctx.fillText(`${icon} ▶`, 0, 0);
+        }
+
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = 'bold 11px sans-serif';
+        this.ctx.fillText(`[ ${keyChar} ]`, 0, 16);
+
+        this.ctx.restore();
+      }
+
+      renderFloatingEffects() {
+        this.floatingTexts.forEach(ft => {
+          this.ctx.save();
+          this.ctx.globalAlpha = Math.max(0, ft.life);
+          this.ctx.fillStyle = ft.color;
+          this.ctx.font = '900 20px sans-serif';
+          this.ctx.shadowColor = '#000';
+          this.ctx.shadowBlur = 8;
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(ft.text, ft.x, ft.y);
+          this.ctx.restore();
+        });
+      }
+    }
+
+    // Inicialização da Aplicação
+    window.addEventListener('DOMContentLoaded', () => {
+      window.game = new NinjaFlightSimulator();
+    });
+  </script>
+</body>
+</html>

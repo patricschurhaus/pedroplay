@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PedroPlay — Alemãozinho Pedro</title>
+  <!-- Bootstrap Icons (Webfont oficial via CDN) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+  <style>
+    :root {
+      /* Paleta inspirada no GitHub Dark Mode */
+      --gh-bg-canvas: #0d1117;
+      --gh-bg-subtle: #161b22;
+      --gh-bg-elevated: #1c2128;
+      --gh-bg-overlay: #21262d;
+      --gh-border-default: #30363d;
+      --gh-border-muted: #21262d;
+      --gh-text-primary: #e6edf3;
+      --gh-text-secondary: #8b949e;
+      --gh-text-muted: #6e7681;
+
+      /* Cores de destaque / hover (Bandeira da Alemanha) */
+      --de-black: #000000;
+      --de-red: #dd0000;
+      --de-gold: #ffce00;
+
+      /* Tipografia da logomarca + UI limpa estilo GitHub */
+      --font-brand: 'Georgia', 'Times New Roman', Times, serif;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background-color: var(--gh-bg-canvas);
+      color: var(--gh-text-primary);
+      font-family: var(--font-ui);
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Barra Superior estilo GitHub Header */
+    .gh-header {
+      background-color: var(--gh-bg-subtle);
+      border-bottom: 1px solid var(--gh-border-default);
+      padding: 14px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .gh-header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--gh-text-primary);
+      font-family: var(--font-brand);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+
+    .brand-nav i {
+      font-size: 1.15rem;
+      color: var(--gh-text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .brand-nav:hover {
+      color: var(--de-gold);
+    }
+
+    .brand-nav:hover i {
+      color: var(--de-red);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Contador Global de Visitas da Página no Header */
+    .page-counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: var(--gh-text-secondary);
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .page-counter-badge i {
+      font-size: 0.95rem;
+      color: var(--gh-text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .page-counter-badge:hover {
+      border-color: var(--de-gold);
+      color: var(--gh-text-primary);
+    }
+
+    .page-counter-badge:hover i {
+      color: var(--de-gold);
+    }
+
+    .counter-number {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--gh-text-primary);
+    }
+
+    /* Botão do Canal no YouTube estilo botão GitHub */
+    .yt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gh-text-primary);
+      background-color: var(--gh-bg-overlay);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 6px;
+      padding: 6px 14px;
+      transition: all 0.2s ease;
+    }
+
+    .yt-btn i {
+      font-size: 1rem;
+      color: var(--gh-text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .yt-btn:hover,
+    .yt-btn:focus-visible {
+      border-color: var(--de-red);
+      background-color: var(--gh-bg-elevated);
+      color: var(--de-gold);
+      outline: none;
+    }
+
+    .yt-btn:hover i,
+    .yt-btn:focus-visible i {
+      color: var(--de-red);
+    }
+
+    /* Seção Hero Sóbria e Elegante */
+    .hero {
+      max-width: 960px;
+      width: 100%;
+      margin: 40px auto 32px;
+      padding: 0 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-wrapper {
+      width: 176px;
+      height: 176px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-brand);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--de-red);
+      margin-bottom: 6px;
+    }
+
+    .hero-title {
+      font-family: var(--font-brand);
+      font-size: clamp(2rem, 4.2vw, 2.85rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gh-text-primary);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .hero-title span {
+      color: var(--de-gold);
+    }
+
+    /* Linha divisória discreta nas 3 cores da Alemanha */
+    .de-divider {
+      width: 96px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(
+        90deg,
+        var(--de-black) 0%,
+        var(--de-black) 33.33%,
+        var(--de-red) 33.33%,
+        var(--de-red) 66.66%,
+        var(--de-gold) 66.66%,
+        var(--de-gold) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 4px auto 14px;
+    }
+
+    .hero-description {
+      font-size: 0.96rem;
+      color: var(--gh-text-secondary);
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    /* Container Principal */
+    .main-container {
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto 56px;
+      padding: 0 28px;
+      flex: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--gh-border-muted);
+      font-size: 0.85rem;
+      color: var(--gh-text-secondary);
+    }
+
+    .section-header-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-brand);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gh-text-primary);
+    }
+
+    .section-header-title i {
+      color: var(--de-gold);
+      font-size: 1rem;
+    }
+
+    /* Grade de Jogos Estilo Repositórios GitHub */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 20px;
+    }
+
+    .game-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: var(--gh-bg-subtle);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 8px;
+      padding: 24px;
+      text-decoration: none;
+      color: var(--gh-text-primary);
+      transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    /* Hover Sóbrio nas cores da Alemanha */
+    .game-card:hover,
+    .game-card:focus-visible {
+      background-color: var(--gh-bg-elevated);
+      border-color: var(--de-gold);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(1, 4, 9, 0.65);
+      outline: none;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .game-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .game-icon-wrap i {
+      font-size: 1.5rem;
+      color: var(--gh-text-secondary);
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .game-card:hover .game-icon-wrap {
+      border-color: var(--de-red);
+      background-color: rgba(221, 0, 0, 0.08);
+    }
+
+    .game-card:hover .game-icon-wrap i {
+      color: var(--de-gold);
+      transform: scale(1.08);
+    }
+
+    .card-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .visit-pill,
+    .key-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: var(--gh-text-secondary);
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      padding: 3px 9px;
+      border-radius: 999px;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .visit-pill i,
+    .key-pill i {
+      font-size: 0.8rem;
+      color: var(--gh-text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .game-card:hover .visit-pill {
+      border-color: rgba(255, 206, 0, 0.45);
+      color: var(--gh-text-primary);
+    }
+
+    .game-card:hover .visit-pill i {
+      color: var(--de-gold);
+    }
+
+    .game-card:hover .key-pill {
+      border-color: rgba(221, 0, 0, 0.45);
+      color: var(--gh-text-primary);
+    }
+
+    .game-card:hover .key-pill i {
+      color: var(--de-red);
+    }
+
+    .card-category {
+      font-family: var(--font-brand);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--de-red);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-family: var(--font-brand);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: var(--gh-text-primary);
+      margin-bottom: 10px;
+      transition: color 0.2s ease;
+    }
+
+    .game-card:hover .card-title {
+      color: var(--de-gold);
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--gh-text-secondary);
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--gh-border-muted);
+    }
+
+    .play-cta {
+      font-family: var(--font-brand);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gh-text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: color 0.2s ease;
+    }
+
+    .play-cta i {
+      font-size: 0.95rem;
+      color: var(--gh-text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .game-card:hover .play-cta {
+      color: var(--gh-text-primary);
+    }
+
+    .game-card:hover .play-cta i {
+      color: var(--de-red);
+    }
+
+    .play-arrow-icon {
+      font-size: 1.1rem;
+      color: var(--gh-text-muted);
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .game-card:hover .play-arrow-icon {
+      color: var(--de-gold);
+      transform: translateX(4px);
+    }
+
+    /* Rodapé Estilo GitHub */
+    .gh-footer {
+      border-top: 1px solid var(--gh-border-muted);
+      background-color: var(--gh-bg-subtle);
+      padding: 20px 28px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--gh-text-secondary);
+    }
+
+    .gh-footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .gh-footer strong {
+      font-family: var(--font-brand);
+      color: var(--gh-text-primary);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-stats {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--gh-text-muted);
+    }
+
+    .footer-stats span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.2s ease;
+    }
+
+    .footer-stats span:hover {
+      color: var(--de-gold);
+    }
+
+    .footer-stats span:hover i {
+      color: var(--de-red);
+    }
+
+    @media (max-width: 640px) {
+      .gh-header {
+        padding: 12px 18px;
+      }
+      .main-container {
+        padding: 0 18px;
+      }
+      .gh-footer-inner {
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho Estilo GitHub Dark -->
+  <header class="gh-header">
+    <div class="gh-header-inner">
+      <a href="index.html" class="brand-nav">
+        <i class="bi bi-controller"></i>
+        <span>PedroPlay</span>
+      </a>
+
+      <div class="header-right">
+        <div class="page-counter-badge" title="Total de visitas à Central PedroPlay">
+          <i class="bi bi-eye"></i>
+          <span>Visitas na Central:</span>
+          <span class="counter-number" id="counter-index">0</span>
+        </div>
+
+        <a
+          href="https://youtube.com/@alemaozinhopedro"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="yt-btn"
+          title="Visitar canal Alemãozinho Pedro no YouTube"
+        >
+          <i class="bi bi-youtube"></i>
+          <span>@alemaozinhopedro</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Seção Principal (Sem anel colorido ao redor da logo) -->
+  <section class="hero">
+    <div class="logo-wrapper">
+      <img
+        src="https://raw.githubusercontent.com/patricschurhaus/pedroplay/main/img/logo.png"
+        onerror="this.onerror=null;this.src='img/logo.png';"
+        alt="Logo Alemãozinho Pedro"
+      />
+    </div>
+
+    <p class="hero-subtitle">Alemãozinho Pedro</p>
+    <h1 class="hero-title">PEDRO<span>PLAY</span></h1>
+    <div class="de-divider" aria-hidden="true"></div>
+    <p class="hero-description">
+      Central de jogos educativos e interativos. Selecione um título abaixo ou utilize as teclas de atalho.
+    </p>
+  </section>
+
+  <!-- Grade de Jogos -->
+  <main class="main-container">
+    <div class="section-header">
+      <span class="section-header-title">
+        <i class="bi bi-grid-1x2"></i>
+        <span>Jogos Disponíveis</span>
+      </span>
+      <span><i class="bi bi-keyboard"></i> Atalhos: Teclas 1, 2 e 3</span>
+    </div>
+
+    <div class="games-grid">
+
+      <!-- Jogo 1: Simulador de Avião -->
+      <a href="avião.html" class="game-card" data-key="1" data-game="aviao">
+        <div>
+          <div class="card-top">
+            <div class="game-icon-wrap" aria-hidden="true">
+              <i class="bi bi-airplane-engines"></i>
+            </div>
+            <div class="card-badges">
+              <span class="visit-pill" title="Quantas vezes AeroVoo 702 foi acessado">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="counter-number" id="counter-aviao">0</span>
+                <span>acessos</span>
+              </span>
+              <span class="key-pill" title="Atalho de teclado: Tecla 1">
+                <i class="bi bi-1-square"></i>
+              </span>
+            </div>
+          </div>
+          <p class="card-category">Simulador de Cabine</p>
+          <h2 class="card-title">AeroVoo 702</h2>
+          <p class="card-desc">
+            Controle o comissário de bordo no voo entre São Paulo e Paris, atendendo passageiros da Primeira Classe, Econômica e os pilotos no Cockpit.
+          </p>
+        </div>
+        <div class="card-footer">
+          <span class="play-cta">
+            <i class="bi bi-play-circle"></i>
+            <span>Iniciar Jogo</span>
+          </span>
+          <i class="bi bi-arrow-right play-arrow-icon" aria-hidden="true"></i>
+        </div>
+      </a>
+
+      <!-- Jogo 2: UNO Mania Kids -->
+      <a href="uno.html" class="game-card" data-key="2" data-game="uno">
+        <div>
+          <div class="card-top">
+            <div class="game-icon-wrap" aria-hidden="true">
+              <i class="bi bi-suit-spade"></i>
+            </div>
+            <div class="card-badges">
+              <span class="visit-pill" title="Quantas vezes UNO Mania Kids foi acessado">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="counter-number" id="counter-uno">0</span>
+                <span>acessos</span>
+              </span>
+              <span class="key-pill" title="Atalho de teclado: Tecla 2">
+                <i class="bi bi-2-square"></i>
+              </span>
+            </div>
+          </div>
+          <p class="card-category">Jogo de Cartas</p>
+          <h2 class="card-title">UNO Mania Kids</h2>
+          <p class="card-desc">
+            Partida rápida contra o Robô Amigo com cartas especiais como Trocar de Mão e Baralho Todo. Fique atento para gritar UNO a tempo!
+          </p>
+        </div>
+        <div class="card-footer">
+          <span class="play-cta">
+            <i class="bi bi-play-circle"></i>
+            <span>Iniciar Jogo</span>
+          </span>
+          <i class="bi bi-arrow-right play-arrow-icon" aria-hidden="true"></i>
+        </div>
+      </a>
+
+      <!-- Jogo 3: Xadrez Clássico -->
+      <a href="xadrez.html" class="game-card" data-key="3" data-game="xadrez">
+        <div>
+          <div class="card-top">
+            <div class="game-icon-wrap" aria-hidden="true">
+              <i class="bi bi-trophy"></i>
+            </div>
+            <div class="card-badges">
+              <span class="visit-pill" title="Quantas vezes Xadrez Clássico foi acessado">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="counter-number" id="counter-xadrez">0</span>
+                <span>acessos</span>
+              </span>
+              <span class="key-pill" title="Atalho de teclado: Tecla 3">
+                <i class="bi bi-3-square"></i>
+              </span>
+            </div>
+          </div>
+          <p class="card-category">Estratégia &amp; Tutoria</p>
+          <h2 class="card-title">Xadrez Clássico</h2>
+          <p class="card-desc">
+            Aprenda e evolua no xadrez com 5 níveis de dificuldade e dicas visuais em tempo real que indicam os melhores lances no tabuleiro.
+          </p>
+        </div>
+        <div class="card-footer">
+          <span class="play-cta">
+            <i class="bi bi-play-circle"></i>
+            <span>Iniciar Jogo</span>
+          </span>
+          <i class="bi bi-arrow-right play-arrow-icon" aria-hidden="true"></i>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Rodapé Estilo GitHub Dark -->
+  <footer class="gh-footer">
+    <div class="gh-footer-inner">
+      <span>
+        <i class="bi bi-code-slash"></i>
+        <strong>PEDROPLAY</strong> &mdash; A Central de Jogos do <strong>Alemãozinho Pedro</strong>
+      </span>
+      <div class="footer-stats">
+        <span>
+          <i class="bi bi-collection-play"></i>
+          Total de partidas iniciadas: <strong id="counter-total-games">0</strong>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * Gerenciador de Contadores de Acesso (index.html e cada jogo individualmente).
+     * Sincroniza com API global de contagem (CounterAPI) + persistência local (localStorage)
+     * para funcionar tanto online (GitHub Pages) quanto localmente.
+     */
+    class VisitCounterManager {
+      constructor() {
+        this.namespace = 'patricschurhaus_pedroplay_v1';
+        this.keys = ['index', 'aviao', 'uno', 'xadrez'];
+        this.storagePrefix = 'pedroplay_visits_';
+      }
+
+      getLocalCount(key) {
+        const raw = localStorage.getItem(this.storagePrefix + key);
+        const parsed = parseInt(raw, 10);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
+      setLocalCount(key, val) {
+        localStorage.setItem(this.storagePrefix + key, String(val));
+      }
+
+      updateDOM() {
+        const indexEl = document.getElementById('counter-index');
+        const aviaoEl = document.getElementById('counter-aviao');
+        const unoEl = document.getElementById('counter-uno');
+        const xadrezEl = document.getElementById('counter-xadrez');
+        const totalGamesEl = document.getElementById('counter-total-games');
+
+        const cIndex = this.getLocalCount('index');
+        const cAviao = this.getLocalCount('aviao');
+        const cUno = this.getLocalCount('uno');
+        const cXadrez = this.getLocalCount('xadrez');
+
+        if (indexEl) indexEl.textContent = cIndex.toLocaleString('pt-BR');
+        if (aviaoEl) aviaoEl.textContent = cAviao.toLocaleString('pt-BR');
+        if (unoEl) unoEl.textContent = cUno.toLocaleString('pt-BR');
+        if (xadrezEl) xadrezEl.textContent = cXadrez.toLocaleString('pt-BR');
+        if (totalGamesEl) {
+          totalGamesEl.textContent = (cAviao + cUno + cXadrez).toLocaleString('pt-BR');
+        }
+      }
+
+      async increment(key) {
+        // Incrementa imediatamente no localStorage para feedback instantâneo
+        const nextLocal = this.getLocalCount(key) + 1;
+        this.setLocalCount(key, nextLocal);
+        this.updateDOM();
+
+        // Sincroniza em background com contador online caso haja conexão
+        try {
+          const res = await fetch(
+            `https://api.counterapi.dev/v1/${this.namespace}/${key}/up`,
+            { cache: 'no-store' }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (typeof data.count === 'number') {
+              const synced = Math.max(nextLocal, data.count);
+              this.setLocalCount(key, synced);
+              this.updateDOM();
+            }
+          }
+        } catch (_) {
+          // Modo offline: mantém contagem do localStorage sem erros
+        }
+      }
+
+      async syncAllCounts() {
+        this.updateDOM();
+        for (const key of ['aviao', 'uno', 'xadrez']) {
+          try {
+            const res = await fetch(
+              `https://api.counterapi.dev/v1/${this.namespace}/${key}`,
+              { cache: 'no-store' }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              if (typeof data.count === 'number') {
+                const current = this.getLocalCount(key);
+                this.setLocalCount(key, Math.max(current, data.count));
+                this.updateDOM();
+              }
+            }
+          } catch (_) {
+            // Ignora se ainda não existir na API ou se estiver offline
+          }
+        }
+      }
+    }
+
+    // Sintetizador acústico discreto (Web Audio API)
+    class HubSound {
+      constructor() {
+        this.ctx = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      hover() {
+        if (!this.ctx || this.ctx.state !== 'running') return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(640, now + 0.04);
+        gain.gain.setValueAtTime(0.018, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+
+      select() {
+        if (!this.ctx) this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+        gain.gain.setValueAtTime(0.045, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.095);
+      }
+    }
+
+    const counters = new VisitCounterManager();
+    const sound = new HubSound();
+
+    // Registra visita na página index.html e carrega contadores dos jogos
+    counters.increment('index');
+    counters.syncAllCounts();
+
+    window.addEventListener('pointerdown', () => sound.init(), { once: true });
+    window.addEventListener('keydown', () => sound.init(), { once: true });
+
+    function openGameCard(card, event) {
+      if (event) event.preventDefault();
+      const gameKey = card.getAttribute('data-game');
+      const targetHref = card.getAttribute('href');
+      sound.select();
+
+      if (gameKey) {
+        counters.increment(gameKey);
+      }
+
+      setTimeout(() => {
+        window.location.href = targetHref;
+      }, 95);
+    }
+
+    const cards = document.querySelectorAll('.game-card');
+    cards.forEach((card) => {
+      card.addEventListener('pointerenter', () => sound.hover());
+      card.addEventListener('click', (e) => openGameCard(card, e));
+    });
+
+    // Atalhos de teclado (1, 2, 3) também contabilizam visita ao jogo escolhido
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const targetCard = document.querySelector(`.game-card[data-key="${e.key}"]`);
+      if (targetCard) {
+        targetCard.focus();
+        openGameCard(targetCard, e);
+      }
+    });
+  </script>
+</body>
+</html>
