@@ -361,7 +361,7 @@
       display: block;
     }
 
-    /* Calibrador Sutil no Canto Superior Esquerdo */
+    /* Calibrador Sutil no Canto Superior Esquerdo (Oculto no Mobile) */
     .compact-calib-bars {
       position: absolute;
       top: 10px;
@@ -379,6 +379,12 @@
       font-size: 0.65rem;
       color: var(--gh-text-secondary);
       z-index: 20;
+    }
+
+    @media (max-width: 768px) {
+      .compact-calib-bars {
+        display: none !important;
+      }
     }
 
     .calib-mini-row {
@@ -506,37 +512,43 @@
 
     .btn-main-shoot {
       pointer-events: auto;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-family: var(--font-brand);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-main-shoot.shoot-mode {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #ffffff;
+      border: 2px solid #ffce00;
+      box-shadow: 0 4px 18px rgba(249, 115, 22, 0.5);
+    }
+
+    .btn-main-shoot.reload-mode {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: #ffffff;
       border: 2px solid #38bdf8;
-      border-radius: 50px;
-      padding: 12px 24px;
-      font-family: var(--font-brand);
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
       box-shadow: 0 4px 18px rgba(37, 99, 235, 0.5);
-      cursor: pointer;
-      display: none; /* No mobile durante a mira fica oculto; surge na nova jogada */
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-      white-space: nowrap;
     }
 
     .btn-main-shoot:hover,
     .btn-main-shoot:active {
       transform: scale(1.04);
-      box-shadow: 0 6px 22px rgba(56, 189, 248, 0.65);
-      border-color: #ffffff;
-    }
-
-    /* No desktop, o botão pode ficar visível se o jogador quiser clicar */
-    @media (min-width: 769px) {
-      .btn-main-shoot {
-        display: inline-flex;
-      }
+      filter: brightness(1.1);
     }
 
     /* Popups Flutuantes */
@@ -775,10 +787,10 @@
 
     <!-- Controles na Base da Tela (100% Mobile-First) -->
     <div class="mobile-bottom-hud">
-      <!-- Dica de Toque Flutuante (Some durante o voo da bola) -->
+      <!-- Dica de Toque Flutuante -->
       <div class="touch-hint-pill" id="touchHintPill">
         <i class="bi bi-hand-index-thumb"></i>
-        <span id="touchHintText">Arraste para mirar &bull; Solte para arremessar</span>
+        <span id="touchHintText">Arraste para mirar &bull; Toque em Arremessar</span>
       </div>
 
       <!-- D-Pad Visível APENAS em Desktop -->
@@ -791,11 +803,11 @@
         <button class="dpad-btn" id="dpadRight" title="Calibrar para direita"><i class="bi bi-arrow-right"></i></button>
       </div>
 
-      <!-- Botão Centralizado na Base (Aparece para Nova Jogada ou Desktop) -->
+      <!-- Botão Ergonômico de Arremesso / Nova Jogada -->
       <div class="btn-action-container">
-        <button class="btn-main-shoot" id="btnMainShoot" aria-label="Ação do jogo">
-          <i class="bi bi-arrow-clockwise" id="actionIcon"></i>
-          <span id="actionBtnText">Nova Jogada</span>
+        <button class="btn-main-shoot shoot-mode" id="btnMainShoot" aria-label="Ação do jogo">
+          <i class="bi bi-dribbble" id="actionIcon"></i>
+          <span id="actionBtnText">Arremessar</span>
         </button>
       </div>
     </div>
@@ -1393,7 +1405,8 @@
          4. Controles Mobile por Toque Nativo:
          - Arrastar dedo para a esquerda -> tabela vai para a direita
          - Arrastar dedo para a direita -> tabela vai para a esquerda
-         - Soltar o dedo da tela -> Dispara o arremesso!
+         - Arraste livre cumulativo (pode tirar o dedo e puxar de novo para girar mais)
+         - O arremesso é acionado no botão ergonômico "ARREMESSAR"
          ========================================================================== */
       setupTouchControls() {
         const arena = document.getElementById('arena');
@@ -1413,12 +1426,13 @@
           this.touchState.active = true;
           this.touchState.startX = touch.clientX;
           this.touchState.startY = touch.clientY;
+          // Guarda a calibragem atual como ponto de partida (arraste cumulativo!)
           this.touchState.startCalibX = this.calibX;
           this.touchState.startCalibY = this.calibY;
           this.touchState.startTime = performance.now();
           this.touchState.moved = false;
 
-          // Esconde a pílula de dica ao começar o toque
+          // Esconde sutilmente a pílula de dica ao começar o toque
           this.dom.touchHintPill.style.opacity = '0.35';
         }, { passive: true });
 
@@ -1433,11 +1447,11 @@
             this.touchState.moved = true;
           }
 
-          // Sensibilidade do arraste:
+          // Sensibilidade do arraste aprimorada e fluida:
           // Arrastar para a esquerda (deltaX < 0) -> diminui calibX -> mira vira para a esquerda -> tabela vai para a direita!
           // Arrastar para a direita (deltaX > 0) -> aumenta calibX -> mira vira para a direita -> tabela vai para a esquerda!
-          const sensitivityX = 0.38;
-          const sensitivityY = 0.38;
+          const sensitivityX = 0.52;
+          const sensitivityY = 0.45;
 
           this.calibX = Math.max(-60, Math.min(60, this.touchState.startCalibX + deltaX * sensitivityX));
           // Arrastar para cima (deltaY < 0) -> aumenta elevação (sobe a trajetória)
@@ -1450,11 +1464,7 @@
           if (!this.touchState.active) return;
           this.touchState.active = false;
           this.dom.touchHintPill.style.opacity = '1';
-
-          if (this.playState === 'HOLDING') {
-            // SOLTOU O DEDO DA TELA -> DISPARA O ARREMESSO!
-            this.triggerJumpShoot();
-          }
+          // Arraste livre cumulativo: não dispara ao soltar o dedo!
         };
 
         arena.addEventListener('touchend', endTouch, { passive: true });
@@ -1520,16 +1530,16 @@
         bindDpad('dpadUp', 0, 4.5);
         bindDpad('dpadDown', 0, -4.5);
 
-        // Botão de Nova Jogada / Disparo
-        this.dom.btnMainShoot.addEventListener('click', (e) => {
+        // Botão Ergonômico de Arremesso / Nova Jogada
+        const onActionBtn = (e) => {
+          e.preventDefault();
           e.stopPropagation();
           this.handleSpaceAction();
-        });
+        };
+
+        this.dom.btnMainShoot.addEventListener('click', onActionBtn);
+        this.dom.btnMainShoot.addEventListener('touchend', onActionBtn);
         this.dom.btnMainShoot.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-        this.dom.btnMainShoot.addEventListener('touchend', (e) => {
-          e.stopPropagation();
-          this.handleSpaceAction();
-        });
 
         // Clique com Mouse no Desktop
         this.canvas.addEventListener('mousedown', (e) => {
@@ -1662,19 +1672,21 @@
           this.dom.touchHintPill.style.display = 'inline-flex';
           this.dom.touchHintText.textContent = isDesktop
             ? 'Use as Setas para mirar • Espaço para arremessar'
-            : 'Arraste para mirar • Solte para arremessar';
+            : 'Arraste para mirar • Toque em Arremessar';
 
-          // No mobile durante a mira, o botão fica oculto para não ocupar tela
-          this.dom.btnMainShoot.style.display = isDesktop ? 'inline-flex' : 'none';
+          // Botão ergonômico visível no Desktop e Mobile
+          this.dom.btnMainShoot.style.display = 'inline-flex';
+          this.dom.btnMainShoot.className = 'btn-main-shoot shoot-mode';
           this.dom.actionIcon.className = 'bi bi-dribbble';
           this.dom.actionBtnText.textContent = isDesktop ? 'Arremessar (Espaço)' : 'Arremessar';
         } else if (state === 'IN_FLIGHT') {
           this.dom.touchHintPill.style.display = 'none';
           this.dom.btnMainShoot.style.display = 'none';
         } else if (state === 'WAITING_NEXT') {
-          // Quando a bola termina o arremesso, surge o botão para nova jogada, 100% centralizado!
+          // Quando a bola termina o arremesso, surge o botão para nova jogada
           this.dom.touchHintPill.style.display = 'none';
           this.dom.btnMainShoot.style.display = 'inline-flex';
+          this.dom.btnMainShoot.className = 'btn-main-shoot reload-mode';
           this.dom.actionIcon.className = 'bi bi-arrow-clockwise';
           this.dom.actionBtnText.textContent = isDesktop ? 'Nova Jogada (Espaço)' : 'Nova Jogada';
         }
