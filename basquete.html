@@ -1447,15 +1447,16 @@
             this.touchState.moved = true;
           }
 
-          // Sensibilidade do arraste aprimorada e fluida:
-          // Arrastar para a esquerda (deltaX < 0) -> diminui calibX -> mira vira para a esquerda -> tabela vai para a direita!
-          // Arrastar para a direita (deltaX > 0) -> aumenta calibX -> mira vira para a direita -> tabela vai para a esquerda!
-          const sensitivityX = 0.52;
-          const sensitivityY = 0.45;
+          // Sensibilidade do arraste confortável, precisa e direta:
+          // Arrastar para a esquerda (deltaX < 0) -> diminui calibX -> tabela se move para a DIREITA!
+          // Arrastar para a direita (deltaX > 0) -> aumenta calibX -> tabela se move para a ESQUERDA!
+          const sensitivityX = 0.85;
+          const sensitivityY = 0.85;
 
-          this.calibX = Math.max(-60, Math.min(60, this.touchState.startCalibX + deltaX * sensitivityX));
-          // Arrastar para cima (deltaY < 0) -> aumenta elevação (sobe a trajetória)
-          this.calibY = Math.max(-60, Math.min(60, this.touchState.startCalibY - deltaY * sensitivityY));
+          // Sem trava prematura (limite amplo que nunca bloqueia a mira)
+          this.calibX = Math.max(-250, Math.min(250, this.touchState.startCalibX + deltaX * sensitivityX));
+          // Arrastar para cima (deltaY < 0) -> aumenta elevação
+          this.calibY = Math.max(-120, Math.min(120, this.touchState.startCalibY - deltaY * sensitivityY));
 
           this.updateCalibrationMeters();
         }, { passive: true });
@@ -1478,16 +1479,16 @@
 
           if (this.playState === 'HOLDING') {
             if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-              this.calibX = Math.max(-60, this.calibX - 3.5);
+              this.calibX = Math.max(-250, this.calibX - 4.5);
               adjusted = true;
             } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-              this.calibX = Math.min(60, this.calibX + 3.5);
+              this.calibX = Math.min(250, this.calibX + 4.5);
               adjusted = true;
             } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-              this.calibY = Math.min(60, this.calibY + 3.5);
+              this.calibY = Math.min(120, this.calibY + 4);
               adjusted = true;
             } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-              this.calibY = Math.max(-60, this.calibY - 3.5);
+              this.calibY = Math.max(-120, this.calibY - 4);
               adjusted = true;
             }
           }
@@ -1588,12 +1589,12 @@
         }
         this.targetPlayerCourtX = newX;
 
-        // Desalinhamento inicial na mira para exigir calibragem:
-        // A tabela aparece fora de centro, exigindo arrastar/calibrar antes de arremessar
-        const lateralBias = (this.targetPlayerCourtX / 150) * 32;
-        const randomVariation = (Math.random() < 0.5 ? -1 : 1) * (14 + Math.random() * 18);
-        this.calibX = Math.round(lateralBias + randomVariation);
-        this.calibY = Math.round((Math.random() - 0.5) * 26);
+        // Desalinhamento suave: A TABELA SEMPRE NASCE VISÍVEL NA TELA!
+        // Desvio visível de ~40 a 65px para um dos lados, bem perto do centro
+        const signX = (Math.random() < 0.5 ? -1 : 1);
+        this.calibX = Math.round(signX * (40 + Math.random() * 25));
+        const signY = (Math.random() < 0.5 ? -1 : 1);
+        this.calibY = Math.round(signY * (15 + Math.random() * 15));
 
         this.updateCalibrationMeters();
 
@@ -1627,14 +1628,15 @@
 
         // FÍSICA DIRETA REAL (Calculada a partir da mira exata da câmera):
         const directYaw = Math.atan2(this.hoop.x - this.cameraX, this.hoop.z - this.cameraZ);
-        const yawOffset = (this.calibX / 60) * 0.42;
+        const yawOffset = this.calibX * 0.0035;
         const totalYaw = directYaw - yawOffset;
 
         // O ponto exato onde a linha de visão do centro da tela cruza o plano da cesta:
+        // Quando calibX = 0, totalYaw == directYaw, targetX é exatamente 0 (cesta)!
         const targetX = this.playerCourtX - distZ * Math.tan(totalYaw);
 
         // Elevação vertical (calibY = 0 acerta no aro, y = 290):
-        const targetY = this.hoop.y + (this.calibY * 1.8);
+        const targetY = this.hoop.y + (this.calibY * 1.35);
 
         const vx = (targetX - startX) / flightTime;
         const vy = (targetY - startY + 0.5 * gravity * flightTime * flightTime) / flightTime;
@@ -1693,22 +1695,25 @@
       }
 
       updateCalibrationMeters() {
+        if (!this.dom.meterHoriz || !this.dom.meterVert) return;
         const pctH = (this.calibX / 60) * 50;
-        if (pctH >= 0) {
+        const clampedH = Math.max(-50, Math.min(50, pctH));
+        if (clampedH >= 0) {
           this.dom.meterHoriz.style.left = '50%';
-          this.dom.meterHoriz.style.width = `${pctH}%`;
+          this.dom.meterHoriz.style.width = `${clampedH}%`;
         } else {
-          this.dom.meterHoriz.style.left = `${50 + pctH}%`;
-          this.dom.meterHoriz.style.width = `${Math.abs(pctH)}%`;
+          this.dom.meterHoriz.style.left = `${50 + clampedH}%`;
+          this.dom.meterHoriz.style.width = `${Math.abs(clampedH)}%`;
         }
 
-        const pctV = (this.calibY / 60) * 50;
-        if (pctV >= 0) {
+        const pctV = (this.calibY / 40) * 50;
+        const clampedV = Math.max(-50, Math.min(50, pctV));
+        if (clampedV >= 0) {
           this.dom.meterVert.style.left = '50%';
-          this.dom.meterVert.style.width = `${pctV}%`;
+          this.dom.meterVert.style.width = `${clampedV}%`;
         } else {
-          this.dom.meterVert.style.left = `${50 + pctV}%`;
-          this.dom.meterVert.style.width = `${Math.abs(pctV)}%`;
+          this.dom.meterVert.style.left = `${50 + clampedV}%`;
+          this.dom.meterVert.style.width = `${Math.abs(clampedV)}%`;
         }
       }
 
@@ -1853,7 +1858,7 @@
         // Calibragem horizontal:
         // Arrastar para a esquerda (deltaX < 0) diminui calibX -> tabela se move para a DIREITA!
         // Arrastar para a direita (deltaX > 0) aumenta calibX -> tabela se move para a ESQUERDA!
-        const yawOffset = (this.calibX / 60) * 0.42;
+        const yawOffset = this.calibX * 0.0035;
         const totalYaw = directYaw - yawOffset;
 
         const dx = wx - camX;
@@ -1870,7 +1875,7 @@
         // Calibragem vertical (elevação):
         // Arremessar mais alto (calibY > 0) -> câmera mira para cima -> objetos descem na tela (+pitch)
         // Arremessar mais baixo (calibY < 0) -> câmera mira para baixo -> objetos sobem na tela (-pitch)
-        const pitchOffset = (this.calibY / 60) * 55;
+        const pitchOffset = this.calibY * 0.85;
 
         const screenX = this.centerX + rotX * scale;
         const screenY = (this.horizonY + pitchOffset) - rotY * scale;
@@ -2360,32 +2365,29 @@
         this.ctx.save();
         this.ctx.globalAlpha = targetAlpha;
 
+        // O alvo (crosshair) fica fixo no ponto ideal da cesta no centro da tela:
         const distZ = this.hoop.z - this.cameraZ;
-        const directYaw = Math.atan2(this.hoop.x - this.cameraX, this.hoop.z - this.cameraZ);
-        const yawOffset = (this.calibX / 60) * 0.42;
-        const totalYaw = directYaw - yawOffset;
-
-        const targetX = this.playerCourtX - distZ * Math.tan(totalYaw);
-        const targetY = this.hoop.y + (this.calibY * 1.8);
-
-        const targetPt = this.project3D(targetX, targetY, this.hoop.z);
+        const baseScale = 420 / (420 + distZ);
+        const targetScreenX = this.centerX;
+        const targetScreenY = this.horizonY - (this.hoop.y - 120) * baseScale;
 
         this.ctx.strokeStyle = '#ffce00';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 2.5;
         this.ctx.beginPath();
-        this.ctx.arc(targetPt.x, targetPt.y, 14, 0, Math.PI * 2);
+        this.ctx.arc(targetScreenX, targetScreenY, 15, 0, Math.PI * 2);
         this.ctx.stroke();
 
         this.ctx.strokeStyle = '#dd0000';
+        this.ctx.lineWidth = 2;
         this.ctx.beginPath();
-        this.ctx.moveTo(targetPt.x - 18, targetPt.y);
-        this.ctx.lineTo(targetPt.x - 5, targetPt.y);
-        this.ctx.moveTo(targetPt.x + 5, targetPt.y);
-        this.ctx.lineTo(targetPt.x + 18, targetPt.y);
-        this.ctx.moveTo(targetPt.x, targetPt.y - 18);
-        this.ctx.lineTo(targetPt.x, targetPt.y - 5);
-        this.ctx.moveTo(targetPt.x, targetPt.y + 5);
-        this.ctx.lineTo(targetPt.x, targetPt.y + 18);
+        this.ctx.moveTo(targetScreenX - 22, targetScreenY);
+        this.ctx.lineTo(targetScreenX - 6, targetScreenY);
+        this.ctx.moveTo(targetScreenX + 6, targetScreenY);
+        this.ctx.lineTo(targetScreenX + 22, targetScreenY);
+        this.ctx.moveTo(targetScreenX, targetScreenY - 22);
+        this.ctx.lineTo(targetScreenX, targetScreenY - 6);
+        this.ctx.moveTo(targetScreenX, targetScreenY + 6);
+        this.ctx.lineTo(targetScreenX, targetScreenY + 22);
         this.ctx.stroke();
 
         this.ctx.restore();
@@ -2416,8 +2418,8 @@
         const drawH = Math.min(maxScaleH, 360);
         const drawW = drawH * aspect;
 
-        const shiftX = this.calibX * 0.6;
-        const shiftY = -this.calibY * 0.4;
+        const shiftX = this.calibX * 0.35;
+        const shiftY = -this.calibY * 0.25;
         const idleBob = Math.sin(performance.now() * 0.003) * 2;
 
         const targetX = this.centerX - drawW / 2 + shiftX;
