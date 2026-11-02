@@ -353,12 +353,18 @@
       align-items: center;
       justify-content: center;
       background-color: #7bb5e6;
+      touch-action: none !important;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     #gameCanvas {
       width: 100%;
       height: 100%;
       display: block;
+      touch-action: none !important;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     /* Calibrador Sutil no Canto Superior Esquerdo (Oculto no Mobile) */
@@ -1402,11 +1408,13 @@
       }
 
       /* ==========================================================================
-         4. Controles Mobile por Toque Nativo:
-         - Arrastar dedo para a esquerda -> tabela vai para a direita
-         - Arrastar dedo para a direita -> tabela vai para a esquerda
-         - Arraste livre cumulativo (pode tirar o dedo e puxar de novo para girar mais)
-         - O arremesso é acionado no botão ergonômico "ARREMESSAR"
+         4. Controles Mobile por Toque Nativo (DIREÇÃO NATURAL 1:1):
+         - Arrastar dedo para a direita -> tabela vai para a DIREITA
+         - Arrastar dedo para a esquerda -> tabela vai para a ESQUERDA
+         - Arrastar dedo para cima -> tabela vai para CIMA
+         - Arrastar dedo para baixo -> tabela vai para BAIXO
+         - Sensibilidade ampliada: um leve toque já move e encaixa a mira!
+         - Blindado contra gestos de borda do Android (passive: false + preventDefault)
          ========================================================================== */
       setupTouchControls() {
         const arena = document.getElementById('arena');
@@ -1439,27 +1447,33 @@
         arena.addEventListener('touchmove', (e) => {
           if (!this.touchState.active || this.playState !== 'HOLDING') return;
 
+          // Impede o Android de disparar gesto de "Voltar" ou scroll nativo ao puxar na borda
+          if (e.cancelable) {
+            e.preventDefault();
+          }
+
           const touch = e.touches[0];
           const deltaX = touch.clientX - this.touchState.startX;
           const deltaY = touch.clientY - this.touchState.startY;
 
-          if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+          if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
             this.touchState.moved = true;
           }
 
-          // Sensibilidade do arraste confortável, precisa e direta:
-          // Arrastar para a esquerda (deltaX < 0) -> diminui calibX -> tabela se move para a DIREITA!
-          // Arrastar para a direita (deltaX > 0) -> aumenta calibX -> tabela se move para a ESQUERDA!
-          const sensitivityX = 0.85;
-          const sensitivityY = 0.85;
+          // Sensibilidade do arraste natural, ágil e direta:
+          // DIREÇÃO NATURAL:
+          // Arrastar para a direita (deltaX > 0) -> aumenta calibX -> tabela se move para a DIREITA!
+          // Arrastar para a esquerda (deltaX < 0) -> diminui calibX -> tabela se move para a ESQUERDA!
+          // Arrastar para cima (deltaY < 0) -> diminui calibY -> tabela se move para CIMA!
+          // Arrastar para baixo (deltaY > 0) -> aumenta calibY -> tabela se move para BAIXO!
+          const sensitivityX = 1.35;
+          const sensitivityY = 1.25;
 
-          // Sem trava prematura (limite amplo que nunca bloqueia a mira)
           this.calibX = Math.max(-250, Math.min(250, this.touchState.startCalibX + deltaX * sensitivityX));
-          // Arrastar para cima (deltaY < 0) -> aumenta elevação
-          this.calibY = Math.max(-120, Math.min(120, this.touchState.startCalibY - deltaY * sensitivityY));
+          this.calibY = Math.max(-120, Math.min(120, this.touchState.startCalibY + deltaY * sensitivityY));
 
           this.updateCalibrationMeters();
-        }, { passive: true });
+        }, { passive: false });
 
         const endTouch = () => {
           if (!this.touchState.active) return;
@@ -1473,22 +1487,22 @@
       }
 
       setupControls() {
-        // Teclado (Desktop)
+        // Teclado (Desktop - Direção Natural)
         window.addEventListener('keydown', (e) => {
           let adjusted = false;
 
           if (this.playState === 'HOLDING') {
             if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-              this.calibX = Math.max(-250, this.calibX - 4.5);
+              this.calibX = Math.max(-250, this.calibX - 5);
               adjusted = true;
             } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-              this.calibX = Math.min(250, this.calibX + 4.5);
+              this.calibX = Math.min(250, this.calibX + 5);
               adjusted = true;
             } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-              this.calibY = Math.min(120, this.calibY + 4);
+              this.calibY = Math.max(-120, this.calibY - 4.5);
               adjusted = true;
             } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-              this.calibY = Math.max(-120, this.calibY - 4);
+              this.calibY = Math.min(120, this.calibY + 4.5);
               adjusted = true;
             }
           }
@@ -1512,24 +1526,24 @@
           }
         });
 
-        // D-Pad Desktop
+        // D-Pad Desktop (Direção Natural)
         const bindDpad = (id, dx, dy) => {
           const btn = document.getElementById(id);
           if (btn) {
             btn.addEventListener('click', () => {
               if (this.playState !== 'HOLDING') return;
-              if (dx !== 0) this.calibX = Math.max(-60, Math.min(60, this.calibX + dx));
-              if (dy !== 0) this.calibY = Math.max(-60, Math.min(60, this.calibY + dy));
+              if (dx !== 0) this.calibX = Math.max(-250, Math.min(250, this.calibX + dx));
+              if (dy !== 0) this.calibY = Math.max(-120, Math.min(120, this.calibY + dy));
               this.audio.playTick();
               this.updateCalibrationMeters();
             });
           }
         };
 
-        bindDpad('dpadLeft', -4.5, 0);
-        bindDpad('dpadRight', 4.5, 0);
-        bindDpad('dpadUp', 0, 4.5);
-        bindDpad('dpadDown', 0, -4.5);
+        bindDpad('dpadLeft', -5, 0);
+        bindDpad('dpadRight', 5, 0);
+        bindDpad('dpadUp', 0, -4.5);
+        bindDpad('dpadDown', 0, 4.5);
 
         // Botão Ergonômico de Arremesso / Nova Jogada
         const onActionBtn = (e) => {
@@ -1590,11 +1604,11 @@
         this.targetPlayerCourtX = newX;
 
         // Desalinhamento suave: A TABELA SEMPRE NASCE VISÍVEL NA TELA!
-        // Desvio visível de ~40 a 65px para um dos lados, bem perto do centro
+        // Desvio visível de ~35 a 55px para um dos lados, bem perto do centro
         const signX = (Math.random() < 0.5 ? -1 : 1);
-        this.calibX = Math.round(signX * (40 + Math.random() * 25));
+        this.calibX = Math.round(signX * (35 + Math.random() * 20));
         const signY = (Math.random() < 0.5 ? -1 : 1);
-        this.calibY = Math.round(signY * (15 + Math.random() * 15));
+        this.calibY = Math.round(signY * (12 + Math.random() * 12));
 
         this.updateCalibrationMeters();
 
@@ -1626,17 +1640,17 @@
         const startY = 240 + this.jump.height;
         const startZ = this.cameraZ + 40;
 
-        // FÍSICA DIRETA REAL (Calculada a partir da mira exata da câmera):
+        // FÍSICA DIRETA REAL (Calculada a partir da mira exata da câmera - DIREÇÃO NATURAL):
         const directYaw = Math.atan2(this.hoop.x - this.cameraX, this.hoop.z - this.cameraZ);
         const yawOffset = this.calibX * 0.0035;
-        const totalYaw = directYaw - yawOffset;
+        const camYaw = directYaw - yawOffset;
 
         // O ponto exato onde a linha de visão do centro da tela cruza o plano da cesta:
-        // Quando calibX = 0, totalYaw == directYaw, targetX é exatamente 0 (cesta)!
-        const targetX = this.playerCourtX - distZ * Math.tan(totalYaw);
+        // Quando calibX = 0, camYaw == directYaw, targetX é exatamente 0 (cesta)!
+        const targetX = this.playerCourtX + distZ * Math.tan(camYaw);
 
         // Elevação vertical (calibY = 0 acerta no aro, y = 290):
-        const targetY = this.hoop.y + (this.calibY * 1.35);
+        const targetY = this.hoop.y - (this.calibY * 1.35);
 
         const vx = (targetX - startX) / flightTime;
         const vy = (targetY - startY + 0.5 * gravity * flightTime * flightTime) / flightTime;
@@ -1855,18 +1869,18 @@
         // Ângulo direto até a cesta no mundo
         const directYaw = Math.atan2(this.hoop.x - camX, this.hoop.z - camZ);
 
-        // Calibragem horizontal:
-        // Arrastar para a esquerda (deltaX < 0) diminui calibX -> tabela se move para a DIREITA!
-        // Arrastar para a direita (deltaX > 0) aumenta calibX -> tabela se move para a ESQUERDA!
+        // DIREÇÃO NATURAL:
+        // Arrastar para a direita (deltaX > 0) -> calibX aumenta -> tabela vai para a DIREITA!
+        // Arrastar para a esquerda (deltaX < 0) -> calibX diminui -> tabela vai para a ESQUERDA!
         const yawOffset = this.calibX * 0.0035;
-        const totalYaw = directYaw - yawOffset;
+        const camYaw = directYaw - yawOffset;
 
         const dx = wx - camX;
         const dy = wy - camY;
         const dz = wz - camZ;
 
-        const rotX = dx * Math.cos(-totalYaw) - dz * Math.sin(-totalYaw);
-        const rotZ = dx * Math.sin(-totalYaw) + dz * Math.cos(-totalYaw);
+        const rotX = dx * Math.cos(camYaw) - dz * Math.sin(camYaw);
+        const rotZ = dx * Math.sin(camYaw) + dz * Math.cos(camYaw);
         const rotY = dy;
 
         const fov = 420;
