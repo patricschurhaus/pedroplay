@@ -599,7 +599,7 @@
         <i class="bi bi-grid-1x2"></i>
         <span>Jogos Disponíveis</span>
       </span>
-      <span><i class="bi bi-keyboard"></i> Atalhos: Teclas 1, 2 e 3</span>
+      <span><i class="bi bi-keyboard"></i> Atalhos: Teclas 1, 2, 3 e 4</span>
     </div>
 
     <div class="games-grid">
@@ -703,6 +703,39 @@
         </div>
       </a>
 
+      <!-- Jogo 4: Basquete Kids -->
+      <a href="basquete.html" class="game-card" data-key="4" data-game="basquete">
+        <div>
+          <div class="card-top">
+            <div class="game-icon-wrap" aria-hidden="true">
+              <i class="bi bi-dribbble"></i>
+            </div>
+            <div class="card-badges">
+              <span class="visit-pill" title="Quantas vezes Basquete Kids foi acessado">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="counter-number" id="counter-basquete">0</span>
+                <span>acessos</span>
+              </span>
+              <span class="key-pill" title="Atalho de teclado: Tecla 4">
+                <i class="bi bi-4-square"></i>
+              </span>
+            </div>
+          </div>
+          <p class="card-category">Esporte &amp; Precisão</p>
+          <h2 class="card-title">Basquete Kids</h2>
+          <p class="card-desc">
+            Arremesse cestas em primeira pessoa com o mouse e teclado! Teleporte entre posições de 1, 2 e 3 pontos e vença o relógio de 60 segundos.
+          </p>
+        </div>
+        <div class="card-footer">
+          <span class="play-cta">
+            <i class="bi bi-play-circle"></i>
+            <span>Iniciar Jogo</span>
+          </span>
+          <i class="bi bi-arrow-right play-arrow-icon" aria-hidden="true"></i>
+        </div>
+      </a>
+
     </div>
   </main>
 
@@ -731,7 +764,7 @@
     class VisitCounterManager {
       constructor() {
         this.namespace = 'patricschurhaus_pedroplay_v1';
-        this.keys = ['index', 'aviao', 'uno', 'xadrez'];
+        this.keys = ['index', 'aviao', 'uno', 'xadrez', 'basquete'];
         this.storagePrefix = 'pedroplay_visits_';
       }
 
@@ -750,19 +783,22 @@
         const aviaoEl = document.getElementById('counter-aviao');
         const unoEl = document.getElementById('counter-uno');
         const xadrezEl = document.getElementById('counter-xadrez');
+        const basqueteEl = document.getElementById('counter-basquete');
         const totalGamesEl = document.getElementById('counter-total-games');
 
         const cIndex = this.getLocalCount('index');
         const cAviao = this.getLocalCount('aviao');
         const cUno = this.getLocalCount('uno');
         const cXadrez = this.getLocalCount('xadrez');
+        const cBasquete = this.getLocalCount('basquete');
 
         if (indexEl) indexEl.textContent = cIndex.toLocaleString('pt-BR');
         if (aviaoEl) aviaoEl.textContent = cAviao.toLocaleString('pt-BR');
         if (unoEl) unoEl.textContent = cUno.toLocaleString('pt-BR');
         if (xadrezEl) xadrezEl.textContent = cXadrez.toLocaleString('pt-BR');
+        if (basqueteEl) basqueteEl.textContent = cBasquete.toLocaleString('pt-BR');
         if (totalGamesEl) {
-          totalGamesEl.textContent = (cAviao + cUno + cXadrez).toLocaleString('pt-BR');
+          totalGamesEl.textContent = (cAviao + cUno + cXadrez + cBasquete).toLocaleString('pt-BR');
         }
       }
 
@@ -793,7 +829,7 @@
 
       async syncAllCounts() {
         this.updateDOM();
-        for (const key of ['aviao', 'uno', 'xadrez']) {
+        for (const key of ['aviao', 'uno', 'xadrez', 'basquete']) {
           try {
             const res = await fetch(
               `https://api.counterapi.dev/v1/${this.namespace}/${key}`,

@@ -41,6 +41,7 @@ c:\Users\patri\Documents\Pedro\
 ├── avião.html     # Simulador de Cabine: Comissário de Bordo (AeroVoo 702)
 ├── uno.html       # UNO Mania Kids: Jogo de Cartas 1v1 contra Robô
 ├── xadrez.html    # Xadrez Clássico & Minimalista com IA Multinível e Modo Didático
+├── basquete.html  # Basquete Kids: Arremessos 3D em 1ª Pessoa, Teleporte (1, 2, 3) e Níveis
 ├── img/
 │   └── logo.png   # Logomarca oficial do canal "Alemãozinho Pedro"
 ├── .gitignore     # Ignora capturas de tela temporárias na raiz
@@ -170,6 +171,23 @@ Aplicação completa de Xadrez com regras oficiais da FIDE, peças vetoriais Sta
 
 ---
 
+### 4.4. Basquete Kids — `basquete.html`
+**Título:** *Basquete Kids: Craque da Cesta*
+
+Jogo de arremessos em primeira pessoa onde a criança vê suas próprias mãos segurando e arremessando a bola em direção à cesta de basquete em uma quadra 3D interativa.
+
+#### Arquitetura Interna e Classes
+- **`BasketballAudio`:** Sintetizador Web Audio API para rede (*swish*), aro de metal (*rim*), tabela (*backboard*), quique na quadra (*bounce*), apito de árbitro (*whistle*) e comemoração (*cheer*).
+- **`ConfettiEffect`:** Sistema de partículas sobreposto no Canvas para celebrar vitórias e passagem de nível.
+- **`BasketballGame` (Motor de Perspectiva 3D e Game Loop):**
+  - **Mundo 3D em Perspectiva:** Cesta, tabela de acrílico com target box, aro com rede móvel e quadra com linhas da NBA projetadas com profundidade `z`.
+  - **Mãos em Primeira Pessoa:** Animação atlética de arremesso sincronizada ao disparar com a barra de Espaço ou clique.
+  - **Teleporte (Teclas `1`, `2`, `3`):** Move a câmera instantaneamente entre Lance Livre (1 pt), Meia Distância/Garrafão (2 pts) e Linha dos Três (3 pts).
+  - **Mira Suave:** Mouse ajusta levemente a mira horizontal e elevação sem causar desorientação.
+  - **Desafio de 1 Minuto & Níveis:** Temporizador de 60s com meta progressiva de cestas (Nível 1 iniciante com meta de 6 pontos para fácil adaptação, avançando para metas maiores).
+
+---
+
 ## 5. Padrões de Estado (`localStorage`)
 
 | Chave `localStorage` | Módulo | Descrição |
@@ -178,9 +196,12 @@ Aplicação completa de Xadrez com regras oficiais da FIDE, peças vetoriais Sta
 | `pedroplay_visits_aviao` | `index.html` | Contador de acessos ao jogo `avião.html`. |
 | `pedroplay_visits_uno` | `index.html` | Contador de acessos ao jogo `uno.html`. |
 | `pedroplay_visits_xadrez` | `index.html` | Contador de acessos ao jogo `xadrez.html`. |
+| `pedroplay_visits_basquete` | `index.html` | Contador de acessos ao jogo `basquete.html`. |
 | `uno_muted` | `uno.html` | Estado de silenciamento do áudio no UNO (`'true'` / `'false'`). |
 | `chess_sound_muted` | `xadrez.html` | Estado de silenciamento do áudio no Xadrez (`'true'` / `'false'`). |
 | `chess_difficulty` | `xadrez.html` | Nível de dificuldade selecionado (`'super_child'`, `'child'`, `'easy'`, `'medium'`, `'hard'`). |
+| `basketball_sound_muted` | `basquete.html` | Estado de silenciamento do áudio no Basquete (`'true'` / `'false'`). |
+| `pedroplay_basketball_highscore` | `basquete.html` | Recorde máximo de pontos no Basquete. |
 
 ---
 

@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Basquete Kids — Alemãozinho Pedro</title>
+  <!-- Bootstrap Icons via CDN oficial -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+  <style>
+    :root {
+      /* Paleta GitHub Dark Mode */
+      --gh-bg-canvas: #0d1117;
+      --gh-bg-subtle: #161b22;
+      --gh-bg-elevated: #1c2128;
+      --gh-bg-overlay: #21262d;
+      --gh-border-default: #30363d;
+      --gh-border-muted: #21262d;
+      --gh-text-primary: #e6edf3;
+      --gh-text-secondary: #8b949e;
+      --gh-text-muted: #6e7681;
+
+      /* Cores da Alemanha */
+      --de-black: #000000;
+      --de-red: #dd0000;
+      --de-gold: #ffce00;
+
+      /* Basquete / Placar */
+      --court-wood-dark: #b8621b;
+      --court-wood-light: #d67d2b;
+      --bball-orange: #f26419;
+      --bball-seams: #26160d;
+      --led-glow: #00ff66;
+      --led-gold: #ffd700;
+      --led-red: #ff3344;
+
+      --font-brand: 'Georgia', 'Times New Roman', Times, serif;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--gh-bg-canvas);
+      color: var(--gh-text-primary);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Cabeçalho Superior */
+    .top-header {
+      background-color: var(--gh-bg-subtle);
+      border-bottom: 1px solid var(--gh-border-default);
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 30;
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--gh-text-secondary);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      background-color: var(--gh-bg-overlay);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      border-color: var(--de-gold);
+      color: var(--de-gold);
+      background-color: var(--gh-bg-elevated);
+    }
+
+    .title-group {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .game-logo-title {
+      font-family: var(--font-brand);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gh-text-primary);
+    }
+
+    .game-logo-title span {
+      color: var(--de-gold);
+    }
+
+    .author-badge {
+      font-size: 0.72rem;
+      color: var(--de-red);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      background-color: var(--gh-bg-overlay);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-primary);
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--de-gold);
+      color: var(--de-gold);
+      background-color: var(--gh-bg-elevated);
+    }
+
+    /* Placar Estilo Ginásio NBA */
+    .scoreboard-bar {
+      background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+      border-bottom: 2px solid var(--gh-border-default);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      z-index: 25;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .score-block {
+      background-color: #0b0e14;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 4px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 90px;
+      position: relative;
+    }
+
+    .score-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gh-text-secondary);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .score-value {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--led-gold);
+      text-shadow: 0 0 10px rgba(255, 206, 0, 0.4);
+      line-height: 1.1;
+    }
+
+    .score-value.timer {
+      color: #38bdf8;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .score-value.timer.hurry {
+      color: var(--led-red);
+      animation: pulseTimer 0.6s infinite alternate;
+      text-shadow: 0 0 12px rgba(255, 51, 68, 0.7);
+    }
+
+    @keyframes pulseTimer {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    .score-value.goal {
+      color: #4ade80;
+    }
+
+    .score-value.level {
+      color: #f43f5e;
+    }
+
+    .score-value.best {
+      color: #e2e8f0;
+      font-size: 1.3rem;
+    }
+
+    /* Posição Ativa & Teleporte */
+    .teleport-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #0b0e14;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 4px 10px;
+    }
+
+    .teleport-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: var(--gh-text-secondary);
+      background-color: var(--gh-bg-overlay);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .teleport-pill:hover {
+      color: var(--gh-text-primary);
+      border-color: var(--gh-border-default);
+    }
+
+    .teleport-pill.active {
+      background: linear-gradient(135deg, #dd0000 0%, #b30000 100%);
+      color: #ffffff;
+      border-color: var(--de-gold);
+      box-shadow: 0 0 8px rgba(221, 0, 0, 0.5);
+    }
+
+    .teleport-pill.active .pt-num {
+      color: var(--de-gold);
+    }
+
+    /* Container do Jogo (Canvas 3D) */
+    .arena-container {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      cursor: crosshair;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 35%, #182232 0%, #0d1117 80%, #06090e 100%);
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Controles Flutuantes / Atalhos na Tela */
+    .hud-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+
+    .hud-top-hint {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .badge-hint {
+      pointer-events: auto;
+      background-color: rgba(22, 27, 34, 0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-secondary);
+      font-size: 0.78rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-hint kbd {
+      background-color: #0b0e14;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--de-gold);
+    }
+
+    .hud-bottom-bar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .mobile-teleport-cluster {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .btn-shoot-mobile {
+      pointer-events: auto;
+      background: linear-gradient(135deg, #f26419 0%, #d44a04 100%);
+      color: #ffffff;
+      border: 2px solid #ffce00;
+      border-radius: 50px;
+      padding: 14px 28px;
+      font-family: var(--font-brand);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 6px 20px rgba(242, 100, 25, 0.45);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-shoot-mobile:hover,
+    .btn-shoot-mobile:active {
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(255, 206, 0, 0.6);
+      border-color: #ffffff;
+    }
+
+    /* Mensagem Flutuante de Pontuação */
+    .score-popup {
+      position: absolute;
+      font-family: var(--font-brand);
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      pointer-events: none;
+      animation: floatScore 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+      z-index: 50;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+    }
+
+    @keyframes floatScore {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 20px) scale(0.6);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -20px) scale(1.2);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -60px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -90px) scale(0.8);
+      }
+    }
+
+    /* Modal de Nível / Fim de Jogo */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(13, 17, 23, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background-color: var(--gh-bg-subtle);
+      border: 2px solid var(--gh-border-default);
+      border-radius: 12px;
+      max-width: 460px;
+      width: 100%;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-icon-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      border: 2px solid var(--gh-border-default);
+    }
+
+    .modal-icon-wrap.win {
+      background: radial-gradient(circle, rgba(255, 206, 0, 0.2) 0%, rgba(221, 0, 0, 0.1) 100%);
+      border-color: var(--de-gold);
+      color: var(--de-gold);
+    }
+
+    .modal-icon-wrap.try {
+      background-color: var(--gh-bg-overlay);
+      border-color: var(--de-red);
+      color: var(--de-red);
+    }
+
+    .modal-title {
+      font-family: var(--font-brand);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--gh-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.95rem;
+      color: var(--gh-text-secondary);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .modal-stats {
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .stat-cell-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gh-text-muted);
+      margin-bottom: 2px;
+    }
+
+    .stat-cell-val {
+      font-family: var(--font-mono);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--gh-text-primary);
+    }
+
+    .btn-modal {
+      width: 100%;
+      background: linear-gradient(135deg, #dd0000 0%, #b30000 100%);
+      color: #ffffff;
+      border: 1px solid var(--de-gold);
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-family: var(--font-brand);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(221, 0, 0, 0.4);
+    }
+
+    .btn-modal:hover {
+      background: linear-gradient(135deg, #ff1a1a 0%, #cc0000 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 206, 0, 0.5);
+    }
+
+    /* Canvas de Confetes */
+    #confettiCanvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 120;
+    }
+
+    @media (max-width: 768px) {
+      .top-header {
+        padding: 6px 12px;
+      }
+      .author-badge,
+      .badge-hint {
+        display: none;
+      }
+      .scoreboard-bar {
+        padding: 6px 10px;
+        gap: 8px;
+      }
+      .score-block {
+        min-width: 65px;
+        padding: 3px 8px;
+      }
+      .score-value {
+        font-size: 1.15rem;
+      }
+      .btn-shoot-mobile {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar Oficial PedroPlay -->
+  <header class="top-header">
+    <div class="header-left">
+      <a href="index.html" class="back-btn" title="Voltar para a central de jogos">
+        <i class="bi bi-arrow-left"></i>
+        <span>Central</span>
+      </a>
+
+      <div class="title-group">
+        <h1 class="game-logo-title">Basquete<span>Kids</span></h1>
+        <span class="author-badge">Alemãozinho Pedro</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="btn-icon" id="btnSoundToggle" title="Ativar ou desativar efeitos sonoros" aria-label="Som">
+        <i class="bi bi-volume-up" id="soundIcon"></i>
+      </button>
+
+      <button class="btn-icon" id="btnRestart" title="Reiniciar partida (Tecla R)" aria-label="Reiniciar">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Placar Ginásio NBA -->
+  <section class="scoreboard-bar" aria-label="Placar do jogo">
+    <!-- Nível -->
+    <div class="score-block" title="Nível atual">
+      <span class="score-label"><i class="bi bi-flag"></i> Nível</span>
+      <span class="score-value level" id="valLevel">1</span>
+    </div>
+
+    <!-- Pontos -->
+    <div class="score-block" title="Pontos na rodada">
+      <span class="score-label"><i class="bi bi-star-fill"></i> Pontos</span>
+      <span class="score-value" id="valScore">0</span>
+    </div>
+
+    <!-- Meta -->
+    <div class="score-block" title="Meta de pontos para passar de nível">
+      <span class="score-label"><i class="bi bi-bullseye"></i> Meta</span>
+      <span class="score-value goal" id="valGoal">6</span>
+    </div>
+
+    <!-- Cronômetro 60s -->
+    <div class="score-block" title="Tempo restante (60 segundos)">
+      <span class="score-label"><i class="bi bi-clock"></i> Tempo</span>
+      <span class="score-value timer" id="valTimer">60</span>
+    </div>
+
+    <!-- Teleporte de Distância (1, 2, 3) -->
+    <div class="teleport-indicator" title="Posição de arremesso">
+      <button class="teleport-pill active" id="btnPos1" data-pos="1" title="Perto da cesta: 1 ponto (Tecla 1)">
+        <i class="bi bi-1-circle-fill"></i>
+        <span>Lance Livre (<strong class="pt-num">1 pt</strong>)</span>
+      </button>
+
+      <button class="teleport-pill" id="btnPos2" data-pos="2" title="Média distância: 2 pontos (Tecla 2)">
+        <i class="bi bi-2-circle-fill"></i>
+        <span>Garrafão (<strong class="pt-num">2 pts</strong>)</span>
+      </button>
+
+      <button class="teleport-pill" id="btnPos3" data-pos="3" title="Linha dos três: 3 pontos (Tecla 3)">
+        <i class="bi bi-3-circle-fill"></i>
+        <span>Três Pontos (<strong class="pt-num">3 pts</strong>)</span>
+      </button>
+    </div>
+
+    <!-- Recorde -->
+    <div class="score-block" title="Seu recorde máximo">
+      <span class="score-label"><i class="bi bi-trophy"></i> Recorde</span>
+      <span class="score-value best" id="valHigh">0</span>
+    </div>
+  </section>
+
+  <!-- Área Principal da Quadra / Arena 3D -->
+  <main class="arena-container" id="arena">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Overlay com Atalhos e Botões de Ação -->
+    <div class="hud-overlay">
+      <div class="hud-top-hint">
+        <div class="badge-hint">
+          <i class="bi bi-mouse"></i>
+          <span>Mexa o mouse para mirar</span>
+        </div>
+        <div class="badge-hint">
+          <i class="bi bi-keyboard"></i>
+          <span>Aperte <kbd>ESPAÇO</kbd> para arremessar</span>
+        </div>
+        <div class="badge-hint">
+          <i class="bi bi-lightning-charge"></i>
+          <span>Teclas <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> para teleporte</span>
+        </div>
+      </div>
+
+      <div class="hud-bottom-bar">
+        <div class="mobile-teleport-cluster">
+          <!-- Acessibilidade mobile / touch -->
+        </div>
+
+        <button class="btn-shoot-mobile" id="btnShoot" aria-label="Arremessar bola de basquete">
+          <i class="bi bi-dribbble"></i>
+          <span>Arremessar (Espaço)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Confetes de Vitória -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Modal de Resultado (Passou de Nível / Fim do Tempo) -->
+    <div class="modal-backdrop" id="resultModal">
+      <div class="modal-card">
+        <div class="modal-icon-wrap win" id="modalIcon">
+          <i class="bi bi-trophy-fill" id="modalIconGlyph"></i>
+        </div>
+        <h2 class="modal-title" id="modalTitle">Nível Concluído!</h2>
+        <p class="modal-desc" id="modalDesc">Parabéns! Você alcançou a meta de cestas!</p>
+
+        <div class="modal-stats">
+          <div>
+            <div class="stat-cell-title">Cestas Feitas</div>
+            <div class="stat-cell-val" id="modalBaskets">0</div>
+          </div>
+          <div>
+            <div class="stat-cell-title">Pontos</div>
+            <div class="stat-cell-val" id="modalScore">0</div>
+          </div>
+          <div>
+            <div class="stat-cell-title">Recorde</div>
+            <div class="stat-cell-val" id="modalHigh">0</div>
+          </div>
+        </div>
+
+        <button class="btn-modal" id="btnModalAction">
+          <i class="bi bi-play-circle-fill"></i>
+          <span id="modalBtnText">Próximo Nível</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    /**
+     * PedroPlay — Basquete Kids
+     * Canal Oficial: Alemãozinho Pedro (@alemaozinhopedro)
+     * Arquitetura: Single-file, HTML5 Canvas 2D/3D com Projeção em Perspectiva,
+     * Web Audio API sintetizada matematicamente e controles intuitivos para crianças de 7 anos.
+     */
+
+    /* ==========================================================================
+       1. Motor de Efeitos Sonoros Acústicos (Web Audio API)
+       ========================================================================== */
+    class BasketballAudio {
+      constructor() {
+        this.ctx = null;
+        this.muted = localStorage.getItem('basketball_sound_muted') === 'true';
+        this.updateIcon();
+      }
+
+      initCtx() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        localStorage.setItem('basketball_sound_muted', this.muted);
+        this.updateIcon();
+        if (!this.muted) {
+          this.playSwish();
+        }
+      }
+
+      updateIcon() {
+        const icon = document.getElementById('soundIcon');
+        if (icon) {
+          icon.className = this.muted ? 'bi bi-volume-mute' : 'bi bi-volume-up';
+        }
+      }
+
+      // Som de rede suave (Swish) ao acertar a cesta
+      playSwish() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const bufferSize = this.ctx.sampleRate * 0.35;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.08));
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2400, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.3);
+        filter.Q.value = 3.0;
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+      }
+
+      // Som metálico ao tocar no aro (Rim bounce)
+      playRim() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(940, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(420, this.ctx.currentTime + 0.18);
+
+        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      }
+
+      // Som sólido ao tocar na tabela (Backboard)
+      playBackboard() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.12);
+
+        gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.16);
+      }
+
+      // Quique da bola no chão de madeira
+      playBounce() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(130, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(45, this.ctx.currentTime + 0.1);
+
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.1);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.11);
+      }
+
+      // Arremesso (som de impulso pelo ar)
+      playShoot() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(520, this.ctx.currentTime + 0.12);
+
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.14);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      }
+
+      // Teleporte / Troca de Posição
+      playTeleport() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(680, this.ctx.currentTime + 0.16);
+
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      }
+
+      // Apito de início ou fim de rodada
+      playWhistle() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        osc1.frequency.setValueAtTime(2800, this.ctx.currentTime);
+        osc2.frequency.setValueAtTime(2850, this.ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc1.start();
+        osc2.start();
+        osc1.stop(this.ctx.currentTime + 0.42);
+        osc2.stop(this.ctx.currentTime + 0.42);
+      }
+
+      // Fanfarra de vitória
+      playCheer() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          const start = this.ctx.currentTime + idx * 0.1;
+          gain.gain.setValueAtTime(0.25, start);
+          gain.gain.exponentialRampToValueAtTime(0.01, start + 0.35);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.38);
+        });
+      }
+    }
+
+    /* ==========================================================================
+       2. Sistema de Partículas de Confetes para Celebrações
+       ========================================================================== */
+    class ConfettiEffect {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.animId = null;
+        this.colors = ['#ffce00', '#dd0000', '#ffffff', '#00ff66', '#38bdf8', '#f26419'];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      burst() {
+        this.resize();
+        this.particles = [];
+        for (let i = 0; i < 90; i++) {
+          this.particles.push({
+            x: this.canvas.width * (0.3 + Math.random() * 0.4),
+            y: this.canvas.height * 0.45,
+            vx: (Math.random() - 0.5) * 16,
+            vy: -Math.random() * 14 - 4,
+            size: Math.random() * 8 + 4,
+            color: this.colors[Math.floor(Math.random() * this.colors.length)],
+            rotation: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 12,
+            opacity: 1
+          });
+        }
+        if (!this.animId) this.loop();
+      }
+
+      loop() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let active = 0;
+
+        for (let p of this.particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.4; // gravidade
+          p.rotation += p.vRot;
+          p.opacity -= 0.008;
+
+          if (p.opacity > 0 && p.y < this.canvas.height) {
+            active++;
+            this.ctx.save();
+            this.ctx.translate(p.x, p.y);
+            this.ctx.rotate((p.rotation * Math.PI) / 180);
+            this.ctx.globalAlpha = Math.max(0, p.opacity);
+            this.ctx.fillStyle = p.color;
+            this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.5);
+            this.ctx.restore();
+          }
+        }
+
+        if (active > 0) {
+          this.animId = requestAnimationFrame(() => this.loop());
+        } else {
+          this.animId = null;
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+      }
+    }
+
+    /* ==========================================================================
+       3. Motor Principal do Jogo de Basquete em Perspectiva (Canvas 2D/3D)
+       ========================================================================== */
+    class BasketballGame {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.audio = new BasketballAudio();
+        this.confetti = new ConfettiEffect('confettiCanvas');
+
+        // Estado do Jogo
+        this.score = 0;
+        this.highScore = parseInt(localStorage.getItem('pedroplay_basketball_highscore') || '0', 10);
+        this.basketsCount = 0;
+        this.level = 1;
+        this.timeLeft = 60;
+        this.timerInterval = null;
+        this.isGameOver = false;
+
+        // Configuração de Níveis (Progressão amigável para o Pedro de 7 anos)
+        this.levelConfigs = [
+          { level: 1, name: 'Iniciante na Quadra', goal: 6, time: 60 },
+          { level: 2, name: 'Armador Talentoso', goal: 14, time: 60 },
+          { level: 3, name: 'Estrela da Cesta', goal: 22, time: 60 },
+          { level: 4, name: 'Lenda da NBA', goal: 32, time: 60 },
+          { level: 5, name: 'Mestre Imparável', goal: 44, time: 60 }
+        ];
+
+        // Posição de Teleporte Atual: 1, 2 ou 3
+        this.currentPosition = 1; // 1 = Lance Livre, 2 = Garrafão, 3 = Linha de 3
+
+        // Câmera / Posição do Jogador
+        // Distância do jogador à cesta (z):
+        // Cesta está em z = 550.
+        this.targetCameraZ = 240; // z atual
+        this.cameraZ = 240;
+        this.cameraX = 0;
+        this.targetCameraX = 0;
+
+        // Controle do Mouse / Mira
+        this.mousePos = { x: 0, y: 0 };
+        this.aimX = 0; // offset suave em X (-60 a +60)
+        this.aimY = 0; // offset suave em Y (-40 a +40)
+
+        // Animação das Mãos e da Bola Pronta
+        this.handsAnim = {
+          shootProgress: 0, // 0 = segurando, 0 a 1 = arremessando
+          isShooting: false,
+          cooldown: 0
+        };
+
+        // Bolas em Voo (Suporta múltiplos arremessos sem travar)
+        this.balls = [];
+
+        // Geometria da Cesta em Coordenadas 3D do Mundo
+        // x: 0 (centro), y: altura a partir do chão, z: profundidade
+        this.hoop = {
+          x: 0,
+          y: 280, // Altura do aro
+          z: 550, // Distância do fundo
+          rimRadius: 36,
+          backboardWidth: 240,
+          backboardHeight: 160,
+          backboardY: 330, // Centro da tabela
+          backboardZ: 575  // Logo atrás do aro
+        };
+
+        // Ondulação / Animação da Rede
+        this.netWave = 0;
+
+        // Elementos DOM
+        this.dom = {
+          valScore: document.getElementById('valScore'),
+          valHigh: document.getElementById('valHigh'),
+          valLevel: document.getElementById('valLevel'),
+          valGoal: document.getElementById('valGoal'),
+          valTimer: document.getElementById('valTimer'),
+          btnPos1: document.getElementById('btnPos1'),
+          btnPos2: document.getElementById('btnPos2'),
+          btnPos3: document.getElementById('btnPos3'),
+          modal: document.getElementById('resultModal'),
+          modalTitle: document.getElementById('modalTitle'),
+          modalDesc: document.getElementById('modalDesc'),
+          modalBaskets: document.getElementById('modalBaskets'),
+          modalScore: document.getElementById('modalScore'),
+          modalHigh: document.getElementById('modalHigh'),
+          modalIcon: document.getElementById('modalIcon'),
+          modalIconGlyph: document.getElementById('modalIconGlyph'),
+          btnModalAction: document.getElementById('btnModalAction'),
+          modalBtnText: document.getElementById('modalBtnText')
+        };
+
+        this.init();
+      }
+
+      init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.setupControls();
+        this.updateHUD();
+        this.startLevel(1);
+
+        // Inicia loop de renderização a 60fps
+        this.lastTime = performance.now();
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+
+      resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+        this.centerX = this.canvas.width / 2;
+        this.centerY = this.canvas.height / 2;
+        this.horizonY = this.canvas.height * 0.52;
+      }
+
+      setupControls() {
+        // Movimento do Mouse para ajustar mira suavemente
+        window.addEventListener('mousemove', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const relX = (e.clientX - rect.left) / rect.width - 0.5;
+          const relY = (e.clientY - rect.top) / rect.height - 0.5;
+
+          // Suave e limitado para não desorientar a criança
+          this.aimX = relX * 120;
+          this.aimY = -relY * 60;
+        });
+
+        // Toque em Telas Touch / Tablets
+        this.canvas.addEventListener('touchmove', (e) => {
+          if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            const relX = (touch.clientX - rect.left) / rect.width - 0.5;
+            const relY = (touch.clientY - rect.top) / rect.height - 0.5;
+            this.aimX = relX * 120;
+            this.aimY = -relY * 60;
+          }
+        }, { passive: true });
+
+        // Atalhos de Teclado
+        window.addEventListener('keydown', (e) => {
+          if (e.code === 'Space') {
+            e.preventDefault();
+            this.triggerShoot();
+          } else if (e.key === '1') {
+            this.setShootingPosition(1);
+          } else if (e.key === '2') {
+            this.setShootingPosition(2);
+          } else if (e.key === '3') {
+            this.setShootingPosition(3);
+          } else if (e.key === 'r' || e.key === 'R') {
+            this.restartGame();
+          }
+        });
+
+        // Botão de Disparo na tela
+        const btnShoot = document.getElementById('btnShoot');
+        if (btnShoot) {
+          btnShoot.addEventListener('click', () => this.triggerShoot());
+        }
+
+        // Clique no próprio canvas também atira
+        this.canvas.addEventListener('mousedown', (e) => {
+          if (e.button === 0 && !this.isGameOver) {
+            this.triggerShoot();
+          }
+        });
+
+        // Botões de Teleporte (1, 2, 3)
+        this.dom.btnPos1.addEventListener('click', () => this.setShootingPosition(1));
+        this.dom.btnPos2.addEventListener('click', () => this.setShootingPosition(2));
+        this.dom.btnPos3.addEventListener('click', () => this.setShootingPosition(3));
+
+        // Botões do Cabeçalho
+        document.getElementById('btnSoundToggle').addEventListener('click', () => this.audio.toggleMute());
+        document.getElementById('btnRestart').addEventListener('click', () => this.restartGame());
+
+        // Ação do Modal
+        this.dom.btnModalAction.addEventListener('click', () => {
+          this.dom.modal.classList.remove('active');
+          if (this.currentWin) {
+            this.startLevel(this.level + 1);
+          } else {
+            this.startLevel(this.level); // Repetir o nível atual
+          }
+        });
+      }
+
+      /* ==========================================================================
+         4. Teleporte de Posições (1, 2 e 3 Pontos)
+         ========================================================================== */
+      setShootingPosition(pos) {
+        if (this.currentPosition === pos) return;
+        this.currentPosition = pos;
+        this.audio.playTeleport();
+
+        // Atualiza estilo dos botões
+        [this.dom.btnPos1, this.dom.btnPos2, this.dom.btnPos3].forEach((btn, idx) => {
+          btn.classList.toggle('active', idx + 1 === pos);
+        });
+
+        // Define a distância da câmera (z)
+        // Cesta está em z = 550.
+        // Posição 1: bem perto (Lance Livre / Fácil)
+        // Posição 2: meia distância (Garrafão / Médio)
+        // Posição 3: longe (Linha dos 3 / Desafiador)
+        if (pos === 1) {
+          this.targetCameraZ = 280; // dist = 270
+        } else if (pos === 2) {
+          this.targetCameraZ = 160; // dist = 390
+        } else if (pos === 3) {
+          this.targetCameraZ = 40;  // dist = 510
+        }
+
+        this.showPopupText(`Posição: ${pos} Ponto${pos > 1 ? 's' : ''}`, '#ffd700');
+      }
+
+      /* ==========================================================================
+         5. Disparo / Arremesso da Bola
+         ========================================================================== */
+      triggerShoot() {
+        if (this.isGameOver || this.handsAnim.cooldown > 0) return;
+
+        this.audio.playShoot();
+        this.handsAnim.isShooting = true;
+        this.handsAnim.shootProgress = 0;
+        this.handsAnim.cooldown = 0.35; // cooldown rápido para manter ritmo alegre
+
+        // Distância até o aro
+        const distZ = this.hoop.z - this.cameraZ;
+
+        // Cálculo da física de lançamento perfeito com base na mira do mouse
+        // Tempo estimado de voo até o aro (segundos)
+        const flightTime = 0.85 + (distZ / 500) * 0.3;
+
+        // Velocidade Z
+        const vz = distZ / flightTime;
+
+        // Gravidade
+        const gravity = 820;
+
+        // Posição inicial da bola (nas mãos do jogador em 3D)
+        const startX = this.cameraX + (this.aimX * 0.15);
+        const startY = 120; // altura do peito do jogador
+        const startZ = this.cameraZ + 40;
+
+        // Alvo no aro com pequenas variações ajustadas pelo mouse
+        const targetX = this.hoop.x + (this.aimX * 0.6);
+        const targetY = this.hoop.y + 12 + (this.aimY * 0.3); // mira suave
+
+        // Velocidade horizontal X
+        const vx = (targetX - startX) / flightTime;
+
+        // Velocidade vertical Y necessária para fazer uma linda parábola de basquete
+        // targetY = startY + vy*t - 0.5*g*t^2  =>  vy = (targetY - startY + 0.5*g*t^2) / t
+        const vy = (targetY - startY + 0.5 * gravity * flightTime * flightTime) / flightTime;
+
+        // Cria a entidade da bola de basquete 3D
+        this.balls.push({
+          x: startX,
+          y: startY,
+          z: startZ,
+          vx: vx,
+          vy: vy,
+          vz: vz,
+          radius: 20,
+          pointsValue: this.currentPosition,
+          rotation: 0,
+          rotSpeed: 8,
+          scored: false,
+          hitBackboard: false,
+          active: true,
+          fade: 1.0,
+          groundBounces: 0
+        });
+      }
+
+      /* ==========================================================================
+         6. Níveis e Temporizador de 1 Minuto (60s)
+         ========================================================================== */
+      startLevel(lvlNum) {
+        this.level = lvlNum;
+        const config = this.levelConfigs.find(c => c.level === lvlNum) || {
+          level: lvlNum,
+          name: `Nível ${lvlNum}`,
+          goal: 10 + (lvlNum - 1) * 10,
+          time: 60
+        };
+
+        this.levelGoal = config.goal;
+        this.timeLeft = config.time;
+        this.score = 0;
+        this.basketsCount = 0;
+        this.isGameOver = false;
+        this.balls = [];
+
+        this.updateHUD();
+        this.audio.playWhistle();
+
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => {
+          if (this.timeLeft > 0) {
+            this.timeLeft--;
+            this.updateTimerDisplay();
+
+            if (this.timeLeft === 0) {
+              this.endLevel();
+            }
+          }
+        }, 1000);
+      }
+
+      updateTimerDisplay() {
+        this.dom.valTimer.textContent = this.timeLeft;
+        if (this.timeLeft <= 10) {
+          this.dom.valTimer.classList.add('hurry');
+        } else {
+          this.dom.valTimer.classList.remove('hurry');
+        }
+      }
+
+      endLevel() {
+        clearInterval(this.timerInterval);
+        this.isGameOver = true;
+        this.audio.playWhistle();
+
+        const won = this.score >= this.levelGoal;
+        this.currentWin = won;
+
+        // Atualiza Recorde
+        if (this.score > this.highScore) {
+          this.highScore = this.score;
+          localStorage.setItem('pedroplay_basketball_highscore', this.highScore);
+        }
+
+        // Configura Modal
+        if (won) {
+          this.audio.playCheer();
+          this.confetti.burst();
+          this.dom.modalIcon.className = 'modal-icon-wrap win';
+          this.dom.modalIconGlyph.className = 'bi bi-trophy-fill';
+          this.dom.modalTitle.textContent = `Nível ${this.level} Concluído!`;
+          this.dom.modalDesc.textContent = `Sensacional, Pedro! Você marcou ${this.score} pontos e superou a meta de ${this.levelGoal}!`;
+          this.dom.modalBtnText.textContent = 'Próximo Nível';
+        } else {
+          this.dom.modalIcon.className = 'modal-icon-wrap try';
+          this.dom.modalIconGlyph.className = 'bi bi-arrow-repeat';
+          this.dom.modalTitle.textContent = 'Tempo Esgotado!';
+          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Vamos tentar de novo?`;
+          this.dom.modalBtnText.textContent = 'Tentar Novamente';
+        }
+
+        this.dom.modalBaskets.textContent = this.basketsCount;
+        this.dom.modalScore.textContent = this.score;
+        this.dom.modalHigh.textContent = this.highScore;
+
+        setTimeout(() => {
+          this.dom.modal.classList.add('active');
+        }, 600);
+      }
+
+      restartGame() {
+        clearInterval(this.timerInterval);
+        this.dom.modal.classList.remove('active');
+        this.startLevel(1);
+      }
+
+      updateHUD() {
+        this.dom.valScore.textContent = this.score;
+        this.dom.valHigh.textContent = this.highScore;
+        this.dom.valLevel.textContent = this.level;
+        this.dom.valGoal.textContent = this.levelGoal;
+        this.updateTimerDisplay();
+      }
+
+      showPopupText(text, color = '#ffce00') {
+        const el = document.createElement('div');
+        el.className = 'score-popup';
+        el.textContent = text;
+        el.style.color = color;
+        el.style.left = `${this.centerX}px`;
+        el.style.top = `${this.horizonY - 80}px`;
+
+        document.getElementById('arena').appendChild(el);
+        setTimeout(() => {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }, 1200);
+      }
+
+      /* ==========================================================================
+         7. Projeção 3D para 2D Canvas & Física
+         ========================================================================== */
+      project3D(x, y, z) {
+        // Câmera do jogador
+        const relZ = z - this.cameraZ;
+        const fov = 420;
+        const scale = fov / Math.max(1, fov + relZ);
+
+        const screenX = this.centerX + (x - this.cameraX) * scale;
+        // y cresce para cima no mundo 3D; na tela cresce para baixo a partir do horizonte
+        const screenY = this.horizonY - (y - 120) * scale;
+
+        return { x: screenX, y: screenY, scale: scale, depth: relZ };
+      }
+
+      update(dt) {
+        // Interpolação suave de câmera ao teletransportar
+        this.cameraZ += (this.targetCameraZ - this.cameraZ) * 6 * dt;
+        this.cameraX += (this.targetCameraX - this.cameraX) * 6 * dt;
+
+        // Cooldown das mãos
+        if (this.handsAnim.cooldown > 0) {
+          this.handsAnim.cooldown -= dt;
+        }
+
+        // Animação de arremesso das mãos
+        if (this.handsAnim.isShooting) {
+          this.handsAnim.shootProgress += dt * 4.5;
+          if (this.handsAnim.shootProgress >= 1) {
+            this.handsAnim.shootProgress = 0;
+            this.handsAnim.isShooting = false;
+          }
+        }
+
+        // Amortecimento da onda na rede da cesta
+        if (this.netWave > 0) {
+          this.netWave = Math.max(0, this.netWave - dt * 2.5);
+        }
+
+        const gravity = 820;
+
+        // Atualização de cada bola em voo
+        for (let i = this.balls.length - 1; i >= 0; i--) {
+          const b = this.balls[i];
+          if (!b.active) continue;
+
+          // Física de movimento
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          b.z += b.vz * dt;
+          b.vy -= gravity * dt; // gravidade puxa para baixo
+          b.rotation += b.rotSpeed * dt;
+
+          // Colisão com Tabela (Backboard)
+          if (!b.hitBackboard && b.z >= this.hoop.backboardZ - 10 && b.vz > 0) {
+            const hw = this.hoop.backboardWidth / 2;
+            const hh = this.hoop.backboardHeight / 2;
+            if (
+              b.x >= this.hoop.x - hw &&
+              b.x <= this.hoop.x + hw &&
+              b.y >= this.hoop.backboardY - hh &&
+              b.y <= this.hoop.backboardY + hh
+            ) {
+              b.z = this.hoop.backboardZ - 10;
+              b.vz = -b.vz * 0.45; // rebate para frente
+              b.vx = b.vx * 0.8 + (this.hoop.x - b.x) * 0.4;
+              b.hitBackboard = true;
+              this.audio.playBackboard();
+            }
+          }
+
+          // Verificação de Cesta (Passagem pelo Aro)
+          if (!b.scored && b.vy < 0) {
+            // Bola descendo na altura do aro
+            const distFromRimY = Math.abs(b.y - this.hoop.y);
+            const distFromRimZ = Math.abs(b.z - this.hoop.z);
+            const distFromRimX = Math.abs(b.x - this.hoop.x);
+            const distHorizontal = Math.hypot(distFromRimX, distFromRimZ);
+
+            // Se estiver descendo exatamente pelo centro do aro
+            if (distFromRimY < 18 && distHorizontal < this.hoop.rimRadius * 0.75) {
+              b.scored = true;
+              this.score += b.pointsValue;
+              this.basketsCount++;
+              this.netWave = 1.0; // balanço da rede
+
+              this.audio.playSwish();
+              this.showPopupText(`+${b.pointsValue} CESTA!`, b.pointsValue === 3 ? '#ffce00' : '#4ade80');
+              this.updateHUD();
+
+              // Freia um pouco a bola ao passar pela rede
+              b.vx *= 0.3;
+              b.vz *= 0.3;
+              b.vy *= 0.5;
+            } else if (distFromRimY < 16 && Math.abs(distHorizontal - this.hoop.rimRadius) < 14) {
+              // Tocou no aro de metal
+              this.audio.playRim();
+              b.vy = -b.vy * 0.5;
+              b.vx += (Math.random() - 0.5) * 80;
+            }
+          }
+
+          // Colisão com o Chão da Quadra
+          if (b.y <= b.radius) {
+            b.y = b.radius;
+            if (Math.abs(b.vy) > 60) {
+              b.vy = -b.vy * 0.65; // quique com perda de energia
+              b.vx *= 0.8;
+              b.vz *= 0.8;
+              b.groundBounces++;
+              if (b.groundBounces <= 3) {
+                this.audio.playBounce();
+              }
+            } else {
+              b.vy = 0;
+              b.vx *= 0.95;
+              b.vz *= 0.95;
+            }
+          }
+
+          // Remove bola após afastar muito ou sumir no chão
+          if (b.z > 700 || b.y < 0 || (b.groundBounces > 4 && Math.abs(b.vy) < 20)) {
+            b.fade -= dt * 1.5;
+            if (b.fade <= 0) {
+              this.balls.splice(i, 1);
+            }
+          }
+        }
+      }
+
+      /* ==========================================================================
+         8. Renderização Visual da Quadra, Cesta, Bola e Mãos
+         ========================================================================== */
+      render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // 1. Fundo do Ginásio / Arquibancada Noturna
+        this.renderStadiumBackground();
+
+        // 2. Chão de Madeira Nobre da Quadra de Basquete
+        this.renderCourtFloor();
+
+        // 3. Suporte do Poste, Tabela, Aro e Rede da Cesta
+        this.renderHoop();
+
+        // 4. Bolas de Basquete no Ar
+        this.renderBalls();
+
+        // 5. Mãos do Jogador segurando a Bola (Primeira Pessoa)
+        this.renderFirstPersonHands();
+
+        // 6. Mira / Retículo de Guia Suave
+        this.renderAimReticle();
+      }
+
+      renderStadiumBackground() {
+        // Céu / Teto escuro do ginásio iluminado
+        const grad = this.ctx.createLinearGradient(0, 0, 0, this.horizonY);
+        grad.addColorStop(0, '#070a0f');
+        grad.addColorStop(0.5, '#0d131d');
+        grad.addColorStop(1, '#162030');
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.horizonY);
+
+        // Holofotes de estádio sutis no topo
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.12;
+        const spot1 = this.ctx.createRadialGradient(this.centerX - 240, 20, 10, this.centerX - 240, 20, 360);
+        spot1.addColorStop(0, '#ffd700');
+        spot1.addColorStop(1, 'transparent');
+        this.ctx.fillStyle = spot1;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.horizonY);
+
+        const spot2 = this.ctx.createRadialGradient(this.centerX + 240, 20, 10, this.centerX + 240, 20, 360);
+        spot2.addColorStop(0, '#38bdf8');
+        spot2.addColorStop(1, 'transparent');
+        this.ctx.fillStyle = spot2;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.horizonY);
+        this.ctx.restore();
+      }
+
+      renderCourtFloor() {
+        // Chão de Madeira com Linhas da NBA em Perspectiva
+        this.ctx.save();
+
+        // Gradiente do Piso da Quadra
+        const floorGrad = this.ctx.createLinearGradient(0, this.horizonY, 0, this.canvas.height);
+        floorGrad.addColorStop(0, '#8c430e');
+        floorGrad.addColorStop(0.4, '#b8621b');
+        floorGrad.addColorStop(1, '#663209');
+        this.ctx.fillStyle = floorGrad;
+        this.ctx.fillRect(0, this.horizonY, this.canvas.width, this.canvas.height - this.horizonY);
+
+        // Tábuas de Madeira da Quadra (Linhas longitudinais em perspectiva)
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+        this.ctx.lineWidth = 1;
+        for (let x = -600; x <= 600; x += 100) {
+          const pFar = this.project3D(x, 0, 600);
+          const pNear = this.project3D(x * 1.4, 0, 0);
+          this.ctx.beginPath();
+          this.ctx.moveTo(pFar.x, pFar.y);
+          this.ctx.lineTo(pNear.x, pNear.y);
+          this.ctx.stroke();
+        }
+
+        // Garrafão (Key Area) em perspectiva
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        this.ctx.lineWidth = 2.5;
+
+        const kFarL = this.project3D(-140, 0, 560);
+        const kFarR = this.project3D(140, 0, 560);
+        const kNearL = this.project3D(-140, 0, 280);
+        const kNearR = this.project3D(140, 0, 280);
+
+        // Preenchimento vermelho discreto do garrafão
+        this.ctx.fillStyle = 'rgba(221, 0, 0, 0.16)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(kFarL.x, kFarL.y);
+        this.ctx.lineTo(kFarR.x, kFarR.y);
+        this.ctx.lineTo(kNearR.x, kNearR.y);
+        this.ctx.lineTo(kNearL.x, kNearL.y);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Linha de Lance Livre (Posição 1: z = 280)
+        this.ctx.strokeStyle = '#ffd700';
+        this.ctx.lineWidth = 3.5;
+        this.ctx.beginPath();
+        this.ctx.moveTo(kNearL.x, kNearL.y);
+        this.ctx.lineTo(kNearR.x, kNearR.y);
+        this.ctx.stroke();
+
+        // Arco da Linha de Três Pontos (Posição 3: z = 80 a 160)
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        this.ctx.lineWidth = 2.5;
+        this.ctx.beginPath();
+        for (let a = -Math.PI / 2; a <= Math.PI / 2; a += 0.1) {
+          const arcR = 380;
+          const arcX = Math.sin(a) * arcR;
+          const arcZ = 550 - Math.cos(a) * arcR;
+          const pt = this.project3D(arcX, 0, arcZ);
+          if (a === -Math.PI / 2) this.ctx.moveTo(pt.x, pt.y);
+          else this.ctx.lineTo(pt.x, pt.y);
+        }
+        this.ctx.stroke();
+
+        this.ctx.restore();
+      }
+
+      renderHoop() {
+        const hp = this.hoop;
+
+        // 1. Poste de sustentação atrás da tabela
+        const poleBottom = this.project3D(hp.x, 0, hp.backboardZ + 50);
+        const poleTop = this.project3D(hp.x, hp.backboardY, hp.backboardZ + 40);
+
+        this.ctx.save();
+        this.ctx.strokeStyle = '#22272e';
+        this.ctx.lineWidth = 14 * poleBottom.scale;
+        this.ctx.beginPath();
+        this.ctx.moveTo(poleBottom.x, poleBottom.y);
+        this.ctx.lineTo(poleTop.x, poleTop.y);
+        this.ctx.stroke();
+
+        // Braço em diagonal sustentando a tabela
+        const armEnd = this.project3D(hp.x, hp.backboardY - 10, hp.backboardZ);
+        this.ctx.lineWidth = 8 * poleBottom.scale;
+        this.ctx.strokeStyle = '#30363d';
+        this.ctx.beginPath();
+        this.ctx.moveTo(poleTop.x, poleTop.y);
+        this.ctx.lineTo(armEnd.x, armEnd.y);
+        this.ctx.stroke();
+
+        // 2. Tabela de Vidro / Acrílico (Backboard)
+        const hw = hp.backboardWidth / 2;
+        const hh = hp.backboardHeight / 2;
+
+        const tl = this.project3D(hp.x - hw, hp.backboardY + hh, hp.backboardZ);
+        const tr = this.project3D(hp.x + hw, hp.backboardY + hh, hp.backboardZ);
+        const br = this.project3D(hp.x + hw, hp.backboardY - hh, hp.backboardZ);
+        const bl = this.project3D(hp.x - hw, hp.backboardY - hh, hp.backboardZ);
+
+        // Fundo de vidro translúcido com reflexo
+        const bbGrad = this.ctx.createLinearGradient(tl.x, tl.y, br.x, br.y);
+        bbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+        bbGrad.addColorStop(0.3, 'rgba(230, 240, 255, 0.2)');
+        bbGrad.addColorStop(1, 'rgba(200, 220, 240, 0.35)');
+
+        this.ctx.fillStyle = bbGrad;
+        this.ctx.beginPath();
+        this.ctx.moveTo(tl.x, tl.y);
+        this.ctx.lineTo(tr.x, tr.y);
+        this.ctx.lineTo(br.x, br.y);
+        this.ctx.lineTo(bl.x, bl.y);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Borda grossa da tabela (Branca com sutil vermelho)
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = 4 * tl.scale;
+        this.ctx.stroke();
+
+        // Quadrado Interno Guia da Cesta (Target Box)
+        const targetW = 70;
+        const targetH = 50;
+        const targetY = hp.y + 35;
+
+        const qTL = this.project3D(hp.x - targetW / 2, targetY + targetH / 2, hp.backboardZ);
+        const qTR = this.project3D(hp.x + targetW / 2, targetY + targetH / 2, hp.backboardZ);
+        const qBR = this.project3D(hp.x + targetW / 2, targetY - targetH / 2, hp.backboardZ);
+        const qBL = this.project3D(hp.x - targetW / 2, targetY - targetH / 2, hp.backboardZ);
+
+        this.ctx.strokeStyle = '#ff3344';
+        this.ctx.lineWidth = 3 * qTL.scale;
+        this.ctx.strokeRect(qTL.x, qTL.y, qTR.x - qTL.x, qBL.y - qTL.y);
+
+        // 3. Suporte do Aro que liga à Tabela
+        const neckStart = this.project3D(hp.x, hp.y, hp.backboardZ);
+        const neckEnd = this.project3D(hp.x, hp.y, hp.z + hp.rimRadius);
+        this.ctx.strokeStyle = '#f26419';
+        this.ctx.lineWidth = 6 * neckStart.scale;
+        this.ctx.beginPath();
+        this.ctx.moveTo(neckStart.x, neckStart.y);
+        this.ctx.lineTo(neckEnd.x, neckEnd.y);
+        this.ctx.stroke();
+
+        // 4. Aro Metálico Laranja (Rim)
+        const rimCenter = this.project3D(hp.x, hp.y, hp.z);
+        const rimRadiusX = hp.rimRadius * rimCenter.scale;
+        const rimRadiusY = hp.rimRadius * rimCenter.scale * 0.32; // perspectiva elíptica
+
+        this.ctx.strokeStyle = '#f26419';
+        this.ctx.lineWidth = 5 * rimCenter.scale;
+        this.ctx.beginPath();
+        this.ctx.ellipse(rimCenter.x, rimCenter.y, rimRadiusX, rimRadiusY, 0, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // 5. Rede de Basquete Tridimensional com Efeito de Balanço
+        this.renderNet(rimCenter, rimRadiusX, rimRadiusY);
+
+        this.ctx.restore();
+      }
+
+      renderNet(rimCenter, rx, ry) {
+        const netHeight = 52 * rimCenter.scale;
+        const wave = Math.sin(performance.now() * 0.02) * 8 * this.netWave;
+
+        this.ctx.save();
+        this.ctx.strokeStyle = 'rgba(240, 246, 252, 0.85)';
+        this.ctx.lineWidth = 1.6 * rimCenter.scale;
+
+        // Fios verticais da rede descendo do aro
+        const strings = 12;
+        const topPts = [];
+        const botPts = [];
+
+        for (let i = 0; i < strings; i++) {
+          const angle = (i / strings) * Math.PI * 2;
+          const tx = rimCenter.x + Math.cos(angle) * rx;
+          const ty = rimCenter.y + Math.sin(angle) * ry;
+
+          // Parte de baixo da rede afunila
+          const bx = rimCenter.x + Math.cos(angle) * (rx * 0.5) + wave;
+          const by = rimCenter.y + netHeight + Math.sin(angle) * (ry * 0.4);
+
+          topPts.push({ x: tx, y: ty });
+          botPts.push({ x: bx, y: by });
+
+          this.ctx.beginPath();
+          this.ctx.moveTo(tx, ty);
+          this.ctx.quadraticCurveTo(
+            (tx + bx) / 2 + wave * 0.5,
+            (ty + by) / 2,
+            bx,
+            by
+          );
+          this.ctx.stroke();
+        }
+
+        // Anéis horizontais que cruzam a rede
+        for (let r = 0.3; r <= 0.85; r += 0.3) {
+          this.ctx.beginPath();
+          for (let i = 0; i <= strings; i++) {
+            const idx = i % strings;
+            const px = topPts[idx].x * (1 - r) + botPts[idx].x * r;
+            const py = topPts[idx].y * (1 - r) + botPts[idx].y * r;
+            if (i === 0) this.ctx.moveTo(px, py);
+            else this.ctx.lineTo(px, py);
+          }
+          this.ctx.stroke();
+        }
+
+        this.ctx.restore();
+      }
+
+      renderBalls() {
+        for (let b of this.balls) {
+          const pt = this.project3D(b.x, b.y, b.z);
+          const r = b.radius * pt.scale;
+
+          if (r < 2) continue;
+
+          this.ctx.save();
+          this.ctx.globalAlpha = Math.max(0, Math.min(1, b.fade));
+
+          // Sombra projetada no chão da quadra
+          const shadowPt = this.project3D(b.x, 0, b.z);
+          const shadowR = r * 0.9;
+          this.ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+          this.ctx.beginPath();
+          this.ctx.ellipse(shadowPt.x, shadowPt.y, shadowR, shadowR * 0.4, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          // Desenho da Bola de Basquete com Textura e Costuras
+          this.drawBasketball(pt.x, pt.y, r, b.rotation);
+
+          this.ctx.restore();
+        }
+      }
+
+      drawBasketball(cx, cy, radius, rot = 0) {
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+        this.ctx.rotate(rot);
+
+        // Gradiente esférico realista de basquete
+        const ballGrad = this.ctx.createRadialGradient(
+          -radius * 0.3,
+          -radius * 0.35,
+          radius * 0.1,
+          0,
+          0,
+          radius
+        );
+        ballGrad.addColorStop(0, '#ff8a43');
+        ballGrad.addColorStop(0.65, '#f26419');
+        ballGrad.addColorStop(1, '#9e3404');
+
+        this.ctx.fillStyle = ballGrad;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Borda e costuras pretas clássicas da bola de basquete
+        this.ctx.strokeStyle = '#26160d';
+        this.ctx.lineWidth = Math.max(1, radius * 0.08);
+
+        // Borda circular
+        this.ctx.stroke();
+
+        // Linha equatorial horizontal
+        this.ctx.beginPath();
+        this.ctx.moveTo(-radius, 0);
+        this.ctx.lineTo(radius, 0);
+        this.ctx.stroke();
+
+        // Linha vertical
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, -radius);
+        this.ctx.lineTo(0, radius);
+        this.ctx.stroke();
+
+        // Costuras em arco
+        const arcOffset = radius * 0.55;
+        this.ctx.beginPath();
+        this.ctx.arc(-arcOffset, 0, radius * 0.8, -Math.PI / 3, Math.PI / 3);
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.arc(arcOffset, 0, radius * 0.8, (2 * Math.PI) / 3, (4 * Math.PI) / 3);
+        this.ctx.stroke();
+
+        this.ctx.restore();
+      }
+
+      /* ==========================================================================
+         9. Mãos em Primeira Pessoa Segurando e Arremessando a Bola
+         ========================================================================== */
+      renderFirstPersonHands() {
+        this.ctx.save();
+
+        const p = this.handsAnim.shootProgress; // 0 = pronto, sobe até 1 ao arremessar
+
+        // Deslocamento suave com o mouse
+        const handBaseX = this.centerX + (this.aimX * 0.8);
+        const handBaseY = this.canvas.height - 20;
+
+        // Animação de subida e extensão dos braços no momento do chute
+        const liftY = Math.sin(p * Math.PI) * -120;
+        const pushZ = p * 40;
+
+        const currentY = handBaseY + liftY;
+        const currentX = handBaseX;
+
+        // Se a bola ainda não foi disparada (ou acabou de recarregar nas mãos)
+        const showHeldBall = !this.handsAnim.isShooting || p < 0.25;
+
+        const skinColor = '#e0a97c';
+        const skinShadow = '#b88158';
+
+        // 1. Braço Esquerdo
+        const armLeftX = currentX - 160;
+        const handLeftX = currentX - 90;
+        const handLeftY = currentY - 70;
+
+        this.ctx.fillStyle = skinColor;
+        this.ctx.strokeStyle = skinShadow;
+        this.ctx.lineWidth = 3;
+
+        // Antebraço esquerdo
+        this.ctx.beginPath();
+        this.ctx.moveTo(armLeftX - 50, this.canvas.height + 40);
+        this.ctx.lineTo(handLeftX, handLeftY);
+        this.ctx.lineTo(handLeftX + 35, handLeftY + 15);
+        this.ctx.lineTo(armLeftX + 30, this.canvas.height + 40);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Mão e Dedos esquerdos apoiando a bola lateralmente
+        this.ctx.beginPath();
+        this.ctx.ellipse(handLeftX + 15, handLeftY - 10, 26, 18, -Math.PI / 6, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // 2. Braço Direito (Mão arremessadora principal)
+        const armRightX = currentX + 160;
+        const handRightX = currentX + 90;
+        const handRightY = currentY - 75;
+
+        // Antebraço direito
+        this.ctx.beginPath();
+        this.ctx.moveTo(armRightX + 50, this.canvas.height + 40);
+        this.ctx.lineTo(handRightX, handRightY);
+        this.ctx.lineTo(handRightX - 35, handRightY + 15);
+        this.ctx.lineTo(armRightX - 30, this.canvas.height + 40);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Mão e Dedos direitos embaixo da bola
+        this.ctx.beginPath();
+        this.ctx.ellipse(handRightX - 15, handRightY - 10, 26, 18, Math.PI / 6, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // 3. Bola Segurada entre as Mãos
+        if (showHeldBall) {
+          const ballRadius = 56;
+          const ballX = currentX;
+          const ballY = currentY - 95;
+
+          // Respiração suave da bola
+          const idleBob = Math.sin(performance.now() * 0.003) * 4;
+          this.drawBasketball(ballX, ballY + idleBob, ballRadius, 0.1);
+        }
+
+        this.ctx.restore();
+      }
+
+      /* ==========================================================================
+         10. Retículo de Mira & Guia Suave de Parábola
+         ========================================================================== */
+      renderAimReticle() {
+        if (this.isGameOver) return;
+
+        this.ctx.save();
+
+        // Alvo no aro com o offset da mira
+        const targetPt = this.project3D(
+          this.hoop.x + this.aimX * 0.6,
+          this.hoop.y + 12 + this.aimY * 0.3,
+          this.hoop.z
+        );
+
+        // Círculo discreto com as cores da bandeira da Alemanha
+        this.ctx.strokeStyle = '#ffce00';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(targetPt.x, targetPt.y, 16, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // Cruz de mira central
+        this.ctx.strokeStyle = '#dd0000';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(targetPt.x - 22, targetPt.y);
+        this.ctx.lineTo(targetPt.x - 8, targetPt.y);
+        this.ctx.moveTo(targetPt.x + 8, targetPt.y);
+        this.ctx.lineTo(targetPt.x + 22, targetPt.y);
+        this.ctx.moveTo(targetPt.x, targetPt.y - 22);
+        this.ctx.lineTo(targetPt.x, targetPt.y - 8);
+        this.ctx.moveTo(targetPt.x, targetPt.y + 8);
+        this.ctx.lineTo(targetPt.x, targetPt.y + 22);
+        this.ctx.stroke();
+
+        this.ctx.restore();
+      }
+
+      /* ==========================================================================
+         11. Loop do Jogo
+         ========================================================================== */
+      gameLoop(now) {
+        const dt = Math.min(0.05, (now - this.lastTime) / 1000);
+        this.lastTime = now;
+
+        this.update(dt);
+        this.render();
+
+        requestAnimationFrame((t) => this.gameLoop(t));
+      }
+    }
+
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      window.gameInstance = new BasketballGame();
+
+      // Registro de Acesso Local
+      try {
+        const count = parseInt(localStorage.getItem('pedroplay_visits_basquete') || '0', 10) + 1;
+        localStorage.setItem('pedroplay_visits_basquete', count);
+      } catch (e) {}
+    });
+  </script>
+</body>
+</html>
