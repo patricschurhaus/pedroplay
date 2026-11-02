@@ -4,23 +4,17 @@ Este documento descreve a arquitetura, a identidade visual, os padrões de proje
 
 ---
 
-## 0. Protocolo Obrigatório de Diálogo e Criação com o Pedro (7 Anos)
+## 0. Protocolo de Diálogo e Criação com o Pedro e Patric
 
 > [!IMPORTANT]
 > **REGRAS ESTRITAS DE INTERAÇÃO (VÁLIDAS PARA TODOS OS CHATS DESTE PROJETO):**
 > 1. **Proibido Gerar Código Sem Autorização Explícita:** O assistente (Antigravity/Gemini) **NUNCA** deve criar código, escrever ou alterar arquivos de jogos antes da autorização explícita: **"pode criar"**.
-> 2. **Narração Obrigatória em Voz Alta:** Em **todas** as respostas durante a concepção do jogo, o assistente **DEVE narrar a sua resposta em voz alta** pelo sintetizador de voz do Windows em português do Brasil (`Microsoft Maria Desktop`), para que o Pedro (7 anos) ouça diretamente nos alto-falantes do computador:
->    ```powershell
->    Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SelectVoice('Microsoft Maria Desktop'); $s.Rate = 0; $s.Speak('Texto a ser narrado')
->    ```
-> 3. **Linguagem Acessível e Acolhedora:** Comunicação adaptada para uma criança de 7 anos, em português brasileiro claro, caloroso e encorajador.
-> 4. **Apenas UMA Pergunta por Vez:** Para tirar dúvidas sobre a mecânica do jogo, faça **exatamente uma pergunta por vez**, com clareza, aguardando a resposta do Pedro antes de avançar.
-> 5. **Ciclo de Criação:**
->    - O Pedro entra com a ideia do jogo.
->    - O assistente responde narrando em voz alta.
->    - O assistente faz uma pergunta por vez se tiver dúvidas, narrando em voz alta.
->    - O Pedro responde.
->    - Quando não houver mais dúvidas, o Pedro autoriza com **"pode criar"**.
+> 2. **Narração em Voz Alta:** Regra de síntese de voz revogada por Patric em 01/11/2026. Comunicação textual direta.
+> 3. **Design Obrigatório Mobile-First:** **Todos os jogos criados desta plataforma devem ser pensados mobile first.** A tela de celulares e tablets não pode sofrer poluição visual; elementos secundários devem ser acomodados em menu sanduíche (`☰`), controles devem ser nativos para toque e a área útil de jogo deve ser sempre priorizada.
+> 4. **Linguagem Acessível e Acolhedora:** Comunicação adaptada para uma criança de 7 anos e seu pai Patric, em português brasileiro claro, caloroso e encorajador.
+> 5. **Ciclo de Planejamento e Criação:**
+>    - Alinhamento prévio dos pontos com Patric e Pedro.
+>    - Quando não houver mais dúvidas, autorização com **"pode criar"**.
 >    - O assistente então implementa o jogo completo conforme as diretrizes deste documento.
 
 ---
