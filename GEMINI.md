@@ -174,10 +174,13 @@ Jogo de arremessos em primeira pessoa onde a criança vê suas próprias mãos s
 - **`BasketballAudio`:** Sintetizador Web Audio API para rede (*swish*), aro de metal (*rim*), tabela (*backboard*), quique na quadra (*bounce*), apito de árbitro (*whistle*) e comemoração (*cheer*).
 - **`ConfettiEffect`:** Sistema de partículas sobreposto no Canvas para celebrar vitórias e passagem de nível.
 - **`BasketballGame` (Motor de Perspectiva 3D e Game Loop):**
-  - **Mundo 3D em Perspectiva:** Cesta, tabela de acrílico com target box, aro com rede móvel e quadra com linhas da NBA projetadas com profundidade `z`.
-  - **Mãos em Primeira Pessoa:** Animação atlética de arremesso sincronizada ao disparar com a barra de Espaço ou clique.
-  - **Teleporte (Teclas `1`, `2`, `3`):** Move a câmera instantaneamente entre Lance Livre (1 pt), Meia Distância/Garrafão (2 pts) e Linha dos Três (3 pts).
-  - **Mira Suave:** Mouse ajusta levemente a mira horizontal e elevação sem causar desorientação.
+  - **Mundo 3D em Perspectiva:** Cesta, tabela de acrílico com target box, aro com rede móvel e quadra esportiva verde com demarcações oficiais completas (linha de fundo, linhas laterais, garrafão com marcas de rebote, linha e círculo de lance livre com metade tracejada, semicírculo de não-obstrução sob o aro, linha oficial de três pontos com cantos retos e arco, linha de meio de quadra e círculo central).
+  - **Cenário de Estádio Sem Confusão Visual:** Fundo com arquibancada esportiva em tons sóbrios de ardósia/marinho (`#0f172a`, `#1e293b`) e torres de iluminação com holofotes sob céu ensolarado, garantindo contraste perfeito com a quadra verde e a bola laranja.
+  - **Mãos em Primeira Pessoa:** Animação atlética de arremesso sincronizada ao disparar com o botão na tela ou barra de Espaço.
+  - **Jogadas Dinâmicas & Balão Flutuante (2 e 3 Pontos):** A cada arremesso, o jogo sorteia automaticamente jogadas de 2 pontos (meia distância/garrafão) ou 3 pontos (perímetro), com anúncio em balão flutuante estilizado (`.play-announcement-pill`) e pontuação correspondente.
+  - **Ritmo Rápido e Contínuo:** No 2º quique da bola no chão ou 450ms após converter uma cesta, a nova bola surge imediatamente nas mãos da criança, eliminando esperas monótonas.
+  - **Controles Touchscreen com Direção Natural:** Arraste de tela fluido com sensibilidade calibrada e proteção total contra gestos de borda do Android (`touch-action: none !important`).
+  - **Navegação Integrada e Minimalista:** Clique no logotipo oficial leva diretamente de volta ao portal `index.html` e menu sanduíche ultra-minimalista sem contorno.
   - **Desafio de 1 Minuto & Níveis:** Temporizador de 60s com meta progressiva de cestas (Nível 1 iniciante com meta de 6 pontos para fácil adaptação, avançando para metas maiores).
 
 ---
