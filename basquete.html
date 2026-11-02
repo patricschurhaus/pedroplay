@@ -27,13 +27,12 @@
       --de-red: #dd0000;
       --de-gold: #ffce00;
 
-      /* Basquete / Placar */
-      --court-wood-dark: #b8621b;
-      --court-wood-light: #d67d2b;
+      /* Cores de Basquete & Placar */
       --bball-orange: #f26419;
-      --bball-seams: #26160d;
-      --led-glow: #00ff66;
-      --led-gold: #ffd700;
+      --bball-rim: #e63946;
+      --led-gold: #ffce00;
+      --led-blue: #38bdf8;
+      --led-green: #4ade80;
       --led-red: #ff3344;
 
       --font-brand: 'Georgia', 'Times New Roman', Times, serif;
@@ -162,7 +161,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
       z-index: 25;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -172,11 +171,11 @@
       background-color: #0b0e14;
       border: 1px solid #30363d;
       border-radius: 8px;
-      padding: 4px 14px;
+      padding: 4px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 90px;
+      min-width: 82px;
       position: relative;
     }
 
@@ -194,7 +193,7 @@
 
     .score-value {
       font-family: var(--font-mono);
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--led-gold);
       text-shadow: 0 0 10px rgba(255, 206, 0, 0.4);
@@ -202,7 +201,7 @@
     }
 
     .score-value.timer {
-      color: #38bdf8;
+      color: var(--led-blue);
       text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
     }
 
@@ -218,7 +217,7 @@
     }
 
     .score-value.goal {
-      color: #4ade80;
+      color: var(--led-green);
     }
 
     .score-value.level {
@@ -227,7 +226,7 @@
 
     .score-value.best {
       color: #e2e8f0;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
     }
 
     /* Posição Ativa & Teleporte */
@@ -238,7 +237,7 @@
       background-color: #0b0e14;
       border: 1px solid #30363d;
       border-radius: 8px;
-      padding: 4px 10px;
+      padding: 4px 8px;
     }
 
     .teleport-pill {
@@ -272,18 +271,17 @@
       color: var(--de-gold);
     }
 
-    /* Container do Jogo (Canvas 3D) */
+    /* Arena do Jogo */
     .arena-container {
       position: relative;
       flex: 1;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      cursor: crosshair;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 50% 35%, #182232 0%, #0d1117 80%, #06090e 100%);
+      background-color: #7bb5e6; /* Céu azul inicial antes do canvas */
     }
 
     #gameCanvas {
@@ -292,7 +290,7 @@
       display: block;
     }
 
-    /* Controles Flutuantes / Atalhos na Tela */
+    /* Overlay HUD e Controles */
     .hud-overlay {
       position: absolute;
       inset: 0;
@@ -300,13 +298,90 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 16px;
+      padding: 14px 18px;
     }
 
-    .hud-top-hint {
+    .hud-top-row {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
+      align-items: flex-start;
       gap: 12px;
+    }
+
+    /* Caixa de Calibragem da Trajetória (Setas) */
+    .calib-panel {
+      pointer-events: auto;
+      background: rgba(13, 17, 23, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 10px;
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .calib-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--de-gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .calib-bars-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 170px;
+    }
+
+    .calib-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--gh-text-secondary);
+    }
+
+    .calib-meter {
+      width: 100px;
+      height: 6px;
+      background: #21262d;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #30363d;
+    }
+
+    .calib-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, #dd0000, #ffce00, #4ade80);
+      transition: width 0.1s ease, left 0.1s ease;
+    }
+
+    .calib-meter-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: #ffffff;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .hud-hints-cluster {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
     }
 
     .badge-hint {
@@ -316,7 +391,7 @@
       border: 1px solid var(--gh-border-default);
       color: var(--gh-text-secondary);
       font-size: 0.78rem;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
@@ -333,33 +408,56 @@
       color: var(--de-gold);
     }
 
-    .hud-bottom-bar {
+    .hud-bottom-row {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
       gap: 16px;
     }
 
-    .mobile-teleport-cluster {
+    /* D-Pad Virtual de Setas para Mobile/Tablet */
+    .dpad-cluster {
       pointer-events: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      display: grid;
+      grid-template-columns: repeat(3, 40px);
+      grid-template-rows: repeat(2, 40px);
+      gap: 4px;
     }
 
-    .btn-shoot-mobile {
+    .dpad-btn {
+      background-color: rgba(22, 27, 34, 0.88);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .dpad-btn:active,
+    .dpad-btn.pressed {
+      background-color: var(--de-red);
+      color: #ffffff;
+      border-color: var(--de-gold);
+      transform: scale(0.95);
+    }
+
+    .btn-shoot-action {
       pointer-events: auto;
       background: linear-gradient(135deg, #f26419 0%, #d44a04 100%);
       color: #ffffff;
       border: 2px solid #ffce00;
       border-radius: 50px;
-      padding: 14px 28px;
+      padding: 14px 30px;
       font-family: var(--font-brand);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      box-shadow: 0 6px 20px rgba(242, 100, 25, 0.45);
+      box-shadow: 0 6px 20px rgba(242, 100, 25, 0.5);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -367,22 +465,22 @@
       transition: all 0.15s ease;
     }
 
-    .btn-shoot-mobile:hover,
-    .btn-shoot-mobile:active {
+    .btn-shoot-action:hover,
+    .btn-shoot-action:active {
       transform: scale(1.05);
-      box-shadow: 0 8px 24px rgba(255, 206, 0, 0.6);
+      box-shadow: 0 8px 24px rgba(255, 206, 0, 0.65);
       border-color: #ffffff;
     }
 
-    /* Mensagem Flutuante de Pontuação */
+    /* Popups de Acerto / Erro */
     .score-popup {
       position: absolute;
       font-family: var(--font-brand);
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 900;
       text-transform: uppercase;
       pointer-events: none;
-      animation: floatScore 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+      animation: floatScore 1.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
       z-index: 50;
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
     }
@@ -394,7 +492,7 @@
       }
       20% {
         opacity: 1;
-        transform: translate(-50%, -20px) scale(1.2);
+        transform: translate(-50%, -20px) scale(1.15);
       }
       80% {
         opacity: 1;
@@ -402,7 +500,7 @@
       }
       100% {
         opacity: 0;
-        transform: translate(-50%, -90px) scale(0.8);
+        transform: translate(-50%, -90px) scale(0.85);
       }
     }
 
@@ -538,7 +636,6 @@
       box-shadow: 0 6px 20px rgba(255, 206, 0, 0.5);
     }
 
-    /* Canvas de Confetes */
     #confettiCanvas {
       position: absolute;
       inset: 0;
@@ -547,28 +644,12 @@
     }
 
     @media (max-width: 768px) {
-      .top-header {
-        padding: 6px 12px;
-      }
-      .author-badge,
-      .badge-hint {
-        display: none;
-      }
-      .scoreboard-bar {
-        padding: 6px 10px;
-        gap: 8px;
-      }
-      .score-block {
-        min-width: 65px;
-        padding: 3px 8px;
-      }
-      .score-value {
-        font-size: 1.15rem;
-      }
-      .btn-shoot-mobile {
-        padding: 10px 20px;
-        font-size: 0.95rem;
-      }
+      .top-header { padding: 6px 12px; }
+      .author-badge, .hud-hints-cluster { display: none; }
+      .scoreboard-bar { padding: 6px 8px; gap: 6px; }
+      .score-block { min-width: 62px; padding: 3px 6px; }
+      .score-value { font-size: 1.15rem; }
+      .btn-shoot-action { padding: 10px 18px; font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -650,33 +731,67 @@
     </div>
   </section>
 
-  <!-- Área Principal da Quadra / Arena 3D -->
+  <!-- Área Principal da Quadra / Arena -->
   <main class="arena-container" id="arena">
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Overlay com Atalhos e Botões de Ação -->
+    <!-- Overlay HUD -->
     <div class="hud-overlay">
-      <div class="hud-top-hint">
-        <div class="badge-hint">
-          <i class="bi bi-mouse"></i>
-          <span>Mexa o mouse para mirar</span>
+      <div class="hud-top-row">
+        <!-- Painel de Calibragem das Setas -->
+        <div class="calib-panel" title="Use as setas para calibrar a mira da bola">
+          <div class="calib-title">
+            <i class="bi bi-sliders2"></i>
+            <span>Calibragem de Trajetória</span>
+          </div>
+          <div class="calib-bars-wrap">
+            <div class="calib-row">
+              <span>Horizontal (<kbd>←</kbd> <kbd>→</kbd>)</span>
+              <div class="calib-meter">
+                <div class="calib-meter-center"></div>
+                <div class="calib-fill" id="meterHoriz" style="left: 50%; width: 0%;"></div>
+              </div>
+            </div>
+            <div class="calib-row">
+              <span>Elevação (<kbd>↓</kbd> <kbd>↑</kbd>)</span>
+              <div class="calib-meter">
+                <div class="calib-meter-center"></div>
+                <div class="calib-fill" id="meterVert" style="left: 50%; width: 0%;"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="badge-hint">
-          <i class="bi bi-keyboard"></i>
-          <span>Aperte <kbd>ESPAÇO</kbd> para arremessar</span>
-        </div>
-        <div class="badge-hint">
-          <i class="bi bi-lightning-charge"></i>
-          <span>Teclas <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> para teleporte</span>
+
+        <!-- Dicas de Teclado -->
+        <div class="hud-hints-cluster">
+          <div class="badge-hint">
+            <i class="bi bi-arrows"></i>
+            <span>Setas <kbd>←</kbd> <kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> para calibrar</span>
+          </div>
+          <div class="badge-hint">
+            <i class="bi bi-keyboard"></i>
+            <span>Aperte <kbd>ESPAÇO</kbd> para Pular &amp; Arremessar</span>
+          </div>
+          <div class="badge-hint">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Teclas <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> teleporte</span>
+          </div>
         </div>
       </div>
 
-      <div class="hud-bottom-bar">
-        <div class="mobile-teleport-cluster">
-          <!-- Acessibilidade mobile / touch -->
+      <div class="hud-bottom-row">
+        <!-- D-Pad Virtual de Setas para Telas Touch -->
+        <div class="dpad-cluster" aria-label="Controle de setas virtuais">
+          <div></div>
+          <button class="dpad-btn" id="dpadUp" title="Calibrar para cima"><i class="bi bi-arrow-up"></i></button>
+          <div></div>
+          <button class="dpad-btn" id="dpadLeft" title="Calibrar para esquerda"><i class="bi bi-arrow-left"></i></button>
+          <button class="dpad-btn" id="dpadDown" title="Calibrar para baixo"><i class="bi bi-arrow-down"></i></button>
+          <button class="dpad-btn" id="dpadRight" title="Calibrar para direita"><i class="bi bi-arrow-right"></i></button>
         </div>
 
-        <button class="btn-shoot-mobile" id="btnShoot" aria-label="Arremessar bola de basquete">
+        <!-- Botão de Arremesso -->
+        <button class="btn-shoot-action" id="btnShoot" aria-label="Arremessar com pulo">
           <i class="bi bi-dribbble"></i>
           <span>Arremessar (Espaço)</span>
         </button>
@@ -686,7 +801,7 @@
     <!-- Confetes de Vitória -->
     <canvas id="confettiCanvas"></canvas>
 
-    <!-- Modal de Resultado (Passou de Nível / Fim do Tempo) -->
+    <!-- Modal de Resultado -->
     <div class="modal-backdrop" id="resultModal">
       <div class="modal-card">
         <div class="modal-icon-wrap win" id="modalIcon">
@@ -720,10 +835,11 @@
 
   <script>
     /**
-     * PedroPlay — Basquete Kids
-     * Canal Oficial: Alemãozinho Pedro (@alemaozinhopedro)
-     * Arquitetura: Single-file, HTML5 Canvas 2D/3D com Projeção em Perspectiva,
-     * Web Audio API sintetizada matematicamente e controles intuitivos para crianças de 7 anos.
+     * PedroPlay — Basquete Kids (Edição Aprimorada)
+     * Visão em 1ª Pessoa fiel à foto real (braços erguidos mirando na cesta),
+     * Cenário ao ar livre ensolarado com árvores e tabela de vidro,
+     * Calibragem nas Setas do Teclado (← ↑ ↓ →),
+     * Física desafiadora: acerta no centro, bate no aro, na tabela ou erra feio se descalibrar!
      */
 
     /* ==========================================================================
@@ -739,9 +855,7 @@
       initCtx() {
         if (!this.ctx) {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext) {
-            this.ctx = new AudioContext();
-          }
+          if (AudioContext) this.ctx = new AudioContext();
         }
         if (this.ctx && this.ctx.state === 'suspended') {
           this.ctx.resume();
@@ -752,9 +866,7 @@
         this.muted = !this.muted;
         localStorage.setItem('basketball_sound_muted', this.muted);
         this.updateIcon();
-        if (!this.muted) {
-          this.playSwish();
-        }
+        if (!this.muted) this.playSwish();
       }
 
       updateIcon() {
@@ -764,7 +876,7 @@
         }
       }
 
-      // Som de rede suave (Swish) ao acertar a cesta
+      // Som suave e satisfatório de rede (Swish) ao acertar
       playSwish() {
         if (this.muted) return;
         this.initCtx();
@@ -782,12 +894,12 @@
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(2400, this.ctx.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.3);
-        filter.Q.value = 3.0;
+        filter.frequency.setValueAtTime(2200, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(500, this.ctx.currentTime + 0.3);
+        filter.Q.value = 3.2;
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.75, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
 
         noise.connect(filter);
@@ -796,7 +908,7 @@
         noise.start();
       }
 
-      // Som metálico ao tocar no aro (Rim bounce)
+      // Som metálico ao bater no aro de metal (Clank)
       playRim() {
         if (this.muted) return;
         this.initCtx();
@@ -805,19 +917,19 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(940, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(420, this.ctx.currentTime + 0.18);
+        osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(360, this.ctx.currentTime + 0.22);
 
-        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+        gain.gain.setValueAtTime(0.55, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start();
-        osc.stop(this.ctx.currentTime + 0.2);
+        osc.stop(this.ctx.currentTime + 0.24);
       }
 
-      // Som sólido ao tocar na tabela (Backboard)
+      // Som sólido ao bater no acrílico da tabela (Backboard)
       playBackboard() {
         if (this.muted) return;
         this.initCtx();
@@ -826,19 +938,19 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(160, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.12);
+        osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(65, this.ctx.currentTime + 0.14);
 
-        gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.16);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start();
-        osc.stop(this.ctx.currentTime + 0.16);
+        osc.stop(this.ctx.currentTime + 0.18);
       }
 
-      // Quique da bola no chão de madeira
+      // Som ao quicar no chão
       playBounce() {
         if (this.muted) return;
         this.initCtx();
@@ -847,20 +959,20 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(130, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(45, this.ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.09);
 
         gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.09);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start();
-        osc.stop(this.ctx.currentTime + 0.11);
+        osc.stop(this.ctx.currentTime + 0.1);
       }
 
-      // Arremesso (som de impulso pelo ar)
-      playShoot() {
+      // Som de impulso do salto + arremesso
+      playJumpShoot() {
         if (this.muted) return;
         this.initCtx();
         if (!this.ctx) return;
@@ -868,32 +980,11 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(260, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(520, this.ctx.currentTime + 0.12);
-
-        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.14);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.15);
-      }
-
-      // Teleporte / Troca de Posição
-      playTeleport() {
-        if (this.muted) return;
-        this.initCtx();
-        if (!this.ctx) return;
-
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(680, this.ctx.currentTime + 0.16);
+        osc.frequency.setValueAtTime(240, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(580, this.ctx.currentTime + 0.16);
 
         gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -901,7 +992,26 @@
         osc.stop(this.ctx.currentTime + 0.2);
       }
 
-      // Apito de início ou fim de rodada
+      // Som de clique sutil ao calibrar com as setas
+      playTick() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.035);
+      }
+
+      // Apito de início e fim
       playWhistle() {
         if (this.muted) return;
         this.initCtx();
@@ -913,11 +1023,11 @@
 
         osc1.type = 'sine';
         osc2.type = 'sine';
-        osc1.frequency.setValueAtTime(2800, this.ctx.currentTime);
-        osc2.frequency.setValueAtTime(2850, this.ctx.currentTime);
+        osc1.frequency.setValueAtTime(2700, this.ctx.currentTime);
+        osc2.frequency.setValueAtTime(2760, this.ctx.currentTime);
 
         gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.38);
 
         osc1.connect(gain);
         osc2.connect(gain);
@@ -925,11 +1035,11 @@
 
         osc1.start();
         osc2.start();
-        osc1.stop(this.ctx.currentTime + 0.42);
-        osc2.stop(this.ctx.currentTime + 0.42);
+        osc1.stop(this.ctx.currentTime + 0.4);
+        osc2.stop(this.ctx.currentTime + 0.4);
       }
 
-      // Fanfarra de vitória
+      // Celebração de vitória
       playCheer() {
         if (this.muted) return;
         this.initCtx();
@@ -954,7 +1064,7 @@
     }
 
     /* ==========================================================================
-       2. Sistema de Partículas de Confetes para Celebrações
+       2. Sistema de Partículas de Confetes
        ========================================================================== */
     class ConfettiEffect {
       constructor(canvasId) {
@@ -998,7 +1108,7 @@
         for (let p of this.particles) {
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.4; // gravidade
+          p.vy += 0.4;
           p.rotation += p.vRot;
           p.opacity -= 0.008;
 
@@ -1024,7 +1134,7 @@
     }
 
     /* ==========================================================================
-       3. Motor Principal do Jogo de Basquete em Perspectiva (Canvas 2D/3D)
+       3. Motor Principal do Basquete Kids em 1ª Pessoa Realista
        ========================================================================== */
     class BasketballGame {
       constructor() {
@@ -1042,55 +1152,50 @@
         this.timerInterval = null;
         this.isGameOver = false;
 
-        // Configuração de Níveis (Progressão amigável para o Pedro de 7 anos)
+        // Metas de cada nível
         this.levelConfigs = [
           { level: 1, name: 'Iniciante na Quadra', goal: 6, time: 60 },
           { level: 2, name: 'Armador Talentoso', goal: 14, time: 60 },
           { level: 3, name: 'Estrela da Cesta', goal: 22, time: 60 },
-          { level: 4, name: 'Lenda da NBA', goal: 32, time: 60 },
-          { level: 5, name: 'Mestre Imparável', goal: 44, time: 60 }
+          { level: 4, name: 'Lenda da NBA', goal: 32, time: 60 }
         ];
 
-        // Posição de Teleporte Atual: 1, 2 ou 3
-        this.currentPosition = 1; // 1 = Lance Livre, 2 = Garrafão, 3 = Linha de 3
-
-        // Câmera / Posição do Jogador
-        // Distância do jogador à cesta (z):
-        // Cesta está em z = 550.
-        this.targetCameraZ = 240; // z atual
+        // Posição de Teleporte Atual (1: Lance Livre, 2: Garrafão, 3: Linha dos Três)
+        this.currentPosition = 1;
         this.cameraZ = 240;
-        this.cameraX = 0;
-        this.targetCameraX = 0;
+        this.targetCameraZ = 240;
 
-        // Controle do Mouse / Mira
-        this.mousePos = { x: 0, y: 0 };
-        this.aimX = 0; // offset suave em X (-60 a +60)
-        this.aimY = 0; // offset suave em Y (-40 a +40)
-
-        // Animação das Mãos e da Bola Pronta
-        this.handsAnim = {
-          shootProgress: 0, // 0 = segurando, 0 a 1 = arremessando
-          isShooting: false,
-          cooldown: 0
+        // Pulo no Ar (Jump Shot)
+        this.jump = {
+          active: false,
+          progress: 0,
+          height: 0
         };
 
-        // Bolas em Voo (Suporta múltiplos arremessos sem travar)
+        // Calibragem da Trajetória via Setas do Teclado (← ↑ ↓ →)
+        // Valores de -50 a +50 (0 = centro perfeito)
+        this.calibX = 0;
+        this.calibY = 0;
+
+        // Cooldown de arremesso
+        this.cooldown = 0;
+
+        // Bolas de Basquete ativas
         this.balls = [];
 
-        // Geometria da Cesta em Coordenadas 3D do Mundo
-        // x: 0 (centro), y: altura a partir do chão, z: profundidade
+        // Geometria da Cesta 3D
         this.hoop = {
           x: 0,
-          y: 280, // Altura do aro
-          z: 550, // Distância do fundo
-          rimRadius: 36,
-          backboardWidth: 240,
-          backboardHeight: 160,
-          backboardY: 330, // Centro da tabela
-          backboardZ: 575  // Logo atrás do aro
+          y: 290,           // Altura do aro
+          z: 550,           // Profundidade do aro
+          rimRadius: 32,    // Raio do aro de metal
+          backboardWidth: 220,
+          backboardHeight: 150,
+          backboardY: 340,  // Centro da tabela
+          backboardZ: 575   // Tabela logo atrás do aro
         };
 
-        // Ondulação / Animação da Rede
+        // Balanço da rede
         this.netWave = 0;
 
         // Elementos DOM
@@ -1100,6 +1205,8 @@
           valLevel: document.getElementById('valLevel'),
           valGoal: document.getElementById('valGoal'),
           valTimer: document.getElementById('valTimer'),
+          meterHoriz: document.getElementById('meterHoriz'),
+          meterVert: document.getElementById('meterVert'),
           btnPos1: document.getElementById('btnPos1'),
           btnPos2: document.getElementById('btnPos2'),
           btnPos3: document.getElementById('btnPos3'),
@@ -1123,9 +1230,9 @@
         window.addEventListener('resize', () => this.resize());
         this.setupControls();
         this.updateHUD();
+        this.updateCalibrationMeters();
         this.startLevel(1);
 
-        // Inicia loop de renderização a 60fps
         this.lastTime = performance.now();
         requestAnimationFrame((t) => this.gameLoop(t));
       }
@@ -1135,39 +1242,29 @@
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
         this.centerX = this.canvas.width / 2;
-        this.centerY = this.canvas.height / 2;
-        this.horizonY = this.canvas.height * 0.52;
+        this.horizonY = this.canvas.height * 0.44; // horizonte ao ar livre
       }
 
       setupControls() {
-        // Movimento do Mouse para ajustar mira suavemente
-        window.addEventListener('mousemove', (e) => {
-          const rect = this.canvas.getBoundingClientRect();
-          const relX = (e.clientX - rect.left) / rect.width - 0.5;
-          const relY = (e.clientY - rect.top) / rect.height - 0.5;
-
-          // Suave e limitado para não desorientar a criança
-          this.aimX = relX * 120;
-          this.aimY = -relY * 60;
-        });
-
-        // Toque em Telas Touch / Tablets
-        this.canvas.addEventListener('touchmove', (e) => {
-          if (e.touches.length > 0) {
-            const touch = e.touches[0];
-            const rect = this.canvas.getBoundingClientRect();
-            const relX = (touch.clientX - rect.left) / rect.width - 0.5;
-            const relY = (touch.clientY - rect.top) / rect.height - 0.5;
-            this.aimX = relX * 120;
-            this.aimY = -relY * 60;
-          }
-        }, { passive: true });
-
-        // Atalhos de Teclado
+        // Calibragem nas Setas do Teclado (← ↑ ↓ →) e Teclas WASD / Espaço
         window.addEventListener('keydown', (e) => {
-          if (e.code === 'Space') {
+          let adjusted = false;
+
+          if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+            this.calibX = Math.max(-50, this.calibX - 3.5);
+            adjusted = true;
+          } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+            this.calibX = Math.min(50, this.calibX + 3.5);
+            adjusted = true;
+          } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+            this.calibY = Math.min(50, this.calibY + 3.5);
+            adjusted = true;
+          } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+            this.calibY = Math.max(-50, this.calibY - 3.5);
+            adjusted = true;
+          } else if (e.code === 'Space') {
             e.preventDefault();
-            this.triggerShoot();
+            this.triggerJumpShoot();
           } else if (e.key === '1') {
             this.setShootingPosition(1);
           } else if (e.key === '2') {
@@ -1177,27 +1274,52 @@
           } else if (e.key === 'r' || e.key === 'R') {
             this.restartGame();
           }
-        });
 
-        // Botão de Disparo na tela
-        const btnShoot = document.getElementById('btnShoot');
-        if (btnShoot) {
-          btnShoot.addEventListener('click', () => this.triggerShoot());
-        }
-
-        // Clique no próprio canvas também atira
-        this.canvas.addEventListener('mousedown', (e) => {
-          if (e.button === 0 && !this.isGameOver) {
-            this.triggerShoot();
+          if (adjusted) {
+            this.audio.playTick();
+            this.updateCalibrationMeters();
           }
         });
 
-        // Botões de Teleporte (1, 2, 3)
+        // Botões Virtuais do D-Pad (Touch / Mobile)
+        const bindDpad = (id, dx, dy) => {
+          const btn = document.getElementById(id);
+          if (btn) {
+            const act = () => {
+              if (dx !== 0) this.calibX = Math.max(-50, Math.min(50, this.calibX + dx));
+              if (dy !== 0) this.calibY = Math.max(-50, Math.min(50, this.calibY + dy));
+              this.audio.playTick();
+              this.updateCalibrationMeters();
+            };
+            btn.addEventListener('click', act);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); act(); }, { passive: false });
+          }
+        };
+
+        bindDpad('dpadLeft', -4.5, 0);
+        bindDpad('dpadRight', 4.5, 0);
+        bindDpad('dpadUp', 0, 4.5);
+        bindDpad('dpadDown', 0, -4.5);
+
+        // Botão de Disparo
+        const btnShoot = document.getElementById('btnShoot');
+        if (btnShoot) {
+          btnShoot.addEventListener('click', () => this.triggerJumpShoot());
+        }
+
+        // Clique no canvas também dispara
+        this.canvas.addEventListener('mousedown', (e) => {
+          if (e.button === 0 && !this.isGameOver) {
+            this.triggerJumpShoot();
+          }
+        });
+
+        // Teleportes 1, 2, 3
         this.dom.btnPos1.addEventListener('click', () => this.setShootingPosition(1));
         this.dom.btnPos2.addEventListener('click', () => this.setShootingPosition(2));
         this.dom.btnPos3.addEventListener('click', () => this.setShootingPosition(3));
 
-        // Botões do Cabeçalho
+        // Cabeçalho
         document.getElementById('btnSoundToggle').addEventListener('click', () => this.audio.toggleMute());
         document.getElementById('btnRestart').addEventListener('click', () => this.restartGame());
 
@@ -1207,81 +1329,98 @@
           if (this.currentWin) {
             this.startLevel(this.level + 1);
           } else {
-            this.startLevel(this.level); // Repetir o nível atual
+            this.startLevel(this.level);
           }
         });
       }
 
-      /* ==========================================================================
-         4. Teleporte de Posições (1, 2 e 3 Pontos)
-         ========================================================================== */
+      updateCalibrationMeters() {
+        // Barra Horizontal (-50 a 50)
+        // 0 = centro (50% no CSS)
+        const pctH = (this.calibX / 50) * 50;
+        if (pctH >= 0) {
+          this.dom.meterHoriz.style.left = '50%';
+          this.dom.meterHoriz.style.width = `${pctH}%`;
+        } else {
+          this.dom.meterHoriz.style.left = `${50 + pctH}%`;
+          this.dom.meterHoriz.style.width = `${Math.abs(pctH)}%`;
+        }
+
+        // Barra Vertical (-50 a 50)
+        const pctV = (this.calibY / 50) * 50;
+        if (pctV >= 0) {
+          this.dom.meterVert.style.left = '50%';
+          this.dom.meterVert.style.width = `${pctV}%`;
+        } else {
+          this.dom.meterVert.style.left = `${50 + pctV}%`;
+          this.dom.meterVert.style.width = `${Math.abs(pctV)}%`;
+        }
+      }
+
       setShootingPosition(pos) {
         if (this.currentPosition === pos) return;
         this.currentPosition = pos;
-        this.audio.playTeleport();
+        this.audio.playJumpShoot();
 
-        // Atualiza estilo dos botões
         [this.dom.btnPos1, this.dom.btnPos2, this.dom.btnPos3].forEach((btn, idx) => {
           btn.classList.toggle('active', idx + 1 === pos);
         });
 
-        // Define a distância da câmera (z)
+        // Distâncias da câmera:
         // Cesta está em z = 550.
-        // Posição 1: bem perto (Lance Livre / Fácil)
-        // Posição 2: meia distância (Garrafão / Médio)
-        // Posição 3: longe (Linha dos 3 / Desafiador)
-        if (pos === 1) {
-          this.targetCameraZ = 280; // dist = 270
-        } else if (pos === 2) {
-          this.targetCameraZ = 160; // dist = 390
-        } else if (pos === 3) {
-          this.targetCameraZ = 40;  // dist = 510
-        }
+        // Posição 1 (Lance Livre): z = 290 (distância curta = 260)
+        // Posição 2 (Garrafão): z = 170 (distância média = 380)
+        // Posição 3 (Linha dos 3): z = 50 (distância longa = 500)
+        if (pos === 1) this.targetCameraZ = 290;
+        else if (pos === 2) this.targetCameraZ = 170;
+        else if (pos === 3) this.targetCameraZ = 50;
 
-        this.showPopupText(`Posição: ${pos} Ponto${pos > 1 ? 's' : ''}`, '#ffd700');
+        this.showPopupText(`Posição: ${pos} Ponto${pos > 1 ? 's' : ''}`, '#ffce00');
       }
 
       /* ==========================================================================
-         5. Disparo / Arremesso da Bola
+         4. Pulo e Arremesso com Salto (Jump Shot)
          ========================================================================== */
-      triggerShoot() {
-        if (this.isGameOver || this.handsAnim.cooldown > 0) return;
+      triggerJumpShoot() {
+        if (this.isGameOver || this.cooldown > 0 || this.jump.active) return;
 
-        this.audio.playShoot();
-        this.handsAnim.isShooting = true;
-        this.handsAnim.shootProgress = 0;
-        this.handsAnim.cooldown = 0.35; // cooldown rápido para manter ritmo alegre
+        this.cooldown = 0.55;
+        this.jump.active = true;
+        this.jump.progress = 0;
+        this.audio.playJumpShoot();
 
-        // Distância até o aro
+        // O disparo da bola ocorre no topo do salto
+        setTimeout(() => {
+          this.releaseBall();
+        }, 180);
+      }
+
+      releaseBall() {
         const distZ = this.hoop.z - this.cameraZ;
 
-        // Cálculo da física de lançamento perfeito com base na mira do mouse
-        // Tempo estimado de voo até o aro (segundos)
-        const flightTime = 0.85 + (distZ / 500) * 0.3;
-
-        // Velocidade Z
+        // Tempo de voo proporcional à distância
+        const flightTime = 0.82 + (distZ / 500) * 0.35;
         const vz = distZ / flightTime;
+        const gravity = 860;
 
-        // Gravidade
-        const gravity = 820;
-
-        // Posição inicial da bola (nas mãos do jogador em 3D)
-        const startX = this.cameraX + (this.aimX * 0.15);
-        const startY = 120; // altura do peito do jogador
+        // Posição inicial: mãos erguidas no alto durante o salto
+        const startX = (this.calibX * 0.6);
+        const startY = 240 + this.jump.height; // Bem alto, como na foto!
         const startZ = this.cameraZ + 40;
 
-        // Alvo no aro com pequenas variações ajustadas pelo mouse
-        const targetX = this.hoop.x + (this.aimX * 0.6);
-        const targetY = this.hoop.y + 12 + (this.aimY * 0.3); // mira suave
+        // Ponto de impacto no plano do aro/tabela calibrado pelas setas:
+        // calibX desvia horizontalmente em pixels reais
+        // calibY desvia altura/força em pixels reais
+        const aimOffsetX = this.calibX * 3.4;
+        const aimOffsetY = this.calibY * 3.2;
 
-        // Velocidade horizontal X
+        const targetX = this.hoop.x + aimOffsetX;
+        const targetY = this.hoop.y + 14 + aimOffsetY;
+
+        // Velocidade calculada pela física da trajetória
         const vx = (targetX - startX) / flightTime;
-
-        // Velocidade vertical Y necessária para fazer uma linda parábola de basquete
-        // targetY = startY + vy*t - 0.5*g*t^2  =>  vy = (targetY - startY + 0.5*g*t^2) / t
         const vy = (targetY - startY + 0.5 * gravity * flightTime * flightTime) / flightTime;
 
-        // Cria a entidade da bola de basquete 3D
         this.balls.push({
           x: startX,
           y: startY,
@@ -1289,10 +1428,10 @@
           vx: vx,
           vy: vy,
           vz: vz,
-          radius: 20,
+          radius: 19,
           pointsValue: this.currentPosition,
           rotation: 0,
-          rotSpeed: 8,
+          rotSpeed: 7,
           scored: false,
           hitBackboard: false,
           active: true,
@@ -1302,7 +1441,7 @@
       }
 
       /* ==========================================================================
-         6. Níveis e Temporizador de 1 Minuto (60s)
+         5. Níveis e Cronômetro de 60s
          ========================================================================== */
       startLevel(lvlNum) {
         this.level = lvlNum;
@@ -1353,13 +1492,11 @@
         const won = this.score >= this.levelGoal;
         this.currentWin = won;
 
-        // Atualiza Recorde
         if (this.score > this.highScore) {
           this.highScore = this.score;
           localStorage.setItem('pedroplay_basketball_highscore', this.highScore);
         }
 
-        // Configura Modal
         if (won) {
           this.audio.playCheer();
           this.confetti.burst();
@@ -1372,7 +1509,7 @@
           this.dom.modalIcon.className = 'modal-icon-wrap try';
           this.dom.modalIconGlyph.className = 'bi bi-arrow-repeat';
           this.dom.modalTitle.textContent = 'Tempo Esgotado!';
-          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Vamos tentar de novo?`;
+          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Calibre a mira nas setas e tente de novo!`;
           this.dom.modalBtnText.textContent = 'Tentar Novamente';
         }
 
@@ -1405,128 +1542,126 @@
         el.textContent = text;
         el.style.color = color;
         el.style.left = `${this.centerX}px`;
-        el.style.top = `${this.horizonY - 80}px`;
+        el.style.top = `${this.horizonY - 90}px`;
 
         document.getElementById('arena').appendChild(el);
         setTimeout(() => {
           if (el.parentNode) el.parentNode.removeChild(el);
-        }, 1200);
+        }, 1300);
       }
 
       /* ==========================================================================
-         7. Projeção 3D para 2D Canvas & Física
+         6. Projeção 3D e Física Realista de Colisão
          ========================================================================== */
       project3D(x, y, z) {
-        // Câmera do jogador
         const relZ = z - this.cameraZ;
         const fov = 420;
         const scale = fov / Math.max(1, fov + relZ);
 
-        const screenX = this.centerX + (x - this.cameraX) * scale;
-        // y cresce para cima no mundo 3D; na tela cresce para baixo a partir do horizonte
-        const screenY = this.horizonY - (y - 120) * scale;
+        const screenX = this.centerX + x * scale;
+        // Pulo no ar eleva a visão
+        const screenY = this.horizonY - (y - 120 + this.jump.height) * scale;
 
         return { x: screenX, y: screenY, scale: scale, depth: relZ };
       }
 
       update(dt) {
-        // Interpolação suave de câmera ao teletransportar
+        // Câmera interpola ao teletransportar
         this.cameraZ += (this.targetCameraZ - this.cameraZ) * 6 * dt;
-        this.cameraX += (this.targetCameraX - this.cameraX) * 6 * dt;
 
-        // Cooldown das mãos
-        if (this.handsAnim.cooldown > 0) {
-          this.handsAnim.cooldown -= dt;
-        }
+        if (this.cooldown > 0) this.cooldown -= dt;
 
-        // Animação de arremesso das mãos
-        if (this.handsAnim.isShooting) {
-          this.handsAnim.shootProgress += dt * 4.5;
-          if (this.handsAnim.shootProgress >= 1) {
-            this.handsAnim.shootProgress = 0;
-            this.handsAnim.isShooting = false;
+        // Animação de Salto no ar (Jump)
+        if (this.jump.active) {
+          this.jump.progress += dt * 3.5;
+          // Curva senoidal do pulo (sobe e desce)
+          this.jump.height = Math.sin(this.jump.progress * Math.PI) * 45;
+
+          if (this.jump.progress >= 1) {
+            this.jump.active = false;
+            this.jump.progress = 0;
+            this.jump.height = 0;
           }
         }
 
-        // Amortecimento da onda na rede da cesta
         if (this.netWave > 0) {
           this.netWave = Math.max(0, this.netWave - dt * 2.5);
         }
 
-        const gravity = 820;
+        const gravity = 860;
 
         // Atualização de cada bola em voo
         for (let i = this.balls.length - 1; i >= 0; i--) {
           const b = this.balls[i];
           if (!b.active) continue;
 
-          // Física de movimento
           b.x += b.vx * dt;
           b.y += b.vy * dt;
           b.z += b.vz * dt;
-          b.vy -= gravity * dt; // gravidade puxa para baixo
+          b.vy -= gravity * dt;
           b.rotation += b.rotSpeed * dt;
 
-          // Colisão com Tabela (Backboard)
+          // 1. Colisão com a Tabela de Vidro (Backboard)
           if (!b.hitBackboard && b.z >= this.hoop.backboardZ - 10 && b.vz > 0) {
             const hw = this.hoop.backboardWidth / 2;
             const hh = this.hoop.backboardHeight / 2;
+
             if (
               b.x >= this.hoop.x - hw &&
               b.x <= this.hoop.x + hw &&
               b.y >= this.hoop.backboardY - hh &&
               b.y <= this.hoop.backboardY + hh
             ) {
+              // Bateu em cheio na tabela!
               b.z = this.hoop.backboardZ - 10;
               b.vz = -b.vz * 0.45; // rebate para frente
-              b.vx = b.vx * 0.8 + (this.hoop.x - b.x) * 0.4;
+              b.vx = b.vx * 0.75 + (this.hoop.x - b.x) * 0.35;
               b.hitBackboard = true;
               this.audio.playBackboard();
             }
           }
 
-          // Verificação de Cesta (Passagem pelo Aro)
+          // 2. Verificação de Cesta ou Aro Metálico (Colisão Realista)
           if (!b.scored && b.vy < 0) {
-            // Bola descendo na altura do aro
-            const distFromRimY = Math.abs(b.y - this.hoop.y);
-            const distFromRimZ = Math.abs(b.z - this.hoop.z);
-            const distFromRimX = Math.abs(b.x - this.hoop.x);
-            const distHorizontal = Math.hypot(distFromRimX, distFromRimZ);
+            const distY = Math.abs(b.y - this.hoop.y);
+            const distZ = Math.abs(b.z - this.hoop.z);
+            const distX = Math.abs(b.x - this.hoop.x);
+            const distHoriz = Math.hypot(distX, distZ);
 
-            // Se estiver descendo exatamente pelo centro do aro
-            if (distFromRimY < 18 && distHorizontal < this.hoop.rimRadius * 0.75) {
+            // Cesta Limpa: passou exatamente no centro do aro
+            if (distY < 18 && distHoriz < this.hoop.rimRadius * 0.65) {
               b.scored = true;
               this.score += b.pointsValue;
               this.basketsCount++;
-              this.netWave = 1.0; // balanço da rede
+              this.netWave = 1.0;
 
               this.audio.playSwish();
-              this.showPopupText(`+${b.pointsValue} CESTA!`, b.pointsValue === 3 ? '#ffce00' : '#4ade80');
+              this.showPopupText(`+${b.pointsValue} LINDA CESTA!`, b.pointsValue === 3 ? '#ffce00' : '#4ade80');
               this.updateHUD();
 
-              // Freia um pouco a bola ao passar pela rede
-              b.vx *= 0.3;
-              b.vz *= 0.3;
+              // Freia na rede
+              b.vx *= 0.25;
+              b.vz *= 0.25;
               b.vy *= 0.5;
-            } else if (distFromRimY < 16 && Math.abs(distHorizontal - this.hoop.rimRadius) < 14) {
-              // Tocou no aro de metal
+            }
+            // Batida no Aro de Metal (Rim Clank): bateu na borda do anel
+            else if (distY < 18 && Math.abs(distHoriz - this.hoop.rimRadius) < 16) {
               this.audio.playRim();
-              b.vy = -b.vy * 0.5;
-              b.vx += (Math.random() - 0.5) * 80;
+              b.vy = -b.vy * 0.45;
+              b.vx += (b.x > this.hoop.x ? 1 : -1) * 60;
+              b.vz = -b.vz * 0.35;
             }
           }
 
-          // Colisão com o Chão da Quadra
+          // 3. Colisão com o Chão da Quadra
           if (b.y <= b.radius) {
             b.y = b.radius;
             if (Math.abs(b.vy) > 60) {
-              b.vy = -b.vy * 0.65; // quique com perda de energia
+              b.vy = -b.vy * 0.6;
               b.vx *= 0.8;
               b.vz *= 0.8;
               b.groundBounces++;
-              if (b.groundBounces <= 3) {
-                this.audio.playBounce();
-              }
+              if (b.groundBounces <= 3) this.audio.playBounce();
             } else {
               b.vy = 0;
               b.vx *= 0.95;
@@ -1534,8 +1669,8 @@
             }
           }
 
-          // Remove bola após afastar muito ou sumir no chão
-          if (b.z > 700 || b.y < 0 || (b.groundBounces > 4 && Math.abs(b.vy) < 20)) {
+          // Descarte após afastar muito ou terminar os quiques
+          if (b.z > 720 || b.y < 0 || (b.groundBounces > 4 && Math.abs(b.vy) < 20)) {
             b.fade -= dt * 1.5;
             if (b.fade <= 0) {
               this.balls.splice(i, 1);
@@ -1545,91 +1680,116 @@
       }
 
       /* ==========================================================================
-         8. Renderização Visual da Quadra, Cesta, Bola e Mãos
+         7. Renderização Visual — Céu Ensolarado, Árvores, Tabela e Mãos (img/basquete.jpg)
          ========================================================================== */
       render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // 1. Fundo do Ginásio / Arquibancada Noturna
-        this.renderStadiumBackground();
+        // 1. Céu Azul Ensolarado ao Ar Livre
+        this.renderSunnySky();
 
-        // 2. Chão de Madeira Nobre da Quadra de Basquete
-        this.renderCourtFloor();
+        // 2. Árvores Verdes ao Fundo (como na foto basquete.jpg)
+        this.renderTreesBackground();
 
-        // 3. Suporte do Poste, Tabela, Aro e Rede da Cesta
+        // 3. Chão da Quadra Externa de Basquete
+        this.renderOutdoorCourtFloor();
+
+        // 4. Poste, Tabela de Vidro Transparente e Aro
         this.renderHoop();
 
-        // 4. Bolas de Basquete no Ar
+        // 5. Bolas de Basquete no Ar
         this.renderBalls();
 
-        // 5. Mãos do Jogador segurando a Bola (Primeira Pessoa)
-        this.renderFirstPersonHands();
+        // 6. Retículo de Calibragem
+        this.renderCalibrationReticle();
 
-        // 6. Mira / Retículo de Guia Suave
-        this.renderAimReticle();
+        // 7. Mãos e Braços Erguidos no Alto com a Bola (Fiel à foto!)
+        this.renderFirstPersonRaisedArms();
       }
 
-      renderStadiumBackground() {
-        // Céu / Teto escuro do ginásio iluminado
-        const grad = this.ctx.createLinearGradient(0, 0, 0, this.horizonY);
-        grad.addColorStop(0, '#070a0f');
-        grad.addColorStop(0.5, '#0d131d');
-        grad.addColorStop(1, '#162030');
-        this.ctx.fillStyle = grad;
+      renderSunnySky() {
+        // Gradiente de céu azul brilhante com sol
+        const skyGrad = this.ctx.createLinearGradient(0, 0, 0, this.horizonY);
+        skyGrad.addColorStop(0, '#4a90e2');
+        skyGrad.addColorStop(0.5, '#7bb5e6');
+        skyGrad.addColorStop(1, '#bfe3f7');
+        this.ctx.fillStyle = skyGrad;
         this.ctx.fillRect(0, 0, this.canvas.width, this.horizonY);
 
-        // Holofotes de estádio sutis no topo
+        // Brilho do Sol Suave no canto superior esquerdo
         this.ctx.save();
-        this.ctx.globalAlpha = 0.12;
-        const spot1 = this.ctx.createRadialGradient(this.centerX - 240, 20, 10, this.centerX - 240, 20, 360);
-        spot1.addColorStop(0, '#ffd700');
-        spot1.addColorStop(1, 'transparent');
-        this.ctx.fillStyle = spot1;
+        const sunGrad = this.ctx.createRadialGradient(
+          this.canvas.width * 0.22, 60, 10,
+          this.canvas.width * 0.22, 60, 260
+        );
+        sunGrad.addColorStop(0, 'rgba(255, 255, 235, 0.9)');
+        sunGrad.addColorStop(0.3, 'rgba(255, 245, 180, 0.45)');
+        sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        this.ctx.fillStyle = sunGrad;
         this.ctx.fillRect(0, 0, this.canvas.width, this.horizonY);
 
-        const spot2 = this.ctx.createRadialGradient(this.centerX + 240, 20, 10, this.centerX + 240, 20, 360);
-        spot2.addColorStop(0, '#38bdf8');
-        spot2.addColorStop(1, 'transparent');
-        this.ctx.fillStyle = spot2;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.horizonY);
+        // Nuvens suaves
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+        this.drawCloud(this.canvas.width * 0.65, 70, 70);
+        this.drawCloud(this.canvas.width * 0.85, 100, 50);
         this.ctx.restore();
       }
 
-      renderCourtFloor() {
-        // Chão de Madeira com Linhas da NBA em Perspectiva
+      drawCloud(cx, cy, r) {
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        this.ctx.arc(cx - r * 0.5, cy + r * 0.2, r * 0.7, 0, Math.PI * 2);
+        this.ctx.arc(cx + r * 0.5, cy + r * 0.2, r * 0.7, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
+      renderTreesBackground() {
+        // Fileira de árvores e vegetação no horizonte (como na foto de referência)
         this.ctx.save();
+        const treeBaseY = this.horizonY;
 
-        // Gradiente do Piso da Quadra
-        const floorGrad = this.ctx.createLinearGradient(0, this.horizonY, 0, this.canvas.height);
-        floorGrad.addColorStop(0, '#8c430e');
-        floorGrad.addColorStop(0.4, '#b8621b');
-        floorGrad.addColorStop(1, '#663209');
-        this.ctx.fillStyle = floorGrad;
-        this.ctx.fillRect(0, this.horizonY, this.canvas.width, this.canvas.height - this.horizonY);
-
-        // Tábuas de Madeira da Quadra (Linhas longitudinais em perspectiva)
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
-        this.ctx.lineWidth = 1;
-        for (let x = -600; x <= 600; x += 100) {
-          const pFar = this.project3D(x, 0, 600);
-          const pNear = this.project3D(x * 1.4, 0, 0);
+        // Camada 1: Árvores mais distantes (verde azulado suave)
+        this.ctx.fillStyle = '#3a6647';
+        for (let x = 0; x <= this.canvas.width + 60; x += 55) {
+          const h = 75 + Math.sin(x * 0.03) * 25;
           this.ctx.beginPath();
-          this.ctx.moveTo(pFar.x, pFar.y);
-          this.ctx.lineTo(pNear.x, pNear.y);
-          this.ctx.stroke();
+          this.ctx.arc(x, treeBaseY - h * 0.5, 45, 0, Math.PI * 2);
+          this.ctx.fill();
         }
 
-        // Garrafão (Key Area) em perspectiva
+        // Camada 2: Árvores mais próximas e verdes vivas
+        this.ctx.fillStyle = '#2d5339';
+        for (let x = -20; x <= this.canvas.width + 40; x += 75) {
+          const h = 90 + Math.cos(x * 0.04) * 30;
+          this.ctx.beginPath();
+          this.ctx.arc(x, treeBaseY - h * 0.4, 52, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+        this.ctx.restore();
+      }
+
+      renderOutdoorCourtFloor() {
+        this.ctx.save();
+
+        // Chão de Quadra ao ar livre (concreto com tom marrom-avermelhado como na foto)
+        const courtGrad = this.ctx.createLinearGradient(0, this.horizonY, 0, this.canvas.height);
+        courtGrad.addColorStop(0, '#5a423a');
+        courtGrad.addColorStop(0.3, '#785549');
+        courtGrad.addColorStop(1, '#4a332d');
+        this.ctx.fillStyle = courtGrad;
+        this.ctx.fillRect(0, this.horizonY, this.canvas.width, this.canvas.height - this.horizonY);
+
+        // Linhas de Demarcação da Quadra
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
         this.ctx.lineWidth = 2.5;
 
-        const kFarL = this.project3D(-140, 0, 560);
-        const kFarR = this.project3D(140, 0, 560);
-        const kNearL = this.project3D(-140, 0, 280);
-        const kNearR = this.project3D(140, 0, 280);
+        // Garrafão (Key Area)
+        const kFarL = this.project3D(-130, 0, 560);
+        const kFarR = this.project3D(130, 0, 560);
+        const kNearL = this.project3D(-130, 0, 290);
+        const kNearR = this.project3D(130, 0, 290);
 
-        // Preenchimento vermelho discreto do garrafão
-        this.ctx.fillStyle = 'rgba(221, 0, 0, 0.16)';
+        this.ctx.fillStyle = 'rgba(180, 70, 50, 0.25)';
         this.ctx.beginPath();
         this.ctx.moveTo(kFarL.x, kFarL.y);
         this.ctx.lineTo(kFarR.x, kFarR.y);
@@ -1639,15 +1799,15 @@
         this.ctx.fill();
         this.ctx.stroke();
 
-        // Linha de Lance Livre (Posição 1: z = 280)
-        this.ctx.strokeStyle = '#ffd700';
+        // Linha de Lance Livre (Posição 1: z = 290)
+        this.ctx.strokeStyle = '#ffce00';
         this.ctx.lineWidth = 3.5;
         this.ctx.beginPath();
         this.ctx.moveTo(kNearL.x, kNearL.y);
         this.ctx.lineTo(kNearR.x, kNearR.y);
         this.ctx.stroke();
 
-        // Arco da Linha de Três Pontos (Posição 3: z = 80 a 160)
+        // Arco dos Três Pontos (Posição 3: z = 50 a 170)
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
         this.ctx.lineWidth = 2.5;
         this.ctx.beginPath();
@@ -1668,27 +1828,27 @@
         const hp = this.hoop;
 
         // 1. Poste de sustentação atrás da tabela
-        const poleBottom = this.project3D(hp.x, 0, hp.backboardZ + 50);
-        const poleTop = this.project3D(hp.x, hp.backboardY, hp.backboardZ + 40);
+        const poleBottom = this.project3D(hp.x, 0, hp.backboardZ + 40);
+        const poleTop = this.project3D(hp.x, hp.backboardY, hp.backboardZ + 30);
 
         this.ctx.save();
-        this.ctx.strokeStyle = '#22272e';
+        this.ctx.strokeStyle = '#263238';
         this.ctx.lineWidth = 14 * poleBottom.scale;
         this.ctx.beginPath();
         this.ctx.moveTo(poleBottom.x, poleBottom.y);
         this.ctx.lineTo(poleTop.x, poleTop.y);
         this.ctx.stroke();
 
-        // Braço em diagonal sustentando a tabela
-        const armEnd = this.project3D(hp.x, hp.backboardY - 10, hp.backboardZ);
+        // Braço metálico que segura a tabela
+        const armEnd = this.project3D(hp.x, hp.backboardY - 15, hp.backboardZ);
         this.ctx.lineWidth = 8 * poleBottom.scale;
-        this.ctx.strokeStyle = '#30363d';
+        this.ctx.strokeStyle = '#37474f';
         this.ctx.beginPath();
         this.ctx.moveTo(poleTop.x, poleTop.y);
         this.ctx.lineTo(armEnd.x, armEnd.y);
         this.ctx.stroke();
 
-        // 2. Tabela de Vidro / Acrílico (Backboard)
+        // 2. Tabela de Vidro / Acrílico Transparente (Fiel à foto img/basquete.jpg)
         const hw = hp.backboardWidth / 2;
         const hh = hp.backboardHeight / 2;
 
@@ -1697,11 +1857,11 @@
         const br = this.project3D(hp.x + hw, hp.backboardY - hh, hp.backboardZ);
         const bl = this.project3D(hp.x - hw, hp.backboardY - hh, hp.backboardZ);
 
-        // Fundo de vidro translúcido com reflexo
+        // Fundo de vidro cristalino translúcido com reflexo do céu
         const bbGrad = this.ctx.createLinearGradient(tl.x, tl.y, br.x, br.y);
-        bbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
-        bbGrad.addColorStop(0.3, 'rgba(230, 240, 255, 0.2)');
-        bbGrad.addColorStop(1, 'rgba(200, 220, 240, 0.35)');
+        bbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+        bbGrad.addColorStop(0.4, 'rgba(220, 240, 255, 0.25)');
+        bbGrad.addColorStop(1, 'rgba(180, 215, 245, 0.4)');
 
         this.ctx.fillStyle = bbGrad;
         this.ctx.beginPath();
@@ -1712,47 +1872,47 @@
         this.ctx.closePath();
         this.ctx.fill();
 
-        // Borda grossa da tabela (Branca com sutil vermelho)
+        // Borda grossa branca da tabela
         this.ctx.strokeStyle = '#ffffff';
-        this.ctx.lineWidth = 4 * tl.scale;
+        this.ctx.lineWidth = 5 * tl.scale;
         this.ctx.stroke();
 
-        // Quadrado Interno Guia da Cesta (Target Box)
-        const targetW = 70;
-        const targetH = 50;
-        const targetY = hp.y + 35;
+        // Quadrado Vermelho Guia (Target Box, idêntico à foto)
+        const targetW = 68;
+        const targetH = 48;
+        const targetY = hp.y + 32;
 
         const qTL = this.project3D(hp.x - targetW / 2, targetY + targetH / 2, hp.backboardZ);
         const qTR = this.project3D(hp.x + targetW / 2, targetY + targetH / 2, hp.backboardZ);
         const qBR = this.project3D(hp.x + targetW / 2, targetY - targetH / 2, hp.backboardZ);
         const qBL = this.project3D(hp.x - targetW / 2, targetY - targetH / 2, hp.backboardZ);
 
-        this.ctx.strokeStyle = '#ff3344';
-        this.ctx.lineWidth = 3 * qTL.scale;
+        this.ctx.strokeStyle = '#e63946'; // Vermelho clássico
+        this.ctx.lineWidth = 3.5 * qTL.scale;
         this.ctx.strokeRect(qTL.x, qTL.y, qTR.x - qTL.x, qBL.y - qTL.y);
 
-        // 3. Suporte do Aro que liga à Tabela
+        // 3. Suporte do Aro
         const neckStart = this.project3D(hp.x, hp.y, hp.backboardZ);
         const neckEnd = this.project3D(hp.x, hp.y, hp.z + hp.rimRadius);
-        this.ctx.strokeStyle = '#f26419';
+        this.ctx.strokeStyle = '#e63946';
         this.ctx.lineWidth = 6 * neckStart.scale;
         this.ctx.beginPath();
         this.ctx.moveTo(neckStart.x, neckStart.y);
         this.ctx.lineTo(neckEnd.x, neckEnd.y);
         this.ctx.stroke();
 
-        // 4. Aro Metálico Laranja (Rim)
+        // 4. Aro Metálico Vermelho (Rim)
         const rimCenter = this.project3D(hp.x, hp.y, hp.z);
         const rimRadiusX = hp.rimRadius * rimCenter.scale;
-        const rimRadiusY = hp.rimRadius * rimCenter.scale * 0.32; // perspectiva elíptica
+        const rimRadiusY = hp.rimRadius * rimCenter.scale * 0.32;
 
-        this.ctx.strokeStyle = '#f26419';
+        this.ctx.strokeStyle = '#e63946';
         this.ctx.lineWidth = 5 * rimCenter.scale;
         this.ctx.beginPath();
         this.ctx.ellipse(rimCenter.x, rimCenter.y, rimRadiusX, rimRadiusY, 0, 0, Math.PI * 2);
         this.ctx.stroke();
 
-        // 5. Rede de Basquete Tridimensional com Efeito de Balanço
+        // 5. Rede Branca com Balanço
         this.renderNet(rimCenter, rimRadiusX, rimRadiusY);
 
         this.ctx.restore();
@@ -1763,10 +1923,9 @@
         const wave = Math.sin(performance.now() * 0.02) * 8 * this.netWave;
 
         this.ctx.save();
-        this.ctx.strokeStyle = 'rgba(240, 246, 252, 0.85)';
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
         this.ctx.lineWidth = 1.6 * rimCenter.scale;
 
-        // Fios verticais da rede descendo do aro
         const strings = 12;
         const topPts = [];
         const botPts = [];
@@ -1776,7 +1935,6 @@
           const tx = rimCenter.x + Math.cos(angle) * rx;
           const ty = rimCenter.y + Math.sin(angle) * ry;
 
-          // Parte de baixo da rede afunila
           const bx = rimCenter.x + Math.cos(angle) * (rx * 0.5) + wave;
           const by = rimCenter.y + netHeight + Math.sin(angle) * (ry * 0.4);
 
@@ -1794,7 +1952,6 @@
           this.ctx.stroke();
         }
 
-        // Anéis horizontais que cruzam a rede
         for (let r = 0.3; r <= 0.85; r += 0.3) {
           this.ctx.beginPath();
           for (let i = 0; i <= strings; i++) {
@@ -1820,15 +1977,15 @@
           this.ctx.save();
           this.ctx.globalAlpha = Math.max(0, Math.min(1, b.fade));
 
-          // Sombra projetada no chão da quadra
+          // Sombra no chão
           const shadowPt = this.project3D(b.x, 0, b.z);
           const shadowR = r * 0.9;
           this.ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
           this.ctx.beginPath();
-          this.ctx.ellipse(shadowPt.x, shadowPt.y, shadowR, shadowR * 0.4, 0, 0, Math.PI * 2);
+          this.ctx.ellipse(shadowPt.x, shadowPt.y, shadowR, shadowR * 0.35, 0, 0, Math.PI * 2);
           this.ctx.fill();
 
-          // Desenho da Bola de Basquete com Textura e Costuras
+          // Desenho da bola
           this.drawBasketball(pt.x, pt.y, r, b.rotation);
 
           this.ctx.restore();
@@ -1840,7 +1997,6 @@
         this.ctx.translate(cx, cy);
         this.ctx.rotate(rot);
 
-        // Gradiente esférico realista de basquete
         const ballGrad = this.ctx.createRadialGradient(
           -radius * 0.3,
           -radius * 0.35,
@@ -1858,26 +2014,22 @@
         this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
         this.ctx.fill();
 
-        // Borda e costuras pretas clássicas da bola de basquete
-        this.ctx.strokeStyle = '#26160d';
+        // Costuras pretas clássicas da bola de basquete
+        this.ctx.strokeStyle = '#22130b';
         this.ctx.lineWidth = Math.max(1, radius * 0.08);
 
-        // Borda circular
         this.ctx.stroke();
 
-        // Linha equatorial horizontal
         this.ctx.beginPath();
         this.ctx.moveTo(-radius, 0);
         this.ctx.lineTo(radius, 0);
         this.ctx.stroke();
 
-        // Linha vertical
         this.ctx.beginPath();
         this.ctx.moveTo(0, -radius);
         this.ctx.lineTo(0, radius);
         this.ctx.stroke();
 
-        // Costuras em arco
         const arcOffset = radius * 0.55;
         this.ctx.beginPath();
         this.ctx.arc(-arcOffset, 0, radius * 0.8, -Math.PI / 3, Math.PI / 3);
@@ -1890,132 +2042,157 @@
         this.ctx.restore();
       }
 
-      /* ==========================================================================
-         9. Mãos em Primeira Pessoa Segurando e Arremessando a Bola
-         ========================================================================== */
-      renderFirstPersonHands() {
+      renderCalibrationReticle() {
+        if (this.isGameOver) return;
+
         this.ctx.save();
 
-        const p = this.handsAnim.shootProgress; // 0 = pronto, sobe até 1 ao arremessar
+        // Alvo no aro calibrado pelas setas do teclado
+        const targetPt = this.project3D(
+          this.hoop.x + (this.calibX * 3.4),
+          this.hoop.y + 14 + (this.calibY * 3.2),
+          this.hoop.z
+        );
 
-        // Deslocamento suave com o mouse
-        const handBaseX = this.centerX + (this.aimX * 0.8);
-        const handBaseY = this.canvas.height - 20;
+        // Mira em Cruz com cores da bandeira da Alemanha
+        this.ctx.strokeStyle = '#ffce00';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(targetPt.x, targetPt.y, 14, 0, Math.PI * 2);
+        this.ctx.stroke();
 
-        // Animação de subida e extensão dos braços no momento do chute
-        const liftY = Math.sin(p * Math.PI) * -120;
-        const pushZ = p * 40;
+        this.ctx.strokeStyle = '#dd0000';
+        this.ctx.beginPath();
+        this.ctx.moveTo(targetPt.x - 20, targetPt.y);
+        this.ctx.lineTo(targetPt.x - 6, targetPt.y);
+        this.ctx.moveTo(targetPt.x + 6, targetPt.y);
+        this.ctx.lineTo(targetPt.x + 20, targetPt.y);
+        this.ctx.moveTo(targetPt.x, targetPt.y - 20);
+        this.ctx.lineTo(targetPt.x, targetPt.y - 6);
+        this.ctx.moveTo(targetPt.x, targetPt.y + 6);
+        this.ctx.lineTo(targetPt.x, targetPt.y + 20);
+        this.ctx.stroke();
 
-        const currentY = handBaseY + liftY;
-        const currentX = handBaseX;
+        this.ctx.restore();
+      }
 
-        // Se a bola ainda não foi disparada (ou acabou de recarregar nas mãos)
-        const showHeldBall = !this.handsAnim.isShooting || p < 0.25;
+      /* ==========================================================================
+         8. Braços e Mãos Erguidos no Alto com a Bola (Idêntico à foto basquete.jpg!)
+         ========================================================================== */
+      renderFirstPersonRaisedArms() {
+        this.ctx.save();
 
-        const skinColor = '#e0a97c';
-        const skinShadow = '#b88158';
+        // Se estiver em cooldown logo após arremessar, bola acabou de sair
+        const showHeldBall = this.cooldown < 0.28;
 
-        // 1. Braço Esquerdo
-        const armLeftX = currentX - 160;
-        const handLeftX = currentX - 90;
-        const handLeftY = currentY - 70;
+        // Deslocamento da calibragem pelas setas
+        const calibShiftX = this.calibX * 1.6;
+        const calibShiftY = -this.calibY * 1.4;
+
+        // Respiração suave quando parado
+        const idleBob = Math.sin(performance.now() * 0.003) * 3;
+
+        // Posição central da bola nas mãos erguidas no alto
+        const ballX = this.centerX + calibShiftX + 20;
+        const ballY = this.canvas.height * 0.52 + calibShiftY + idleBob;
+        const ballRadius = Math.min(this.canvas.width * 0.16, 115);
+
+        const skinColor = '#e2a97b';
+        const skinShadow = '#b88058';
+
+        // 1. Braço Esquerdo (Vem de baixo e sobe esticado sustentando a bola)
+        const armLeftOriginX = this.centerX - 180;
+        const armLeftOriginY = this.canvas.height + 40;
+
+        const handLeftX = ballX - ballRadius * 0.65;
+        const handLeftY = ballY + ballRadius * 0.35;
 
         this.ctx.fillStyle = skinColor;
         this.ctx.strokeStyle = skinShadow;
-        this.ctx.lineWidth = 3;
+        this.ctx.lineWidth = 3.5;
 
-        // Antebraço esquerdo
+        // Antebraço esquerdo longo subindo até a bola
         this.ctx.beginPath();
-        this.ctx.moveTo(armLeftX - 50, this.canvas.height + 40);
-        this.ctx.lineTo(handLeftX, handLeftY);
-        this.ctx.lineTo(handLeftX + 35, handLeftY + 15);
-        this.ctx.lineTo(armLeftX + 30, this.canvas.height + 40);
+        this.ctx.moveTo(armLeftOriginX - 45, armLeftOriginY);
+        this.ctx.lineTo(handLeftX - 10, handLeftY + 20);
+        this.ctx.lineTo(handLeftX + 30, handLeftY + 30);
+        this.ctx.lineTo(armLeftOriginX + 40, armLeftOriginY);
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
 
-        // Mão e Dedos esquerdos apoiando a bola lateralmente
-        this.ctx.beginPath();
-        this.ctx.ellipse(handLeftX + 15, handLeftY - 10, 26, 18, -Math.PI / 6, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.stroke();
+        // 2. Braço Direito (Mão arremessadora principal bem esticada para cima)
+        const armRightOriginX = this.centerX + 180;
+        const armRightOriginY = this.canvas.height + 40;
 
-        // 2. Braço Direito (Mão arremessadora principal)
-        const armRightX = currentX + 160;
-        const handRightX = currentX + 90;
-        const handRightY = currentY - 75;
+        const handRightX = ballX + ballRadius * 0.6;
+        const handRightY = ballY + ballRadius * 0.05;
 
-        // Antebraço direito
+        // Antebraço direito longo subindo até a bola
         this.ctx.beginPath();
-        this.ctx.moveTo(armRightX + 50, this.canvas.height + 40);
-        this.ctx.lineTo(handRightX, handRightY);
-        this.ctx.lineTo(handRightX - 35, handRightY + 15);
-        this.ctx.lineTo(armRightX - 30, this.canvas.height + 40);
+        this.ctx.moveTo(armRightOriginX - 40, armRightOriginY);
+        this.ctx.lineTo(handRightX - 25, handRightY + 25);
+        this.ctx.lineTo(handRightX + 15, handRightY + 15);
+        this.ctx.lineTo(armRightOriginX + 45, armRightOriginY);
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
 
-        // Mão e Dedos direitos embaixo da bola
-        this.ctx.beginPath();
-        this.ctx.ellipse(handRightX - 15, handRightY - 10, 26, 18, Math.PI / 6, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.stroke();
-
-        // 3. Bola Segurada entre as Mãos
+        // 3. Bola de Basquete Segurada no Alto
         if (showHeldBall) {
-          const ballRadius = 56;
-          const ballX = currentX;
-          const ballY = currentY - 95;
+          this.drawBasketball(ballX, ballY, ballRadius, -0.05);
 
-          // Respiração suave da bola
-          const idleBob = Math.sin(performance.now() * 0.003) * 4;
-          this.drawBasketball(ballX, ballY + idleBob, ballRadius, 0.1);
+          // 4. Mão Esquerda (Dedos apoiando por baixo da bola, como na foto)
+          this.ctx.fillStyle = skinColor;
+          this.ctx.strokeStyle = skinShadow;
+          this.ctx.lineWidth = 3;
+
+          // Palma e base dos dedos
+          this.ctx.beginPath();
+          this.ctx.ellipse(handLeftX, handLeftY, 32, 22, -Math.PI / 4, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.stroke();
+
+          // Dedos da mão esquerda envolvendo a curva inferior
+          for (let f = 0; f < 4; f++) {
+            const angle = -0.4 + f * 0.22;
+            const fx = handLeftX + Math.cos(angle) * 36;
+            const fy = handLeftY + Math.sin(angle) * 32 - 10;
+            this.ctx.beginPath();
+            this.ctx.ellipse(fx, fy, 16, 9, angle + 0.3, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.stroke();
+          }
+
+          // 5. Mão Direita (Dedos bem abertos na lateral/frente da bola, como na foto)
+          this.ctx.beginPath();
+          this.ctx.ellipse(handRightX, handRightY, 36, 24, Math.PI / 6, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.stroke();
+
+          // 4 Dedos estendidos sobre a textura da bola
+          for (let f = 0; f < 4; f++) {
+            const fAngle = -0.55 + f * 0.26;
+            const fx = handRightX + Math.cos(fAngle) * 38;
+            const fy = handRightY + Math.sin(fAngle) * 32 - 12;
+            this.ctx.beginPath();
+            this.ctx.ellipse(fx, fy, 18, 9, fAngle - 0.2, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.stroke();
+          }
+
+          // Polegar direito dando sustentação
+          this.ctx.beginPath();
+          this.ctx.ellipse(handRightX - 18, handRightY + 22, 16, 11, -Math.PI / 5, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.stroke();
         }
 
         this.ctx.restore();
       }
 
       /* ==========================================================================
-         10. Retículo de Mira & Guia Suave de Parábola
-         ========================================================================== */
-      renderAimReticle() {
-        if (this.isGameOver) return;
-
-        this.ctx.save();
-
-        // Alvo no aro com o offset da mira
-        const targetPt = this.project3D(
-          this.hoop.x + this.aimX * 0.6,
-          this.hoop.y + 12 + this.aimY * 0.3,
-          this.hoop.z
-        );
-
-        // Círculo discreto com as cores da bandeira da Alemanha
-        this.ctx.strokeStyle = '#ffce00';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.arc(targetPt.x, targetPt.y, 16, 0, Math.PI * 2);
-        this.ctx.stroke();
-
-        // Cruz de mira central
-        this.ctx.strokeStyle = '#dd0000';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(targetPt.x - 22, targetPt.y);
-        this.ctx.lineTo(targetPt.x - 8, targetPt.y);
-        this.ctx.moveTo(targetPt.x + 8, targetPt.y);
-        this.ctx.lineTo(targetPt.x + 22, targetPt.y);
-        this.ctx.moveTo(targetPt.x, targetPt.y - 22);
-        this.ctx.lineTo(targetPt.x, targetPt.y - 8);
-        this.ctx.moveTo(targetPt.x, targetPt.y + 8);
-        this.ctx.lineTo(targetPt.x, targetPt.y + 22);
-        this.ctx.stroke();
-
-        this.ctx.restore();
-      }
-
-      /* ==========================================================================
-         11. Loop do Jogo
+         9. Loop de Animação a 60fps
          ========================================================================== */
       gameLoop(now) {
         const dt = Math.min(0.05, (now - this.lastTime) / 1000);
@@ -2028,11 +2205,10 @@
       }
     }
 
-    // Inicialização ao carregar a página
+    // Inicialização ao carregar
     window.addEventListener('DOMContentLoaded', () => {
       window.gameInstance = new BasketballGame();
 
-      // Registro de Acesso Local
       try {
         const count = parseInt(localStorage.getItem('pedroplay_visits_basquete') || '0', 10) + 1;
         localStorage.setItem('pedroplay_visits_basquete', count);
