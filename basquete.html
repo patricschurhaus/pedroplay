@@ -470,7 +470,7 @@
       transform: scale(0.95);
     }
 
-    /* Botão Principal de Ação (Alterna entre Arremessar e Pegar Nova Bola) */
+    /* Botão Principal de Ação (Arremessar ou Nova Jogada) */
     .action-button-cluster {
       display: flex;
       align-items: center;
@@ -898,15 +898,15 @@
 
   <script>
     /**
-     * PedroPlay — Basquete Kids (Edição Craque com Posição Dinâmica & Ciclo de Bola)
-     * - A bola nas mãos desaparece imediatamente ao ser arremessada!
-     * - A tecla ESPAÇO inicia uma nova jogada, fazendo uma nova bola emergir de baixo!
-     * - A cada nova jogada o jogador surge em uma nova posição na quadra e deve calibrar de novo!
-     * - Seta ↑ pode passar por cima da tabela; Seta ↓ pode passar por debaixo da tabela!
-     * - Sistema de Alvo/Mira Didático:
-     *     * Fase 1: Alvo ligado o tempo todo para aprender.
-     *     * Fase 2: Alvo dá um vislumbre rápido de 2s e apaga (ou segure SHIFT para espiar).
-     *     * Fase 3: Sem alvo nenhum (puro talento e memória motora!).
+     * PedroPlay — Basquete Kids
+     * - Imagem real dos braços e da bola (img/basket.png) com fundo transparente!
+     * - A imagem desaparece ao arremessar (barra de espaço).
+     * - Barra de espaço inicia nova jogada: nova posição na quadra e a imagem emerge de baixo!
+     * - FÍSICA REAL DIRETA: O arremesso sai reto a partir de onde o jogador está.
+     *   Se estiver na esquerda e não calibrar com as setas, a bola voa reto pela esquerda e erra feio!
+     *   Seta ↑ sobe a trajetória (podendo passar por cima da tabela).
+     *   Seta ↓ desce a trajetória (podendo passar por debaixo da tabela).
+     * - Alvo didático: Fase 1 ativo, Fase 2 vislumbre rápido (ou Shift para espiar), Fase 3 sem alvo!
      */
 
     /* ==========================================================================
@@ -1054,7 +1054,6 @@
         osc.stop(this.ctx.currentTime + 0.2);
       }
 
-      // Som de bola emergindo para as mãos
       playEmerge() {
         if (this.muted) return;
         this.initCtx();
@@ -1223,6 +1222,13 @@
         this.audio = new BasketballAudio();
         this.confetti = new ConfettiEffect('confettiCanvas');
 
+        // Carrega imagem real dos braços e da bola (img/basket.png)
+        this.basketImg = new Image();
+        this.basketImg.src = 'img/basket.png';
+        this.basketImg.onerror = () => {
+          this.basketImg.src = 'https://raw.githubusercontent.com/patricschurhaus/pedroplay/main/img/basket.png';
+        };
+
         // Estado do Jogo
         this.score = 0;
         this.highScore = parseInt(localStorage.getItem('pedroplay_basketball_highscore') || '0', 10);
@@ -1240,7 +1246,7 @@
           { level: 4, name: 'Lenda da NBA', goal: 32, time: 60 }
         ];
 
-        // Posição de Distância (1, 2 ou 3)
+        // Posição de Distância Selecionada (1, 2 ou 3)
         this.currentDistancePreset = 1;
         this.targetCameraZ = 290;
         this.cameraZ = 290;
@@ -1256,7 +1262,7 @@
         this.playState = 'HOLDING';
 
         // Animação de bola emergindo da parte inferior
-        this.emergeProgress = 1.0; // 0 = embaixo, 1 = nas mãos
+        this.emergeProgress = 1.0;
 
         // Pulo no Ar (Jump Shot)
         this.jump = {
@@ -1266,21 +1272,18 @@
         };
 
         // Calibragem da Trajetória via Setas (← ↑ ↓ →)
-        // Valores amplos para permitir passar por cima ou por baixo da tabela!
-        this.calibX = 0; // -60 a +60
-        this.calibY = 0; // -60 a +60
+        // 0 = arremesso reto para a frente a partir da posição do jogador
+        this.calibX = 0;
+        this.calibY = 0;
 
         // Sistema do Alvo de Mira por Fase
-        // Fase 1: permanente
-        // Fase 2: vislumbre de 2s ao emergir a bola (ou segurar Shift para espiar)
-        // Fase 3+: sem alvo nenhum!
         this.aimTimer = 2.0;
         this.isPeeking = false;
 
         // Bolas de Basquete ativas
         this.balls = [];
 
-        // Geometria da Cesta 3D
+        // Geometria da Cesta 3D (Cesta no centro da quadra x = 0)
         this.hoop = {
           x: 0,
           y: 290,           // Altura do aro
@@ -1288,7 +1291,7 @@
           rimRadius: 32,    // Raio do aro de metal
           backboardWidth: 220,
           backboardHeight: 150,
-          backboardY: 340,  // Centro da tabela
+          backboardY: 340,  // Centro da tabela (topo = 415, base = 265)
           backboardZ: 575   // Tabela logo atrás do aro
         };
 
@@ -1348,7 +1351,6 @@
       }
 
       setupControls() {
-        // Teclado
         window.addEventListener('keydown', (e) => {
           let adjusted = false;
 
@@ -1361,11 +1363,11 @@
               this.calibX = Math.min(60, this.calibX + 3.5);
               adjusted = true;
             } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-              // Seta ↑ faz subir muito mais alto (podendo passar por cima da tabela)
+              // Seta ↑ arremessa mais alto (podendo passar por cima da tabela)
               this.calibY = Math.min(60, this.calibY + 3.5);
               adjusted = true;
             } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-              // Seta ↓ faz descer muito mais baixo (podendo passar por debaixo da tabela)
+              // Seta ↓ arremessa mais baixo (podendo passar por baixo da tabela)
               this.calibY = Math.max(-60, this.calibY - 3.5);
               adjusted = true;
             }
@@ -1375,7 +1377,6 @@
             e.preventDefault();
             this.handleSpaceAction();
           } else if (e.key === 'Shift') {
-            // Espiar mira na Fase 2
             this.isPeeking = true;
           } else if (e.key === '1') {
             this.setShootingDistancePreset(1);
@@ -1399,7 +1400,7 @@
           }
         });
 
-        // Botões Virtuais do D-Pad (Touch / Mobile)
+        // D-Pad Virtual (Touch)
         const bindDpad = (id, dx, dy) => {
           const btn = document.getElementById(id);
           if (btn) {
@@ -1458,7 +1459,7 @@
       }
 
       /* ==========================================================================
-         4. Gerenciador de Ciclo: Arremessar -> Esperar -> Nova Bola Emerge
+         4. Gerenciador de Ciclo: Arremessar -> Desaparecer -> Nova Bola Emerge
          ========================================================================== */
       handleSpaceAction() {
         if (this.isGameOver) return;
@@ -1467,7 +1468,7 @@
           // Arremessa a bola que está nas mãos!
           this.triggerJumpShoot();
         } else if (this.playState === 'WAITING_NEXT') {
-          // Inicia nova jogada: nova posição aleatória e nova bola emerge!
+          // Pressiona barra de espaço novamente: surge nova bola de baixo e nova posição!
           this.startNewPlay();
         }
       }
@@ -1477,20 +1478,18 @@
         this.emergeProgress = 0;
         this.audio.playEmerge();
 
-        // 1. Jogador surge em uma nova posição na quadra!
-        // Às vezes mais à esquerda (-150 a -50), às vezes centro (-40 a 40), às vezes direita (50 a 150)
-        const positions = [-150, -100, -50, 0, 50, 100, 150];
+        // Nova posição aleatória na quadra a cada jogada!
+        // Varia entre esquerda, centro e direita
+        const positions = [-150, -110, -60, 0, 60, 110, 150];
         this.targetPlayerCourtX = positions[Math.floor(Math.random() * positions.length)];
 
-        // 2. Reseta a calibragem para a posição neutra (centro) para o jogador calibrar de novo
+        // Reseta calibragem para 0 (tiro reto a partir da nova posição)
+        // Como o jogador está fora do centro, arremessar sem calibrar vai errar feio!
         this.calibX = 0;
         this.calibY = 0;
         this.updateCalibrationMeters();
 
-        // 3. Reseta temporizador da mira para a Fase 2 (2 segundos de vislumbre)
         this.aimTimer = 2.0;
-
-        // Atualiza botões e dicas
         this.updateActionUI('HOLDING');
       }
 
@@ -1501,13 +1500,13 @@
         this.jump.progress = 0;
         this.audio.playJumpShoot();
 
-        // No topo do pulo, a bola é lançada e DESAPARECE imediatamente das mãos!
+        // No momento em que solta a bola, a imagem em primeira pessoa DESAPARECE!
         setTimeout(() => {
           this.releaseBall();
-          // A bola que estava nas mãos desaparece da tela!
+          // Imagem desaparece imediatamente!
           this.playState = 'IN_FLIGHT';
           this.updateActionUI('IN_FLIGHT');
-        }, 170);
+        }, 160);
       }
 
       releaseBall() {
@@ -1516,20 +1515,26 @@
         const vz = distZ / flightTime;
         const gravity = 860;
 
-        // Posição inicial da bola (onde o jogador está na quadra no topo do pulo)
-        const startX = this.playerCourtX + (this.calibX * 0.5);
+        // Posição de lançamento (onde o jogador está na quadra)
+        const startX = this.playerCourtX;
         const startY = 240 + this.jump.height;
         const startZ = this.cameraZ + 40;
 
-        // Mira com alcance amplo:
-        // Seta ↑ sobe tanto que pode passar por cima da tabela!
-        // Seta ↓ desce tanto que pode passar por baixo da tabela!
-        // Setas ← e → podem passar direto pelas laterais!
-        const aimOffsetX = this.calibX * 5.2;
-        const aimOffsetY = this.calibY * 4.6;
+        // =========================================================================
+        // FÍSICA DIRETA REALISTA (SEM MIRA AUTOMÁTICA!):
+        // Se calibX == 0, o jogador arremessa RETO para a frente a partir de onde está!
+        // Se estiver em playerCourtX = 150 e atirar reto, a bola vai para x = 150
+        // (passa 150px à direita da cesta que está em x = 0, errando a tabela!).
+        // Para acertar, o jogador PRECISA calibrar com as setas para apontar para x = 0!
+        // =========================================================================
+        const targetX = this.playerCourtX + (this.calibX * 4.8);
 
-        const targetX = this.hoop.x + aimOffsetX;
-        const targetY = this.hoop.y + 14 + aimOffsetY;
+        // Na vertical:
+        // Posição base neutra é 220 (abaixo do aro).
+        // Seta ↑ (calibY positivo): sobe a trajetória (se for muito alto, passa por cima da tabela!)
+        // Seta ↓ (calibY negativo): abaixa a trajetória (se for muito baixo, passa por debaixo da tabela!)
+        const baseTargetY = 220;
+        const targetY = baseTargetY + (this.calibY * 3.8);
 
         const vx = (targetX - startX) / flightTime;
         const vy = (targetY - startY + 0.5 * gravity * flightTime * flightTime) / flightTime;
@@ -1552,7 +1557,7 @@
           groundBounces: 0
         });
 
-        // Quando o arremesso se resolve (ou após 1.4s), libera para pedir nova bola com Espaço
+        // Quando a bola resolve (ou após 1.3s), libera para pedir nova bola com Espaço
         setTimeout(() => {
           if (this.playState === 'IN_FLIGHT') {
             this.playState = 'WAITING_NEXT';
@@ -1609,9 +1614,6 @@
           btn.classList.toggle('active', idx + 1 === pos);
         });
 
-        // 1: Lance Livre (z = 290)
-        // 2: Garrafão (z = 170)
-        // 3: Linha de 3 (z = 50)
         if (pos === 1) this.targetCameraZ = 290;
         else if (pos === 2) this.targetCameraZ = 170;
         else if (pos === 3) this.targetCameraZ = 50;
@@ -1638,7 +1640,6 @@
         this.isGameOver = false;
         this.balls = [];
 
-        // Configuração do Alvo para a Fase
         if (this.level === 1) {
           this.dom.btnPeekAim.style.display = 'none';
         } else if (this.level === 2) {
@@ -1698,7 +1699,7 @@
           this.dom.modalIcon.className = 'modal-icon-wrap try';
           this.dom.modalIconGlyph.className = 'bi bi-arrow-repeat';
           this.dom.modalTitle.textContent = 'Tempo Esgotado!';
-          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Vamos tentar de novo?`;
+          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Calibre a mira nas setas e tente de novo!`;
           this.dom.modalBtnText.textContent = 'Tentar Novamente';
         }
 
@@ -1740,10 +1741,10 @@
       }
 
       /* ==========================================================================
-         6. Projeção 3D & Atualização Física
+         6. Projeção 3D & Física
          ========================================================================== */
       project3D(x, y, z) {
-        // Câmera acompanha a posição do jogador na quadra
+        // Câmera acompanha o jogador
         const relX = x - this.cameraX;
         const relZ = z - this.cameraZ;
         const fov = 420;
@@ -1756,12 +1757,11 @@
       }
 
       update(dt) {
-        // Interpolação de câmera ao teletransportar ou mudar de lugar na quadra
         this.cameraZ += (this.targetCameraZ - this.cameraZ) * 6 * dt;
         this.cameraX += (this.targetPlayerCourtX - this.cameraX) * 6 * dt;
         this.playerCourtX = this.cameraX;
 
-        // Animação de bola emergindo da parte inferior
+        // Imagem emergindo de baixo
         if (this.playState === 'EMERGING') {
           this.emergeProgress += dt * 3.2;
           if (this.emergeProgress >= 1) {
@@ -1771,12 +1771,11 @@
           }
         }
 
-        // Temporizador do vislumbre do Alvo na Fase 2
+        // Temporizador do Alvo na Fase 2
         if (this.aimTimer > 0) {
           this.aimTimer -= dt;
         }
 
-        // Atualiza badge de status da mira no painel
         if (this.level === 1) {
           this.dom.aimBadge.className = 'aim-status-badge visible';
           this.dom.aimBadge.textContent = 'Mira Fixa (Fase 1)';
@@ -1796,7 +1795,6 @@
           this.dom.aimBadge.textContent = 'Sem Mira (Craque)';
         }
 
-        // Salto no ar (Jump)
         if (this.jump.active) {
           this.jump.progress += dt * 3.5;
           this.jump.height = Math.sin(this.jump.progress * Math.PI) * 45;
@@ -1814,7 +1812,7 @@
 
         const gravity = 860;
 
-        // Atualização de cada bola em voo
+        // Bolas em voo
         for (let i = this.balls.length - 1; i >= 0; i--) {
           const b = this.balls[i];
           if (!b.active) continue;
@@ -1825,12 +1823,11 @@
           b.vy -= gravity * dt;
           b.rotation += b.rotSpeed * dt;
 
-          // 1. Colisão com a Tabela de Vidro (Backboard)
+          // 1. Colisão com a Tabela de Vidro
           if (!b.hitBackboard && b.z >= this.hoop.backboardZ - 10 && b.vz > 0) {
             const hw = this.hoop.backboardWidth / 2;
             const hh = this.hoop.backboardHeight / 2;
 
-            // Bate na tabela se as coordenadas x e y estiverem dentro do retângulo
             if (
               b.x >= this.hoop.x - hw &&
               b.x <= this.hoop.x + hw &&
@@ -1845,14 +1842,13 @@
             }
           }
 
-          // 2. Verificação de Cesta ou Aro Metálico
+          // 2. Verificação de Cesta ou Aro
           if (!b.scored && b.vy < 0) {
             const distY = Math.abs(b.y - this.hoop.y);
             const distZ = Math.abs(b.z - this.hoop.z);
             const distX = Math.abs(b.x - this.hoop.x);
             const distHoriz = Math.hypot(distX, distZ);
 
-            // Cesta Limpa no centro
             if (distY < 18 && distHoriz < this.hoop.rimRadius * 0.65) {
               b.scored = true;
               this.score += b.pointsValue;
@@ -1867,14 +1863,11 @@
               b.vz *= 0.25;
               b.vy *= 0.5;
 
-              // Libera próxima jogada imediatamente após a cesta
               if (this.playState === 'IN_FLIGHT') {
                 this.playState = 'WAITING_NEXT';
                 this.updateActionUI('WAITING_NEXT');
               }
-            }
-            // Batida no Aro
-            else if (distY < 18 && Math.abs(distHoriz - this.hoop.rimRadius) < 16) {
+            } else if (distY < 18 && Math.abs(distHoriz - this.hoop.rimRadius) < 16) {
               this.audio.playRim();
               b.vy = -b.vy * 0.45;
               b.vx += (b.x > this.hoop.x ? 1 : -1) * 60;
@@ -1898,7 +1891,6 @@
             }
           }
 
-          // Descarte
           if (b.z > 720 || b.y < 0 || (b.groundBounces > 4 && Math.abs(b.vy) < 20)) {
             b.fade -= dt * 1.5;
             if (b.fade <= 0) {
@@ -1920,7 +1912,7 @@
         this.renderHoop();
         this.renderBalls();
         this.renderCalibrationReticle();
-        this.renderFirstPersonRaisedArms();
+        this.renderFirstPersonBasketImage();
       }
 
       renderSunnySky() {
@@ -2187,13 +2179,13 @@
           this.ctx.ellipse(shadowPt.x, shadowPt.y, shadowR, shadowR * 0.35, 0, 0, Math.PI * 2);
           this.ctx.fill();
 
-          this.drawBasketball(pt.x, pt.y, r, b.rotation);
+          this.drawRotatingBasketball(pt.x, pt.y, r, b.rotation);
 
           this.ctx.restore();
         }
       }
 
-      drawBasketball(cx, cy, radius, rot = 0) {
+      drawRotatingBasketball(cx, cy, radius, rot = 0) {
         this.ctx.save();
         this.ctx.translate(cx, cy);
         this.ctx.rotate(rot);
@@ -2248,10 +2240,6 @@
       renderCalibrationReticle() {
         if (this.isGameOver) return;
 
-        // Regra do Alvo:
-        // Fase 1: sempre visível
-        // Fase 2: visível durante os primeiros 2s (aimTimer > 0) ou se estiver espiando (isPeeking)
-        // Fase 3+: NUNCA visível
         let shouldShowTarget = false;
         let targetAlpha = 1.0;
 
@@ -2272,12 +2260,17 @@
         this.ctx.save();
         this.ctx.globalAlpha = targetAlpha;
 
-        // Ponto de impacto no aro calibrado pelas setas
-        const targetPt = this.project3D(
-          this.hoop.x + (this.calibX * 5.2),
-          this.hoop.y + 14 + (this.calibY * 4.6),
-          this.hoop.z
-        );
+        // =======================================================================
+        // O Alvo mostra exatamente para onde a bola irá voar com a calibragem atual!
+        // targetX = playerCourtX + (calibX * 4.8)
+        // targetY = 220 + (calibY * 3.8)
+        // Se calibX == 0 e playerCourtX != 0, o alvo fica deslocado do centro da cesta,
+        // mostrando ao jogador que ele PRECISA calibrar nas setas!
+        // =======================================================================
+        const aimTargetX = this.playerCourtX + (this.calibX * 4.8);
+        const aimTargetY = 220 + (this.calibY * 3.8);
+
+        const targetPt = this.project3D(aimTargetX, aimTargetY, this.hoop.z);
 
         this.ctx.strokeStyle = '#ffce00';
         this.ctx.lineWidth = 2;
@@ -2301,121 +2294,48 @@
       }
 
       /* ==========================================================================
-         9. Braços e Mãos Erguidos — Desaparece após o arremesso e emerge ao pedir nova bola
+         9. Imagem Real dos Braços e Bola (img/basket.png)
+         - Desaparece imediatamente ao arremessar (playState === 'IN_FLIGHT' ou 'WAITING_NEXT')
+         - Emerge de baixo na nova jogada (playState === 'EMERGING')
          ========================================================================== */
-      renderFirstPersonRaisedArms() {
-        // Se a bola foi arremessada ('IN_FLIGHT' ou 'WAITING_NEXT'),
-        // a bola NÃO aparece mais na tela! Afinal, ela já foi lançada!
-        const showBallInHands = (this.playState === 'HOLDING' || this.playState === 'EMERGING');
+      renderFirstPersonBasketImage() {
+        // Se a bola já foi arremessada, a imagem desaparece!
+        if (this.playState === 'IN_FLIGHT' || this.playState === 'WAITING_NEXT') {
+          return;
+        }
+
+        if (!this.basketImg.complete || !this.basketImg.naturalWidth) {
+          return;
+        }
 
         this.ctx.save();
 
-        const calibShiftX = this.calibX * 1.6;
-        const calibShiftY = -this.calibY * 1.4;
+        const imgNaturalW = this.basketImg.naturalWidth;
+        const imgNaturalH = this.basketImg.naturalHeight;
+        const aspect = imgNaturalW / imgNaturalH;
+
+        // Proporção imersiva na tela
+        const drawH = Math.min(this.canvas.height * 0.88, 700);
+        const drawW = drawH * aspect;
+
+        // Inclinação suave com as setas de calibragem
+        const shiftX = this.calibX * 1.8;
+        const shiftY = -this.calibY * 1.4;
         const idleBob = Math.sin(performance.now() * 0.003) * 3;
 
-        // Posição final da bola nas mãos erguidas no alto
-        const targetBallX = this.centerX + calibShiftX + 20;
-        const targetBallY = this.canvas.height * 0.52 + calibShiftY + idleBob;
-        const ballRadius = Math.min(this.canvas.width * 0.16, 115);
+        // Posição final ancorada na base da tela
+        const targetX = this.centerX - drawW / 2 + shiftX;
+        const targetY = this.canvas.height - drawH + 30 + shiftY + idleBob;
 
-        // Se a bola estiver emergindo da parte inferior:
-        let currentBallY = targetBallY;
-        let currentBallX = targetBallX;
+        let currentY = targetY;
 
+        // Animação de emergir de baixo na nova jogada
         if (this.playState === 'EMERGING') {
-          // Interpolação de baixo da tela para a posição das mãos
-          const startBottomY = this.canvas.height + ballRadius + 40;
-          currentBallY = startBottomY + (targetBallY - startBottomY) * this.emergeProgress;
+          const offscreenY = this.canvas.height + 60;
+          currentY = offscreenY + (targetY - offscreenY) * this.emergeProgress;
         }
 
-        const skinColor = '#e2a97b';
-        const skinShadow = '#b88058';
-
-        // 1. Braço Esquerdo
-        const armLeftOriginX = this.centerX - 180;
-        const armLeftOriginY = this.canvas.height + 40;
-
-        const handLeftX = currentBallX - ballRadius * 0.65;
-        const handLeftY = currentBallY + ballRadius * 0.35;
-
-        this.ctx.fillStyle = skinColor;
-        this.ctx.strokeStyle = skinShadow;
-        this.ctx.lineWidth = 3.5;
-
-        // Quando a bola não está nas mãos (foi arremessada), os braços baixam suavemente
-        const armsDownShift = (!showBallInHands) ? 140 : 0;
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(armLeftOriginX - 45, armLeftOriginY);
-        this.ctx.lineTo(handLeftX - 10, handLeftY + 20 + armsDownShift);
-        this.ctx.lineTo(handLeftX + 30, handLeftY + 30 + armsDownShift);
-        this.ctx.lineTo(armLeftOriginX + 40, armLeftOriginY);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-
-        // 2. Braço Direito
-        const armRightOriginX = this.centerX + 180;
-        const armRightOriginY = this.canvas.height + 40;
-
-        const handRightX = currentBallX + ballRadius * 0.6;
-        const handRightY = currentBallY + ballRadius * 0.05;
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(armRightOriginX - 40, armRightOriginY);
-        this.ctx.lineTo(handRightX - 25, handRightY + 25 + armsDownShift);
-        this.ctx.lineTo(handRightX + 15, handRightY + 15 + armsDownShift);
-        this.ctx.lineTo(armRightOriginX + 45, armRightOriginY);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-
-        // 3. Bola e Dedos Segurando (APENAS se a bola ainda não foi arremessada!)
-        if (showBallInHands) {
-          this.drawBasketball(currentBallX, currentBallY, ballRadius, -0.05);
-
-          // Mão Esquerda envolvendo a curva inferior
-          this.ctx.fillStyle = skinColor;
-          this.ctx.strokeStyle = skinShadow;
-          this.ctx.lineWidth = 3;
-
-          this.ctx.beginPath();
-          this.ctx.ellipse(handLeftX, handLeftY, 32, 22, -Math.PI / 4, 0, Math.PI * 2);
-          this.ctx.fill();
-          this.ctx.stroke();
-
-          for (let f = 0; f < 4; f++) {
-            const angle = -0.4 + f * 0.22;
-            const fx = handLeftX + Math.cos(angle) * 36;
-            const fy = handLeftY + Math.sin(angle) * 32 - 10;
-            this.ctx.beginPath();
-            this.ctx.ellipse(fx, fy, 16, 9, angle + 0.3, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.stroke();
-          }
-
-          // Mão Direita com dedos abertos na lateral/frente
-          this.ctx.beginPath();
-          this.ctx.ellipse(handRightX, handRightY, 36, 24, Math.PI / 6, 0, Math.PI * 2);
-          this.ctx.fill();
-          this.ctx.stroke();
-
-          for (let f = 0; f < 4; f++) {
-            const fAngle = -0.55 + f * 0.26;
-            const fx = handRightX + Math.cos(fAngle) * 38;
-            const fy = handRightY + Math.sin(fAngle) * 32 - 12;
-            this.ctx.beginPath();
-            this.ctx.ellipse(fx, fy, 18, 9, fAngle - 0.2, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.stroke();
-          }
-
-          this.ctx.beginPath();
-          this.ctx.ellipse(handRightX - 18, handRightY + 22, 16, 11, -Math.PI / 5, 0, Math.PI * 2);
-          this.ctx.fill();
-          this.ctx.stroke();
-        }
+        this.ctx.drawImage(this.basketImg, targetX, currentY, drawW, drawH);
 
         this.ctx.restore();
       }
