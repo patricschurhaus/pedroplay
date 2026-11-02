@@ -58,48 +58,50 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      touch-action: none; /* Desativa zoom/scroll nativo para toque no jogo */
     }
 
     /* ==========================================================================
-       1. Top Bar Minimalista Mobile-First (com Logo Oficial e Placar Compacto)
+       1. Top Bar Minimalista Mobile-First (Sem Cortes em Nenhuma Resolução)
        ========================================================================== */
     .mobile-header-bar {
-      background: rgba(13, 17, 23, 0.88);
+      background: rgba(13, 17, 23, 0.92);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(48, 54, 61, 0.7);
-      padding: 6px 14px;
+      padding: 4px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 6px;
       z-index: 40;
       flex-shrink: 0;
-      height: 48px;
+      height: 44px;
     }
 
     .header-brand-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     .brand-logo-img {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       object-fit: contain;
       display: block;
     }
 
     .brand-name-text {
       font-family: var(--font-brand);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
       color: var(--gh-text-primary);
-      display: inline-block;
+      white-space: nowrap;
     }
 
     .brand-name-text span {
@@ -110,25 +112,28 @@
     .mini-scoreboard {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 5px;
+      flex-shrink: 1;
+      overflow: hidden;
     }
 
     .mini-chip {
-      background-color: rgba(22, 27, 34, 0.9);
+      background-color: rgba(22, 27, 34, 0.95);
       border: 1px solid var(--gh-border-default);
       border-radius: 6px;
-      padding: 3px 8px;
+      padding: 2px 6px;
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 0.75rem;
+      gap: 4px;
+      font-size: 0.72rem;
       color: var(--gh-text-secondary);
       font-family: var(--font-mono);
+      white-space: nowrap;
     }
 
     .mini-chip strong {
       color: var(--led-gold);
-      font-size: 0.95rem;
+      font-size: 0.88rem;
     }
 
     .mini-chip.timer strong {
@@ -150,14 +155,14 @@
       background-color: var(--gh-bg-overlay);
       border: 1px solid var(--gh-border-default);
       color: var(--gh-text-primary);
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       transition: all 0.2s ease;
       flex-shrink: 0;
     }
@@ -167,6 +172,13 @@
       border-color: var(--de-gold);
       color: var(--de-gold);
       background-color: var(--gh-bg-elevated);
+    }
+
+    /* Em telas muito estreitas (<420px), esconde o texto da marca mantendo a logo e o placar */
+    @media (max-width: 420px) {
+      .brand-name-text {
+        display: none;
+      }
     }
 
     /* ==========================================================================
@@ -349,74 +361,22 @@
       display: block;
     }
 
-    /* ==========================================================================
-       4. Controles Mobile-First na Base da Tela (Centro 100% Desobstruído)
-       ========================================================================== */
-    .mobile-bottom-hud {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 12px 16px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      pointer-events: none;
-      z-index: 30;
-    }
-
-    /* D-Pad de Calibragem Compacto no Canto Inferior Esquerdo */
-    .compact-dpad {
-      pointer-events: auto;
-      display: grid;
-      grid-template-columns: repeat(3, 42px);
-      grid-template-rows: repeat(2, 42px);
-      gap: 4px;
-      background: rgba(13, 17, 23, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(48, 54, 61, 0.6);
-      padding: 6px;
-      border-radius: 12px;
-    }
-
-    .dpad-btn {
-      background-color: rgba(33, 38, 45, 0.9);
-      border: 1px solid var(--gh-border-default);
-      color: var(--gh-text-primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
-      cursor: pointer;
-      transition: all 0.12s ease;
-    }
-
-    .dpad-btn:active,
-    .dpad-btn.pressed {
-      background-color: var(--de-red);
-      color: #ffffff;
-      border-color: var(--de-gold);
-      transform: scale(0.92);
-    }
-
-    /* Calibrador Sutil Integrado no Canto Superior ou na Base */
+    /* Calibrador Sutil no Canto Superior Esquerdo */
     .compact-calib-bars {
       position: absolute;
       top: 10px;
-      left: 14px;
+      left: 12px;
       pointer-events: none;
-      background: rgba(13, 17, 23, 0.75);
+      background: rgba(13, 17, 23, 0.7);
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       border: 1px solid rgba(48, 54, 61, 0.5);
-      border-radius: 8px;
-      padding: 6px 10px;
+      border-radius: 6px;
+      padding: 5px 8px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      font-size: 0.68rem;
+      gap: 3px;
+      font-size: 0.65rem;
       color: var(--gh-text-secondary);
       z-index: 20;
     }
@@ -428,7 +388,7 @@
     }
 
     .calib-mini-meter {
-      width: 60px;
+      width: 50px;
       height: 4px;
       background: #21262d;
       border-radius: 2px;
@@ -453,39 +413,130 @@
       transform: translateX(-50%);
     }
 
-    /* Botão Principal de Disparo / Nova Jogada */
+    /* ==========================================================================
+       4. Controles Mobile-First: Arraste para Mirar + Botão Centralizado
+       ========================================================================== */
+    .mobile-bottom-hud {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    /* Dica Sutil Flutuante de Toque (Some ao arrastar) */
+    .touch-hint-pill {
+      background: rgba(13, 17, 23, 0.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(48, 54, 61, 0.6);
+      color: var(--gh-text-secondary);
+      font-size: 0.75rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .touch-hint-pill i {
+      color: var(--de-gold);
+    }
+
+    /* D-Pad Visível APENAS em Telas Grandes/Desktop para quem prefere clique */
+    .compact-dpad {
+      display: none;
+      pointer-events: auto;
+      grid-template-columns: repeat(3, 40px);
+      grid-template-rows: repeat(2, 40px);
+      gap: 4px;
+      background: rgba(13, 17, 23, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(48, 54, 61, 0.6);
+      padding: 6px;
+      border-radius: 10px;
+    }
+
+    @media (min-width: 769px) {
+      .compact-dpad {
+        display: grid;
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+      }
+    }
+
+    .dpad-btn {
+      background-color: rgba(33, 38, 45, 0.9);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .dpad-btn:active,
+    .dpad-btn.pressed {
+      background-color: var(--de-red);
+      color: #ffffff;
+      border-color: var(--de-gold);
+      transform: scale(0.92);
+    }
+
+    /* Botão Centralizado na Base (Apenas quando precisa recarregar ou no Desktop) */
+    .btn-action-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      pointer-events: none;
+    }
+
     .btn-main-shoot {
       pointer-events: auto;
-      background: linear-gradient(135deg, #f26419 0%, #d44a04 100%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: #ffffff;
-      border: 2px solid #ffce00;
+      border: 2px solid #38bdf8;
       border-radius: 50px;
-      padding: 14px 26px;
+      padding: 12px 24px;
       font-family: var(--font-brand);
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      box-shadow: 0 6px 20px rgba(242, 100, 25, 0.5);
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.5);
       cursor: pointer;
-      display: inline-flex;
+      display: none; /* No mobile durante a mira fica oculto; surge na nova jogada */
       align-items: center;
       gap: 8px;
       transition: all 0.15s ease;
-      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .btn-main-shoot:hover,
     .btn-main-shoot:active {
       transform: scale(1.04);
-      box-shadow: 0 8px 24px rgba(255, 206, 0, 0.6);
+      box-shadow: 0 6px 22px rgba(56, 189, 248, 0.65);
       border-color: #ffffff;
     }
 
-    .btn-main-shoot.next-play {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      border-color: #38bdf8;
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    /* No desktop, o botão pode ficar visível se o jogador quiser clicar */
+    @media (min-width: 769px) {
+      .btn-main-shoot {
+        display: inline-flex;
+      }
     }
 
     /* Popups Flutuantes */
@@ -663,7 +714,7 @@
 </head>
 <body>
 
-  <!-- Top Bar Minimalista Mobile-First com Logo Oficial e Mini Placar -->
+  <!-- Top Bar Minimalista Mobile-First com Logo Oficial e Mini Placar Compacto -->
   <header class="mobile-header-bar">
     <div class="header-brand-wrap">
       <img
@@ -675,7 +726,7 @@
       <span class="brand-name-text">Basquete<span>Kids</span></span>
     </div>
 
-    <!-- Mini Placar Compacto no Topo -->
+    <!-- Mini Placar Ultra Compacto -->
     <div class="mini-scoreboard">
       <div class="mini-chip" title="Fase atual">
         <i class="bi bi-flag"></i>
@@ -707,14 +758,14 @@
     <!-- Indicador de Calibragem Sutil no Canto Superior Esquerdo -->
     <div class="compact-calib-bars" id="calibIndicator">
       <div class="calib-mini-row">
-        <span>Horiz</span>
+        <span>H</span>
         <div class="calib-mini-meter">
           <div class="calib-mini-center"></div>
           <div class="calib-mini-fill" id="meterHoriz" style="left: 50%; width: 0%;"></div>
         </div>
       </div>
       <div class="calib-mini-row">
-        <span>Elev</span>
+        <span>V</span>
         <div class="calib-mini-meter">
           <div class="calib-mini-center"></div>
           <div class="calib-mini-fill" id="meterVert" style="left: 50%; width: 0%;"></div>
@@ -722,9 +773,15 @@
       </div>
     </div>
 
-    <!-- Controles na Base da Tela (Centro 100% Desobstruído) -->
+    <!-- Controles na Base da Tela (100% Mobile-First) -->
     <div class="mobile-bottom-hud">
-      <!-- D-Pad Virtual Compacto para Mobile -->
+      <!-- Dica de Toque Flutuante (Some durante o voo da bola) -->
+      <div class="touch-hint-pill" id="touchHintPill">
+        <i class="bi bi-hand-index-thumb"></i>
+        <span id="touchHintText">Arraste para mirar &bull; Solte para arremessar</span>
+      </div>
+
+      <!-- D-Pad Visível APENAS em Desktop -->
       <div class="compact-dpad" aria-label="Controle de setas">
         <div></div>
         <button class="dpad-btn" id="dpadUp" title="Calibrar para cima"><i class="bi bi-arrow-up"></i></button>
@@ -734,11 +791,13 @@
         <button class="dpad-btn" id="dpadRight" title="Calibrar para direita"><i class="bi bi-arrow-right"></i></button>
       </div>
 
-      <!-- Botão de Ação -->
-      <button class="btn-main-shoot" id="btnMainShoot" aria-label="Ação do jogo">
-        <i class="bi bi-dribbble" id="actionIcon"></i>
-        <span id="actionBtnText">Arremessar</span>
-      </button>
+      <!-- Botão Centralizado na Base (Aparece para Nova Jogada ou Desktop) -->
+      <div class="btn-action-container">
+        <button class="btn-main-shoot" id="btnMainShoot" aria-label="Ação do jogo">
+          <i class="bi bi-arrow-clockwise" id="actionIcon"></i>
+          <span id="actionBtnText">Nova Jogada</span>
+        </button>
+      </div>
     </div>
 
     <!-- Confetes -->
@@ -842,12 +901,11 @@
 
   <script>
     /**
-     * PedroPlay — Basquete Kids (Edição Mobile-First & 3D Angular Real)
-     * - Topo despoluído com Mini Placar e Menu Sanduíche (☰).
-     * - Imagem real dos braços/bola (img/basket.png) redimensionada proporcionalmente
-     *   e rebaixada para deixar a tabela 100% visível!
-     * - Rotação angular (Yaw Rotation) da tabela e aro em 3D quando o jogador está na diagonal!
-     * - Física direcional real: arremessos sem calibrar passam reto e erram a cesta!
+     * PedroPlay — Basquete Kids (Touch Nativo: Arraste para Mirar & Solte para Disparar)
+     * - Topo compacto com Logo Oficial Alemãozinho Pedro (sem cortes em mobile).
+     * - Mobile: Tocar e arrastar o dedo move a mira em tempo real (arrasta para a esquerda -> tabela vai para a direita).
+     * - Mobile: Soltou o dedo da tela -> Dispara o arremesso!
+     * - O botão surge apenas para recarregar nova bola ("Nova Jogada"), 100% centralizado e sem vazamento.
      */
 
     /* ==========================================================================
@@ -1028,7 +1086,7 @@
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(600, this.ctx.currentTime);
-        gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.035, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
 
         osc.connect(gain);
@@ -1174,7 +1232,6 @@
           this.basketImg.src = 'https://raw.githubusercontent.com/patricschurhaus/pedroplay/main/img/basket.png';
         };
 
-        // Detecção de Desktop para adaptar textos
         this.isDesktop = window.matchMedia('(min-width: 769px)').matches;
 
         // Estado do Jogo
@@ -1203,7 +1260,7 @@
         this.targetPlayerCourtX = 0;
         this.cameraX = 0;
 
-        // Estados do Ciclo de Jogada: 'HOLDING', 'EMERGING', 'IN_FLIGHT', 'WAITING_NEXT'
+        // Estados do Ciclo: 'HOLDING', 'EMERGING', 'IN_FLIGHT', 'WAITING_NEXT'
         this.playState = 'HOLDING';
         this.emergeProgress = 1.0;
 
@@ -1214,13 +1271,23 @@
           height: 0
         };
 
-        // Calibragem nas Setas
+        // Calibragem nas Setas / Toque
         this.calibX = 0;
         this.calibY = 0;
 
+        // Controle por Toque / Arraste (Mobile)
+        this.touchState = {
+          active: false,
+          startX: 0,
+          startY: 0,
+          startCalibX: 0,
+          startCalibY: 0,
+          startTime: 0,
+          moved: false
+        };
+
         // Alvo de Mira por Fase
         this.aimTimer = 2.0;
-        this.isPeeking = false;
 
         // Bolas de Basquete no Ar
         this.balls = [];
@@ -1250,6 +1317,8 @@
           btnMainShoot: document.getElementById('btnMainShoot'),
           actionIcon: document.getElementById('actionIcon'),
           actionBtnText: document.getElementById('actionBtnText'),
+          touchHintPill: document.getElementById('touchHintPill'),
+          touchHintText: document.getElementById('touchHintText'),
           drawerBackdrop: document.getElementById('drawerBackdrop'),
           btnToggleDrawer: document.getElementById('btnToggleDrawer'),
           btnCloseDrawer: document.getElementById('btnCloseDrawer'),
@@ -1282,6 +1351,7 @@
         });
 
         this.setupControls();
+        this.setupTouchControls();
         this.setupDrawer();
         this.updateHUD();
         this.updateCalibrationMeters();
@@ -1319,7 +1389,80 @@
         });
       }
 
+      /* ==========================================================================
+         4. Controles Mobile por Toque Nativo:
+         - Arrastar dedo para a esquerda -> tabela vai para a direita
+         - Arrastar dedo para a direita -> tabela vai para a esquerda
+         - Soltar o dedo da tela -> Dispara o arremesso!
+         ========================================================================== */
+      setupTouchControls() {
+        const arena = document.getElementById('arena');
+
+        arena.addEventListener('touchstart', (e) => {
+          if (this.isGameOver || this.dom.drawerBackdrop.classList.contains('active')) return;
+
+          // Se estiver esperando nova jogada, um toque recarrega a bola!
+          if (this.playState === 'WAITING_NEXT') {
+            this.startNewPlay();
+            return;
+          }
+
+          if (this.playState !== 'HOLDING') return;
+
+          const touch = e.touches[0];
+          this.touchState.active = true;
+          this.touchState.startX = touch.clientX;
+          this.touchState.startY = touch.clientY;
+          this.touchState.startCalibX = this.calibX;
+          this.touchState.startCalibY = this.calibY;
+          this.touchState.startTime = performance.now();
+          this.touchState.moved = false;
+
+          // Esconde a pílula de dica ao começar o toque
+          this.dom.touchHintPill.style.opacity = '0.35';
+        }, { passive: true });
+
+        arena.addEventListener('touchmove', (e) => {
+          if (!this.touchState.active || this.playState !== 'HOLDING') return;
+
+          const touch = e.touches[0];
+          const deltaX = touch.clientX - this.touchState.startX;
+          const deltaY = touch.clientY - this.touchState.startY;
+
+          if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+            this.touchState.moved = true;
+          }
+
+          // Sensibilidade do arraste:
+          // Arrastar para a esquerda (deltaX < 0) -> diminui calibX -> mira vira para a esquerda -> tabela vai para a direita!
+          // Arrastar para a direita (deltaX > 0) -> aumenta calibX -> mira vira para a direita -> tabela vai para a esquerda!
+          const sensitivityX = 0.38;
+          const sensitivityY = 0.38;
+
+          this.calibX = Math.max(-60, Math.min(60, this.touchState.startCalibX + deltaX * sensitivityX));
+          // Arrastar para cima (deltaY < 0) -> aumenta elevação (sobe a trajetória)
+          this.calibY = Math.max(-60, Math.min(60, this.touchState.startCalibY - deltaY * sensitivityY));
+
+          this.updateCalibrationMeters();
+        }, { passive: true });
+
+        const endTouch = () => {
+          if (!this.touchState.active) return;
+          this.touchState.active = false;
+          this.dom.touchHintPill.style.opacity = '1';
+
+          if (this.playState === 'HOLDING') {
+            // SOLTOU O DEDO DA TELA -> DISPARA O ARREMESSO!
+            this.triggerJumpShoot();
+          }
+        };
+
+        arena.addEventListener('touchend', endTouch, { passive: true });
+        arena.addEventListener('touchcancel', endTouch, { passive: true });
+      }
+
       setupControls() {
+        // Teclado (Desktop)
         window.addEventListener('keydown', (e) => {
           let adjusted = false;
 
@@ -1342,8 +1485,6 @@
           if (e.code === 'Space') {
             e.preventDefault();
             this.handleSpaceAction();
-          } else if (e.key === 'Shift') {
-            this.isPeeking = true;
           } else if (e.key === '1') {
             this.setShootingDistancePreset(1);
           } else if (e.key === '2') {
@@ -1360,23 +1501,17 @@
           }
         });
 
-        window.addEventListener('keyup', (e) => {
-          if (e.key === 'Shift') this.isPeeking = false;
-        });
-
-        // D-Pad Touch
+        // D-Pad Desktop
         const bindDpad = (id, dx, dy) => {
           const btn = document.getElementById(id);
           if (btn) {
-            const act = () => {
+            btn.addEventListener('click', () => {
               if (this.playState !== 'HOLDING') return;
               if (dx !== 0) this.calibX = Math.max(-60, Math.min(60, this.calibX + dx));
               if (dy !== 0) this.calibY = Math.max(-60, Math.min(60, this.calibY + dy));
               this.audio.playTick();
               this.updateCalibrationMeters();
-            };
-            btn.addEventListener('click', act);
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); act(); }, { passive: false });
+            });
           }
         };
 
@@ -1385,10 +1520,20 @@
         bindDpad('dpadUp', 0, 4.5);
         bindDpad('dpadDown', 0, -4.5);
 
-        this.dom.btnMainShoot.addEventListener('click', () => this.handleSpaceAction());
+        // Botão de Nova Jogada / Disparo
+        this.dom.btnMainShoot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.handleSpaceAction();
+        });
+        this.dom.btnMainShoot.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+        this.dom.btnMainShoot.addEventListener('touchend', (e) => {
+          e.stopPropagation();
+          this.handleSpaceAction();
+        });
 
+        // Clique com Mouse no Desktop
         this.canvas.addEventListener('mousedown', (e) => {
-          if (e.button === 0 && !this.isGameOver && !this.dom.drawerBackdrop.classList.contains('active')) {
+          if (this.isDesktop && e.button === 0 && !this.isGameOver && !this.dom.drawerBackdrop.classList.contains('active')) {
             this.handleSpaceAction();
           }
         });
@@ -1408,7 +1553,7 @@
       }
 
       /* ==========================================================================
-         4. Gerenciador de Ciclo: Arremessar -> Desaparecer -> Nova Bola Emerge
+         5. Ciclo de Jogada
          ========================================================================== */
       handleSpaceAction() {
         if (this.isGameOver) return;
@@ -1425,13 +1570,21 @@
         this.emergeProgress = 0;
         this.audio.playEmerge();
 
-        // Posição aleatória na quadra a cada jogada
-        const positions = [-150, -110, -60, 0, 60, 110, 150];
-        this.targetPlayerCourtX = positions[Math.floor(Math.random() * positions.length)];
+        // Nova posição aleatória na quadra (esquerda, centro ou direita)
+        const positions = [-150, -100, -50, 0, 50, 100, 150];
+        let newX = positions[Math.floor(Math.random() * positions.length)];
+        if (newX === this.targetPlayerCourtX && positions.length > 1) {
+          newX = positions[(positions.indexOf(newX) + 1) % positions.length];
+        }
+        this.targetPlayerCourtX = newX;
 
-        // Calibragem reinicia em 0
-        this.calibX = 0;
-        this.calibY = 0;
+        // Desalinhamento inicial na mira para exigir calibragem:
+        // A tabela aparece fora de centro, exigindo arrastar/calibrar antes de arremessar
+        const lateralBias = (this.targetPlayerCourtX / 150) * 32;
+        const randomVariation = (Math.random() < 0.5 ? -1 : 1) * (14 + Math.random() * 18);
+        this.calibX = Math.round(lateralBias + randomVariation);
+        this.calibY = Math.round((Math.random() - 0.5) * 26);
+
         this.updateCalibrationMeters();
 
         this.aimTimer = 2.0;
@@ -1445,7 +1598,6 @@
         this.jump.progress = 0;
         this.audio.playJumpShoot();
 
-        // No ponto alto do pulo, a bola voa e a imagem em 1ª pessoa DESAPARECE
         setTimeout(() => {
           this.releaseBall();
           this.playState = 'IN_FLIGHT';
@@ -1463,10 +1615,16 @@
         const startY = 240 + this.jump.height;
         const startZ = this.cameraZ + 40;
 
-        // FÍSICA DIRETA REAL (SEM MIRA AUTOMÁTICA):
-        const targetX = this.playerCourtX + (this.calibX * 4.8);
-        const baseTargetY = 220;
-        const targetY = baseTargetY + (this.calibY * 3.8);
+        // FÍSICA DIRETA REAL (Calculada a partir da mira exata da câmera):
+        const directYaw = Math.atan2(this.hoop.x - this.cameraX, this.hoop.z - this.cameraZ);
+        const yawOffset = (this.calibX / 60) * 0.42;
+        const totalYaw = directYaw - yawOffset;
+
+        // O ponto exato onde a linha de visão do centro da tela cruza o plano da cesta:
+        const targetX = this.playerCourtX - distZ * Math.tan(totalYaw);
+
+        // Elevação vertical (calibY = 0 acerta no aro, y = 290):
+        const targetY = this.hoop.y + (this.calibY * 1.8);
 
         const vx = (targetX - startX) / flightTime;
         const vy = (targetY - startY + 0.5 * gravity * flightTime * flightTime) / flightTime;
@@ -1501,15 +1659,22 @@
         const isDesktop = this.isDesktop;
 
         if (state === 'HOLDING') {
-          this.dom.btnMainShoot.classList.remove('next-play');
+          this.dom.touchHintPill.style.display = 'inline-flex';
+          this.dom.touchHintText.textContent = isDesktop
+            ? 'Use as Setas para mirar • Espaço para arremessar'
+            : 'Arraste para mirar • Solte para arremessar';
+
+          // No mobile durante a mira, o botão fica oculto para não ocupar tela
+          this.dom.btnMainShoot.style.display = isDesktop ? 'inline-flex' : 'none';
           this.dom.actionIcon.className = 'bi bi-dribbble';
           this.dom.actionBtnText.textContent = isDesktop ? 'Arremessar (Espaço)' : 'Arremessar';
         } else if (state === 'IN_FLIGHT') {
-          this.dom.btnMainShoot.classList.add('next-play');
-          this.dom.actionIcon.className = 'bi bi-hourglass-split';
-          this.dom.actionBtnText.textContent = 'Bola em Voo...';
+          this.dom.touchHintPill.style.display = 'none';
+          this.dom.btnMainShoot.style.display = 'none';
         } else if (state === 'WAITING_NEXT') {
-          this.dom.btnMainShoot.classList.add('next-play');
+          // Quando a bola termina o arremesso, surge o botão para nova jogada, 100% centralizado!
+          this.dom.touchHintPill.style.display = 'none';
+          this.dom.btnMainShoot.style.display = 'inline-flex';
           this.dom.actionIcon.className = 'bi bi-arrow-clockwise';
           this.dom.actionBtnText.textContent = isDesktop ? 'Nova Jogada (Espaço)' : 'Nova Jogada';
         }
@@ -1552,7 +1717,7 @@
       }
 
       /* ==========================================================================
-         5. Fases e Cronômetro
+         6. Fases e Cronômetro
          ========================================================================== */
       startLevel(lvlNum) {
         this.level = lvlNum;
@@ -1621,7 +1786,7 @@
           this.dom.modalIcon.className = 'modal-icon-wrap try';
           this.dom.modalIconGlyph.className = 'bi bi-arrow-repeat';
           this.dom.modalTitle.textContent = 'Tempo Esgotado!';
-          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Calibre a mira nas setas e tente de novo!`;
+          this.dom.modalDesc.textContent = `Muito bom treino! Você fez ${this.score} pontos. Faltaram apenas ${this.levelGoal - this.score} pontos para a meta. Vamos tentar de novo?`;
           this.dom.modalBtnText.textContent = 'Tentar Novamente';
         }
 
@@ -1663,35 +1828,40 @@
       }
 
       /* ==========================================================================
-         6. Projeção 3D com Rotação Angular Real (Yaw Perspective)
-         Quando o jogador está na diagonal, a câmera se volta para a cesta,
-         gerando a rotação de perspectiva autêntica na tabela e no aro!
+         7. Projeção 3D com Yaw Angular Real e Calibragem de Câmera
          ========================================================================== */
       project3D(wx, wy, wz) {
-        // Câmera do jogador
         const camX = this.cameraX;
         const camY = 120 + this.jump.height;
         const camZ = this.cameraZ;
 
-        // Ângulo de rotação da câmera (Yaw) em direção ao aro no centro da quadra
-        const yaw = Math.atan2(this.hoop.x - camX, this.hoop.z - camZ);
+        // Ângulo direto até a cesta no mundo
+        const directYaw = Math.atan2(this.hoop.x - camX, this.hoop.z - camZ);
 
-        // Translação relativa à câmera
+        // Calibragem horizontal:
+        // Arrastar para a esquerda (deltaX < 0) diminui calibX -> tabela se move para a DIREITA!
+        // Arrastar para a direita (deltaX > 0) aumenta calibX -> tabela se move para a ESQUERDA!
+        const yawOffset = (this.calibX / 60) * 0.42;
+        const totalYaw = directYaw - yawOffset;
+
         const dx = wx - camX;
         const dy = wy - camY;
         const dz = wz - camZ;
 
-        // Rotação de perspectiva (Yaw Rotation): o observador olha para a cesta!
-        // A tabela (que fica reta na quadra) parecerá inclinada em 3D conforme o ângulo!
-        const rotX = dx * Math.cos(-yaw) - dz * Math.sin(-yaw);
-        const rotZ = dx * Math.sin(-yaw) + dz * Math.cos(-yaw);
+        const rotX = dx * Math.cos(-totalYaw) - dz * Math.sin(-totalYaw);
+        const rotZ = dx * Math.sin(-totalYaw) + dz * Math.cos(-totalYaw);
         const rotY = dy;
 
         const fov = 420;
         const scale = fov / Math.max(1, fov + rotZ);
 
+        // Calibragem vertical (elevação):
+        // Arremessar mais alto (calibY > 0) -> câmera mira para cima -> objetos descem na tela (+pitch)
+        // Arremessar mais baixo (calibY < 0) -> câmera mira para baixo -> objetos sobem na tela (-pitch)
+        const pitchOffset = (this.calibY / 60) * 55;
+
         const screenX = this.centerX + rotX * scale;
-        const screenY = this.horizonY - rotY * scale;
+        const screenY = (this.horizonY + pitchOffset) - rotY * scale;
 
         return { x: screenX, y: screenY, scale: scale, depth: rotZ };
       }
@@ -1731,7 +1901,6 @@
 
         const gravity = 860;
 
-        // Atualização das bolas em voo
         for (let i = this.balls.length - 1; i >= 0; i--) {
           const b = this.balls[i];
           if (!b.active) continue;
@@ -1742,7 +1911,7 @@
           b.vy -= gravity * dt;
           b.rotation += b.rotSpeed * dt;
 
-          // 1. Colisão com a Tabela de Vidro
+          // 1. Colisão com Tabela
           if (!b.hitBackboard && b.z >= this.hoop.backboardZ - 10 && b.vz > 0) {
             const hw = this.hoop.backboardWidth / 2;
             const hh = this.hoop.backboardHeight / 2;
@@ -1761,7 +1930,7 @@
             }
           }
 
-          // 2. Verificação de Cesta ou Aro
+          // 2. Cesta ou Aro
           if (!b.scored && b.vy < 0) {
             const distY = Math.abs(b.y - this.hoop.y);
             const distZ = Math.abs(b.z - this.hoop.z);
@@ -1794,7 +1963,7 @@
             }
           }
 
-          // 3. Colisão com o Chão
+          // 3. Chão
           if (b.y <= b.radius) {
             b.y = b.radius;
             if (Math.abs(b.vy) > 60) {
@@ -1820,7 +1989,7 @@
       }
 
       /* ==========================================================================
-         7. Renderização Visual com Perspectiva 3D Real
+         8. Renderização Visual
          ========================================================================== */
       render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -1946,7 +2115,6 @@
       renderHoop() {
         const hp = this.hoop;
 
-        // 1. Poste de sustentação atrás da tabela
         const poleBottom = this.project3D(hp.x, 0, hp.backboardZ + 40);
         const poleTop = this.project3D(hp.x, hp.backboardY, hp.backboardZ + 30);
 
@@ -1966,9 +2134,7 @@
         this.ctx.lineTo(armEnd.x, armEnd.y);
         this.ctx.stroke();
 
-        // 2. Tabela de Vidro com ROTAÇÃO 3D ANGULAR REAL
-        // Cada um dos 4 cantos é projetado no espaço 3D,
-        // gerando inclinação e encurtamento (foreshortening) autêntico quando visto em diagonal!
+        // Tabela de Vidro em 3D Real (Foreshortening)
         const hw = hp.backboardWidth / 2;
         const hh = hp.backboardHeight / 2;
 
@@ -1991,12 +2157,11 @@
         this.ctx.closePath();
         this.ctx.fill();
 
-        // Moldura Branca
         this.ctx.strokeStyle = '#ffffff';
         this.ctx.lineWidth = 4.5 * ((tl.scale + tr.scale) / 2);
         this.ctx.stroke();
 
-        // 3. Quadrado Vermelho Guia (Target Box em 3D Angular)
+        // Target Box
         const targetW = 68;
         const targetH = 48;
         const targetY = hp.y + 32;
@@ -2016,7 +2181,7 @@
         this.ctx.closePath();
         this.ctx.stroke();
 
-        // 4. Suporte do Aro
+        // Suporte do Aro
         const neckStart = this.project3D(hp.x, hp.y, hp.backboardZ);
         const neckEnd = this.project3D(hp.x, hp.y, hp.z + hp.rimRadius);
         this.ctx.strokeStyle = '#e63946';
@@ -2026,7 +2191,7 @@
         this.ctx.lineTo(neckEnd.x, neckEnd.y);
         this.ctx.stroke();
 
-        // 5. Aro Vermelho em 3D
+        // Aro
         const rimCenter = this.project3D(hp.x, hp.y, hp.z);
         const rimRadiusX = hp.rimRadius * rimCenter.scale;
         const rimRadiusY = hp.rimRadius * rimCenter.scale * 0.32;
@@ -2175,9 +2340,6 @@
           if (this.aimTimer > 0) {
             shouldShowTarget = true;
             targetAlpha = Math.min(1.0, this.aimTimer / 0.8);
-          } else if (this.isPeeking) {
-            shouldShowTarget = true;
-            targetAlpha = 0.9;
           }
         }
 
@@ -2186,15 +2348,20 @@
         this.ctx.save();
         this.ctx.globalAlpha = targetAlpha;
 
-        const aimTargetX = this.playerCourtX + (this.calibX * 4.8);
-        const aimTargetY = 220 + (this.calibY * 3.8);
+        const distZ = this.hoop.z - this.cameraZ;
+        const directYaw = Math.atan2(this.hoop.x - this.cameraX, this.hoop.z - this.cameraZ);
+        const yawOffset = (this.calibX / 60) * 0.42;
+        const totalYaw = directYaw - yawOffset;
 
-        const targetPt = this.project3D(aimTargetX, aimTargetY, this.hoop.z);
+        const targetX = this.playerCourtX - distZ * Math.tan(totalYaw);
+        const targetY = this.hoop.y + (this.calibY * 1.8);
+
+        const targetPt = this.project3D(targetX, targetY, this.hoop.z);
 
         this.ctx.strokeStyle = '#ffce00';
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
-        this.ctx.arc(targetPt.x, targetPt.y, 13, 0, Math.PI * 2);
+        this.ctx.arc(targetPt.x, targetPt.y, 14, 0, Math.PI * 2);
         this.ctx.stroke();
 
         this.ctx.strokeStyle = '#dd0000';
@@ -2213,10 +2380,9 @@
       }
 
       /* ==========================================================================
-         8. Imagem Real em Primeira Pessoa (img/basket.png)
+         9. Imagem Real em Primeira Pessoa (img/basket.png)
          - Redimensionada proporcionalmente para NÃO cobrir a tabela!
          - Ancorada na base com a bola situada no terço inferior.
-         - Desaparece ao arremessar e emerge ao pedir nova bola.
          ========================================================================== */
       renderFirstPersonBasketImage() {
         if (this.playState === 'IN_FLIGHT' || this.playState === 'WAITING_NEXT') {
@@ -2233,18 +2399,17 @@
         const imgNaturalH = this.basketImg.naturalHeight;
         const aspect = imgNaturalW / imgNaturalH;
 
-        // Proporção Mobile-First limpa: ocupa apenas 42% a 46% da tela
-        const maxScaleH = this.canvas.height * (this.isDesktop ? 0.46 : 0.42);
-        const drawH = Math.min(maxScaleH, 380);
+        // Proporção Mobile-First limpa: ocupa apenas 40% a 44% da tela
+        const maxScaleH = this.canvas.height * (this.isDesktop ? 0.44 : 0.40);
+        const drawH = Math.min(maxScaleH, 360);
         const drawW = drawH * aspect;
 
-        const shiftX = this.calibX * 1.4;
-        const shiftY = -this.calibY * 1.1;
-        const idleBob = Math.sin(performance.now() * 0.003) * 2.5;
+        const shiftX = this.calibX * 0.6;
+        const shiftY = -this.calibY * 0.4;
+        const idleBob = Math.sin(performance.now() * 0.003) * 2;
 
-        // Ancorada bem na base da tela: a bola fica baixa, deixando a tabela 100% desobstruída!
         const targetX = this.centerX - drawW / 2 + shiftX;
-        const targetY = this.canvas.height - drawH + 15 + shiftY + idleBob;
+        const targetY = this.canvas.height - drawH + 12 + shiftY + idleBob;
 
         let currentY = targetY;
 
