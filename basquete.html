@@ -85,6 +85,13 @@
       gap: 7px;
       text-decoration: none;
       flex-shrink: 0;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .header-brand-wrap:hover {
+      opacity: 0.85;
+      transform: scale(1.02);
     }
 
     .brand-logo-img {
@@ -150,28 +157,28 @@
       to { transform: scale(1.15); }
     }
 
-    /* Botão Sanduíche (☰) */
+    /* Botão Sanduíche (☰) - Ultra-minimalista sem contorno */
     .btn-hamburger {
-      background-color: var(--gh-bg-overlay);
-      border: 1px solid var(--gh-border-default);
+      background: transparent;
+      border: none;
       color: var(--gh-text-primary);
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
+      width: 34px;
+      height: 34px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.15rem;
+      font-size: 1.35rem;
       transition: all 0.2s ease;
       flex-shrink: 0;
+      padding: 0;
     }
 
     .btn-hamburger:hover,
     .btn-hamburger:active {
-      border-color: var(--de-gold);
       color: var(--de-gold);
-      background-color: var(--gh-bg-elevated);
+      background: transparent;
+      transform: scale(1.12);
     }
 
     /* Em telas muito estreitas (<420px), esconde o texto da marca mantendo a logo e o placar */
@@ -570,6 +577,51 @@
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
     }
 
+    /* Balão Flutuante Indicador da Jogada (2 Pontos ou 3 Pontos) */
+    .play-announcement-pill {
+      position: absolute;
+      top: 22%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.7);
+      background: rgba(13, 17, 23, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid #ffce00;
+      border-radius: 999px;
+      padding: 7px 20px;
+      font-family: var(--font-brand);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      z-index: 50;
+      pointer-events: none;
+      animation: popPlayBadge 1.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+      white-space: nowrap;
+    }
+
+    @keyframes popPlayBadge {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -20%) scale(0.6);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.06);
+      }
+      28% {
+        transform: translate(-50%, -50%) scale(1.0);
+      }
+      75% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.0);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -75%) scale(0.9);
+      }
+    }
+
     @keyframes floatScore {
       0% {
         opacity: 0;
@@ -734,7 +786,7 @@
 
   <!-- Top Bar Minimalista Mobile-First com Logo Oficial e Mini Placar Compacto -->
   <header class="mobile-header-bar">
-    <div class="header-brand-wrap">
+    <a href="index.html" class="header-brand-wrap" title="Voltar à Central PedroPlay">
       <img
         src="img/logo.png"
         onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/patricschurhaus/pedroplay/main/img/logo.png';"
@@ -742,7 +794,7 @@
         class="brand-logo-img"
       />
       <span class="brand-name-text">Basquete<span>Kids</span></span>
-    </div>
+    </a>
 
     <!-- Mini Placar Ultra Compacto -->
     <div class="mini-scoreboard">
@@ -1595,13 +1647,37 @@
         this.emergeProgress = 0;
         this.audio.playEmerge();
 
-        // Nova posição aleatória na quadra (esquerda, centro ou direita)
-        const positions = [-150, -100, -50, 0, 50, 100, 150];
-        let newX = positions[Math.floor(Math.random() * positions.length)];
-        if (newX === this.targetPlayerCourtX && positions.length > 1) {
-          newX = positions[(positions.indexOf(newX) + 1) % positions.length];
+        // Escolha aleatória entre arremesso de 2 pontos e de 3 pontos:
+        const isThree = Math.random() < 0.45;
+        this.currentDistancePreset = isThree ? 3 : 2;
+
+        if (this.dom.btnPos1 && this.dom.btnPos2 && this.dom.btnPos3) {
+          this.dom.btnPos1.classList.toggle('active', false);
+          this.dom.btnPos2.classList.toggle('active', !isThree);
+          this.dom.btnPos3.classList.toggle('active', isThree);
         }
-        this.targetPlayerCourtX = newX;
+
+        if (isThree) {
+          // 3 PONTOS: Atrás da linha de 3 pontos (distância ao cesto ~490-530)
+          this.targetCameraZ = 50 + (Math.random() * 40 - 20);
+          const positions3 = [-160, -110, -55, 0, 55, 110, 160];
+          let newX = positions3[Math.floor(Math.random() * positions3.length)];
+          if (newX === this.targetPlayerCourtX && positions3.length > 1) {
+            newX = positions3[(positions3.indexOf(newX) + 1) % positions3.length];
+          }
+          this.targetPlayerCourtX = newX;
+          this.showPlayBadge('★ ARREMESSO DE 3 PONTOS! ★', '#ffce00');
+        } else {
+          // 2 PONTOS: Próximo à linha de lance livre / garrafão (distância ao cesto ~300-330)
+          this.targetCameraZ = 240 + (Math.random() * 40 - 20);
+          const positions2 = [-110, -60, 0, 60, 110];
+          let newX = positions2[Math.floor(Math.random() * positions2.length)];
+          if (newX === this.targetPlayerCourtX && positions2.length > 1) {
+            newX = positions2[(positions2.indexOf(newX) + 1) % positions2.length];
+          }
+          this.targetPlayerCourtX = newX;
+          this.showPlayBadge('ARREMESSO DE 2 PONTOS!', '#38bdf8');
+        }
 
         // Desalinhamento suave: A TABELA SEMPRE NASCE VISÍVEL NA TELA!
         // Desvio visível de ~35 a 55px para um dos lados, bem perto do centro
@@ -1614,6 +1690,27 @@
 
         this.aimTimer = 2.0;
         this.updateActionUI('HOLDING');
+      }
+
+      showPlayBadge(text, color = '#ffce00') {
+        const existing = document.querySelector('.play-announcement-pill');
+        if (existing && existing.parentNode) {
+          existing.parentNode.removeChild(existing);
+        }
+
+        const badge = document.createElement('div');
+        badge.className = 'play-announcement-pill';
+        badge.innerHTML = text;
+        badge.style.borderColor = color;
+        badge.style.color = color;
+        badge.style.boxShadow = `0 4px 18px ${color}55`;
+
+        const arena = document.getElementById('arena');
+        if (arena) arena.appendChild(badge);
+
+        setTimeout(() => {
+          if (badge.parentNode) badge.parentNode.removeChild(badge);
+        }, 1500);
       }
 
       triggerJumpShoot() {
@@ -1675,10 +1772,9 @@
 
         setTimeout(() => {
           if (this.playState === 'IN_FLIGHT') {
-            this.playState = 'WAITING_NEXT';
-            this.updateActionUI('WAITING_NEXT');
+            this.startNewPlay();
           }
-        }, 1300);
+        }, 1800);
       }
 
       updateActionUI(state) {
@@ -1741,10 +1837,12 @@
         });
 
         if (pos === 1) this.targetCameraZ = 290;
-        else if (pos === 2) this.targetCameraZ = 170;
+        else if (pos === 2) this.targetCameraZ = 240;
         else if (pos === 3) this.targetCameraZ = 50;
 
-        this.showPopupText(`Distância: ${pos} Ponto${pos > 1 ? 's' : ''}`, '#ffce00');
+        const badgeText = pos === 3 ? '★ ARREMESSO DE 3 PONTOS! ★' : `ARREMESSO DE ${pos === 1 ? '1 PONTO' : '2 PONTOS'}!`;
+        const badgeColor = pos === 3 ? '#ffce00' : '#38bdf8';
+        this.showPlayBadge(badgeText, badgeColor);
       }
 
       /* ==========================================================================
@@ -1982,9 +2080,14 @@
               b.vz *= 0.25;
               b.vy *= 0.5;
 
-              if (this.playState === 'IN_FLIGHT') {
-                this.playState = 'WAITING_NEXT';
-                this.updateActionUI('WAITING_NEXT');
+              // Transição ágil após a cesta convertida (450ms)
+              if (!b.scoredTriggeredPlay) {
+                b.scoredTriggeredPlay = true;
+                setTimeout(() => {
+                  if (this.playState === 'IN_FLIGHT' || this.playState === 'WAITING_NEXT') {
+                    this.startNewPlay();
+                  }
+                }, 450);
               }
             } else if (distY < 18 && Math.abs(distHoriz - this.hoop.rimRadius) < 16) {
               this.audio.playRim();
@@ -2003,6 +2106,11 @@
               b.vz *= 0.8;
               b.groundBounces++;
               if (b.groundBounces <= 3) this.audio.playBounce();
+
+              // Ao quicar pela 2ª vez no chão, surge imediatamente a nova bola em primeira pessoa!
+              if (b.groundBounces === 2 && (this.playState === 'IN_FLIGHT' || this.playState === 'WAITING_NEXT')) {
+                this.startNewPlay();
+              }
             } else {
               b.vy = 0;
               b.vx *= 0.95;
@@ -2026,7 +2134,7 @@
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.renderSunnySky();
-        this.renderTreesBackground();
+        this.renderArenaSkyline();
         this.renderOutdoorCourtFloor();
         this.renderHoop();
         this.renderBalls();
@@ -2067,48 +2175,148 @@
         this.ctx.fill();
       }
 
-      renderTreesBackground() {
+      renderArenaSkyline() {
         this.ctx.save();
-        const treeBaseY = this.horizonY;
+        const horiz = this.horizonY;
+        const w = this.canvas.width;
 
-        this.ctx.fillStyle = '#3a6647';
-        for (let x = 0; x <= this.canvas.width + 60; x += 55) {
-          const h = 75 + Math.sin(x * 0.03) * 25;
+        // 1. Arquibancada / Estrutura do Estádio ao fundo (Slate Navy)
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(0, horiz - 85, w, 85);
+
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(0, horiz - 70, w, 70);
+
+        // Degraus da arquibancada
+        this.ctx.strokeStyle = 'rgba(51, 65, 85, 0.7)';
+        this.ctx.lineWidth = 1.5;
+        for (let y = horiz - 60; y < horiz - 15; y += 12) {
           this.ctx.beginPath();
-          this.ctx.arc(x, treeBaseY - h * 0.5, 45, 0, Math.PI * 2);
-          this.ctx.fill();
+          this.ctx.moveTo(0, y);
+          this.ctx.lineTo(w, y);
+          this.ctx.stroke();
         }
 
-        this.ctx.fillStyle = '#2d5339';
-        for (let x = -20; x <= this.canvas.width + 40; x += 75) {
-          const h = 90 + Math.cos(x * 0.04) * 30;
+        // Setores verticais
+        this.ctx.strokeStyle = 'rgba(15, 23, 42, 0.5)';
+        for (let x = 40; x < w; x += 75) {
           this.ctx.beginPath();
-          this.ctx.arc(x, treeBaseY - h * 0.4, 52, 0, Math.PI * 2);
-          this.ctx.fill();
+          this.ctx.moveTo(x, horiz - 70);
+          this.ctx.lineTo(x, horiz - 15);
+          this.ctx.stroke();
         }
+
+        // 2. Mureta de contenção / Painel lateral do estádio
+        this.ctx.fillStyle = '#161b22';
+        this.ctx.fillRect(0, horiz - 18, w, 18);
+        this.ctx.strokeStyle = '#30363d';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, horiz - 18);
+        this.ctx.lineTo(w, horiz - 18);
+        this.ctx.stroke();
+
+        // Faixa de acabamento elegante (PedroPlay Gold)
+        this.ctx.fillStyle = 'rgba(255, 206, 0, 0.45)';
+        this.ctx.fillRect(0, horiz - 2, w, 2);
+
+        // 3. Postes de Iluminação do Estádio (Refletores/Holofotes)
+        const drawFloodlight = (towerX) => {
+          this.ctx.strokeStyle = '#334155';
+          this.ctx.lineWidth = 3;
+          this.ctx.beginPath();
+          this.ctx.moveTo(towerX - 10, horiz - 18);
+          this.ctx.lineTo(towerX - 4, horiz - 140);
+          this.ctx.lineTo(towerX + 4, horiz - 140);
+          this.ctx.lineTo(towerX + 10, horiz - 18);
+          this.ctx.stroke();
+
+          // Treliça em X
+          this.ctx.lineWidth = 1.2;
+          for (let ty = horiz - 35; ty > horiz - 130; ty -= 25) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(towerX - 8, ty);
+            this.ctx.lineTo(towerX + 8, ty - 15);
+            this.ctx.moveTo(towerX + 8, ty);
+            this.ctx.lineTo(towerX - 8, ty - 15);
+            this.ctx.stroke();
+          }
+
+          // Painel de lâmpadas
+          this.ctx.fillStyle = '#1e293b';
+          this.ctx.fillRect(towerX - 22, horiz - 152, 44, 14);
+          this.ctx.strokeStyle = '#475569';
+          this.ctx.lineWidth = 1.5;
+          this.ctx.strokeRect(towerX - 22, horiz - 152, 44, 14);
+
+          // 4 holofotes acesas
+          for (let lx = towerX - 15; lx <= towerX + 15; lx += 10) {
+            const lampGlow = this.ctx.createRadialGradient(lx, horiz - 145, 1, lx, horiz - 145, 12);
+            lampGlow.addColorStop(0, '#ffffff');
+            lampGlow.addColorStop(0.3, 'rgba(255, 255, 220, 0.85)');
+            lampGlow.addColorStop(1, 'rgba(255, 255, 200, 0)');
+            this.ctx.fillStyle = lampGlow;
+            this.ctx.beginPath();
+            this.ctx.arc(lx, horiz - 145, 12, 0, Math.PI * 2);
+            this.ctx.fill();
+
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.beginPath();
+            this.ctx.arc(lx, horiz - 145, 3.5, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
+        };
+
+        if (w > 360) {
+          drawFloodlight(w * 0.12);
+          drawFloodlight(w * 0.88);
+        } else {
+          drawFloodlight(w * 0.14);
+        }
+
         this.ctx.restore();
       }
 
       renderOutdoorCourtFloor() {
         this.ctx.save();
 
-        const courtGrad = this.ctx.createLinearGradient(0, this.horizonY, 0, this.canvas.height);
-        courtGrad.addColorStop(0, '#5a423a');
-        courtGrad.addColorStop(0.3, '#785549');
-        courtGrad.addColorStop(1, '#4a332d');
-        this.ctx.fillStyle = courtGrad;
+        // 1. Área externa / Escape da quadra (Run-off Apron - verde escuro musgo)
+        const apronGrad = this.ctx.createLinearGradient(0, this.horizonY, 0, this.canvas.height);
+        apronGrad.addColorStop(0, '#102d1a');
+        apronGrad.addColorStop(0.35, '#133821');
+        apronGrad.addColorStop(1, '#0e2416');
+        this.ctx.fillStyle = apronGrad;
         this.ctx.fillRect(0, this.horizonY, this.canvas.width, this.canvas.height - this.horizonY);
 
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-        this.ctx.lineWidth = 2.5;
+        // 2. Área principal de jogo (Green Athletic Court Floor - verde atlético profissional)
+        // Dimensões no mundo: X de -340 a +340, Z de 585 (fundo) a -140 (meio/trás)
+        const cFarL = this.project3D(-340, 0, 585);
+        const cFarR = this.project3D(340, 0, 585);
+        const cNearR = this.project3D(340, 0, -140);
+        const cNearL = this.project3D(-340, 0, -140);
 
-        // Garrafão (Key Area) em perspectiva real
-        const kFarL = this.project3D(-130, 0, 560);
-        const kFarR = this.project3D(130, 0, 560);
+        const courtGrad = this.ctx.createLinearGradient(0, cFarL.y, 0, cNearL.y);
+        courtGrad.addColorStop(0, '#226237');
+        courtGrad.addColorStop(0.35, '#297341');
+        courtGrad.addColorStop(1, '#1b512c');
+
+        this.ctx.fillStyle = courtGrad;
+        this.ctx.beginPath();
+        this.ctx.moveTo(cFarL.x, cFarL.y);
+        this.ctx.lineTo(cFarR.x, cFarR.y);
+        this.ctx.lineTo(cNearR.x, cNearR.y);
+        this.ctx.lineTo(cNearL.x, cNearL.y);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // 3. Garrafão (The Key / Paint Area) - Verde floresta esmeralda profundo contrastado
+        // X de -130 a +130, Z de 585 a 290
+        const kFarL = this.project3D(-130, 0, 585);
+        const kFarR = this.project3D(130, 0, 585);
         const kNearL = this.project3D(-130, 0, 290);
         const kNearR = this.project3D(130, 0, 290);
 
-        this.ctx.fillStyle = 'rgba(180, 70, 50, 0.25)';
+        this.ctx.fillStyle = '#143d22';
         this.ctx.beginPath();
         this.ctx.moveTo(kFarL.x, kFarL.y);
         this.ctx.lineTo(kFarR.x, kFarR.y);
@@ -2116,26 +2324,139 @@
         this.ctx.lineTo(kNearL.x, kNearL.y);
         this.ctx.closePath();
         this.ctx.fill();
+
+        // Linhas de Demarcação Oficiais em Branco Brilhante
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+
+        // 4. Limites da Quadra (Linha de fundo e Linhas laterais)
+        this.ctx.lineWidth = Math.max(2, 5 * cFarL.scale);
+        this.ctx.beginPath();
+        this.ctx.moveTo(cNearL.x, cNearL.y);
+        this.ctx.lineTo(cFarL.x, cFarL.y);
+        this.ctx.lineTo(cFarR.x, cFarR.y);
+        this.ctx.lineTo(cNearR.x, cNearR.y);
         this.ctx.stroke();
 
-        // Linha de Lance Livre
-        this.ctx.strokeStyle = '#ffce00';
-        this.ctx.lineWidth = 3.5;
+        // 5. Contorno do Garrafão (The Key)
+        this.ctx.lineWidth = Math.max(1.8, 4.5 * kNearL.scale);
+        this.ctx.beginPath();
+        this.ctx.moveTo(kFarL.x, kFarL.y);
+        this.ctx.lineTo(kFarR.x, kFarR.y);
+        this.ctx.lineTo(kNearR.x, kNearR.y);
+        this.ctx.lineTo(kNearL.x, kNearL.y);
+        this.ctx.closePath();
+        this.ctx.stroke();
+
+        // Marcas de Rebote / Lances Livres nas laterais do garrafão (Tick Marks)
+        this.ctx.lineWidth = Math.max(1.5, 3.5 * kNearL.scale);
+        const tickZs = [350, 410, 470];
+        for (const tz of tickZs) {
+          const tL1 = this.project3D(-130, 0, tz);
+          const tL2 = this.project3D(-145, 0, tz);
+          this.ctx.beginPath();
+          this.ctx.moveTo(tL1.x, tL1.y);
+          this.ctx.lineTo(tL2.x, tL2.y);
+          this.ctx.stroke();
+
+          const tR1 = this.project3D(130, 0, tz);
+          const tR2 = this.project3D(145, 0, tz);
+          this.ctx.beginPath();
+          this.ctx.moveTo(tR1.x, tR1.y);
+          this.ctx.lineTo(tR2.x, tR2.y);
+          this.ctx.stroke();
+        }
+
+        // 6. Linha de Lance Livre (Free-Throw Line)
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = Math.max(2.5, 5.5 * kNearL.scale);
         this.ctx.beginPath();
         this.ctx.moveTo(kNearL.x, kNearL.y);
         this.ctx.lineTo(kNearR.x, kNearR.y);
         this.ctx.stroke();
 
-        // Arco de Três Pontos
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-        this.ctx.lineWidth = 2.5;
+        // 7. Círculo de Lances Livres (Free-Throw Circle, R = 80, centro (0, 290))
+        // Metade externa (sólida, voltada para o arremessador)
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+        this.ctx.lineWidth = Math.max(1.8, 4 * kNearL.scale);
+        this.ctx.beginPath();
+        for (let a = -Math.PI / 2; a <= Math.PI / 2; a += 0.08) {
+          const fx = Math.sin(a) * 80;
+          const fz = 290 - Math.cos(a) * 80;
+          const pt = this.project3D(fx, 0, fz);
+          if (a === -Math.PI / 2) this.ctx.moveTo(pt.x, pt.y);
+          else this.ctx.lineTo(pt.x, pt.y);
+        }
+        this.ctx.stroke();
+
+        // Metade interna (tracejada, dentro do garrafão)
+        this.ctx.setLineDash([8, 8]);
+        this.ctx.beginPath();
+        for (let a = -Math.PI / 2; a <= Math.PI / 2; a += 0.08) {
+          const fx = Math.sin(a) * 80;
+          const fz = 290 + Math.cos(a) * 80;
+          const pt = this.project3D(fx, 0, fz);
+          if (a === -Math.PI / 2) this.ctx.moveTo(pt.x, pt.y);
+          else this.ctx.lineTo(pt.x, pt.y);
+        }
+        this.ctx.stroke();
+        this.ctx.setLineDash([]); // Restaura traço contínuo
+
+        // 8. Semicírculo de Não-Obstrução / Área Restrita (sob o cesto, R = 48, centro (0, 550))
         this.ctx.beginPath();
         for (let a = -Math.PI / 2; a <= Math.PI / 2; a += 0.1) {
-          const arcR = 380;
-          const arcX = Math.sin(a) * arcR;
-          const arcZ = 550 - Math.cos(a) * arcR;
-          const pt = this.project3D(arcX, 0, arcZ);
+          const rx = Math.sin(a) * 48;
+          const rz = 550 - Math.cos(a) * 48;
+          const pt = this.project3D(rx, 0, rz);
           if (a === -Math.PI / 2) this.ctx.moveTo(pt.x, pt.y);
+          else this.ctx.lineTo(pt.x, pt.y);
+        }
+        this.ctx.stroke();
+
+        // 9. Linha Oficial de Três Pontos (3-Point Line)
+        // R = 380 centrado na cesta (0, 550), cantos retos em X = ±260 do fundo até o arco
+        const arcR = 380;
+        const cornerX = 260;
+        const angleCorner = Math.asin(cornerX / arcR);
+        const cornerZ = 550 - Math.cos(angleCorner) * arcR;
+
+        this.ctx.lineWidth = Math.max(2, 4.5 * kNearL.scale);
+        this.ctx.beginPath();
+        // Canto esquerdo: do fundo (Z = 585) até a junção do arco (Z = cornerZ)
+        const cornerFarL = this.project3D(-cornerX, 0, 585);
+        const cornerNearL = this.project3D(-cornerX, 0, cornerZ);
+        this.ctx.moveTo(cornerFarL.x, cornerFarL.y);
+        this.ctx.lineTo(cornerNearL.x, cornerNearL.y);
+
+        // Arco de 3 pontos
+        for (let a = -angleCorner; a <= angleCorner; a += 0.05) {
+          const ax = Math.sin(a) * arcR;
+          const az = 550 - Math.cos(a) * arcR;
+          const pt = this.project3D(ax, 0, az);
+          this.ctx.lineTo(pt.x, pt.y);
+        }
+
+        // Canto direito: da junção do arco (Z = cornerZ) até o fundo (Z = 585)
+        const cornerFarR = this.project3D(cornerX, 0, 585);
+        this.ctx.lineTo(cornerFarR.x, cornerFarR.y);
+        this.ctx.stroke();
+
+        // 10. Linha de Meio da Quadra e Círculo Central (Half-court)
+        const midL = this.project3D(-340, 0, -100);
+        const midR = this.project3D(340, 0, -100);
+        this.ctx.beginPath();
+        this.ctx.moveTo(midL.x, midL.y);
+        this.ctx.lineTo(midR.x, midR.y);
+        this.ctx.stroke();
+
+        // Círculo central (R = 80, centro (0, -100))
+        this.ctx.beginPath();
+        for (let a = 0; a <= Math.PI * 2 + 0.1; a += 0.1) {
+          const cx = Math.sin(a) * 80;
+          const cz = -100 + Math.cos(a) * 80;
+          const pt = this.project3D(cx, 0, cz);
+          if (a === 0) this.ctx.moveTo(pt.x, pt.y);
           else this.ctx.lineTo(pt.x, pt.y);
         }
         this.ctx.stroke();
