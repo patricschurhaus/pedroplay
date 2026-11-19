@@ -336,45 +336,68 @@
       color: var(--gh-text-secondary);
     }
 
-    /* Estrutura da Conta Armada (Grid Vertical) */
+    /* Estrutura da Conta Armada (Linhas Flex Independentes e Anti-Colisão) */
     .armed-problem {
-      display: grid;
-      grid-template-columns: 46px 60px 60px;
-      grid-template-rows: auto auto auto auto;
-      column-gap: 6px;
-      row-gap: 2px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 6px auto;
+      margin: 8px auto;
       font-family: var(--font-mono);
+      width: 100%;
+      max-width: 240px;
+    }
+
+    .armed-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .cell-sign {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cell-digit {
+      width: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-align: center;
     }
 
     /* Colunas D e U (Dezena e Unidade) */
     .col-header {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: var(--gh-text-muted);
-      text-align: center;
       letter-spacing: 0.1em;
       padding-bottom: 2px;
+      height: 20px;
     }
 
     /* Auxiliar de "Vai Um" (Reserva na Soma) ou "Empréstimo" (Menos) */
     .aux-box {
-      font-size: 0.85rem;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 0.95rem;
+      height: 26px;
       color: var(--accent-purple);
       font-weight: 800;
     }
 
     .aux-pill {
-      background: rgba(188, 140, 255, 0.15);
+      background: rgba(188, 140, 255, 0.18);
       border: 1px dashed var(--accent-purple);
       border-radius: 999px;
-      padding: 0 6px;
+      padding: 1px 7px;
+      display: inline-block;
       animation: popAux 0.3s ease;
     }
 
@@ -385,23 +408,19 @@
 
     /* Sinal da Operação (+ ou -) */
     .operator-symbol {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 900;
       color: var(--de-red);
-      text-align: center;
-      grid-column: 1 / 2;
-      grid-row: 3 / 4;
       line-height: 1;
     }
 
     /* Dígitos dos Números */
     .num-digit {
-      font-size: 2.7rem;
+      font-size: 2.8rem;
       font-weight: 800;
       color: var(--gh-text-primary);
-      text-align: center;
       line-height: 1.1;
-      min-width: 50px;
+      height: 52px;
     }
 
     /* Risco de corte didático no empréstimo */
@@ -423,7 +442,7 @@
 
     /* Traço Horizontal da Conta Armada */
     .armed-divider {
-      grid-column: 1 / 4;
+      width: 100%;
       height: 4px;
       background: linear-gradient(
         90deg,
@@ -432,24 +451,23 @@
         var(--de-gold) 100%
       );
       border-radius: 2px;
-      margin: 4px 0 8px 0;
+      margin: 6px 0 10px 0;
     }
 
     /* Área de Resposta */
-    .answer-row {
-      grid-column: 2 / 4;
+    .answer-container {
+      width: calc(58px * 2 + 8px);
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 6px;
     }
 
     .answer-slot {
       min-width: 64px;
       width: auto;
-      max-width: 140px;
-      padding: 0 10px;
-      height: 60px;
+      max-width: 124px;
+      padding: 0 12px;
+      height: 58px;
       border-radius: 8px;
       background-color: var(--gh-bg-canvas);
       border: 2px solid var(--gh-border-default);
@@ -978,34 +996,45 @@
         </span>
       </div>
 
-      <!-- Estrutura da Conta Armada -->
+      <!-- Estrutura da Conta Armada (Linhas Anti-Colisão) -->
       <div class="armed-problem" id="armedProblem" aria-live="polite">
         <!-- Linha 1: Cabeçalho das Colunas (D = Dezena, U = Unidade) -->
-        <div></div>
-        <div class="col-header">D</div>
-        <div class="col-header">U</div>
+        <div class="armed-row">
+          <div class="cell-sign"></div>
+          <div class="cell-digit col-header">D</div>
+          <div class="cell-digit col-header">U</div>
+        </div>
 
         <!-- Linha 2: Indicador Auxiliar ("Vai Um" / Empréstimo) -->
-        <div></div>
-        <div class="aux-box" id="auxD"></div>
-        <div class="aux-box" id="auxU"></div>
+        <div class="armed-row">
+          <div class="cell-sign"></div>
+          <div class="cell-digit aux-box" id="auxD"></div>
+          <div class="cell-digit aux-box" id="auxU"></div>
+        </div>
 
         <!-- Linha 3: Primeiro Número (Topo) -->
-        <div></div>
-        <div class="num-digit" id="topD">3</div>
-        <div class="num-digit" id="topU">8</div>
+        <div class="armed-row">
+          <div class="cell-sign"></div>
+          <div class="cell-digit num-digit" id="topD">3</div>
+          <div class="cell-digit num-digit" id="topU">8</div>
+        </div>
 
         <!-- Linha 4: Segundo Número + Sinal da Operação -->
-        <div class="operator-symbol" id="opSymbol">-</div>
-        <div class="num-digit" id="botD">1</div>
-        <div class="num-digit" id="botU">5</div>
+        <div class="armed-row">
+          <div class="cell-sign operator-symbol" id="opSymbol">-</div>
+          <div class="cell-digit num-digit" id="botD">1</div>
+          <div class="cell-digit num-digit" id="botU">5</div>
+        </div>
 
         <!-- Linha 5: Traço Divisório -->
         <div class="armed-divider"></div>
 
         <!-- Linha 6: Resultado / Slots de Resposta -->
-        <div class="answer-row">
-          <div class="answer-slot active-focus" id="answerSlot">?</div>
+        <div class="armed-row">
+          <div class="cell-sign"></div>
+          <div class="answer-container">
+            <div class="answer-slot active-focus" id="answerSlot">?</div>
+          </div>
         </div>
       </div>
 
