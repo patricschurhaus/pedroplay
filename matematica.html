@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+  <title>Matemática Kids: Contas Armadas — Alemãozinho Pedro</title>
+  <!-- Bootstrap Icons via CDN oficial -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+  <style>
+    :root {
+      /* Paleta GitHub Dark Mode */
+      --gh-bg-canvas: #0d1117;
+      --gh-bg-subtle: #161b22;
+      --gh-bg-elevated: #1c2128;
+      --gh-bg-overlay: #21262d;
+      --gh-border-default: #30363d;
+      --gh-border-muted: #21262d;
+      --gh-text-primary: #e6edf3;
+      --gh-text-secondary: #8b949e;
+      --gh-text-muted: #6e7681;
+
+      /* Cores da Alemanha */
+      --de-black: #000000;
+      --de-red: #dd0000;
+      --de-gold: #ffce00;
+
+      /* Cores Didáticas de Destaque */
+      --accent-green: #2ea043;
+      --accent-green-bright: #3fb950;
+      --accent-blue: #38bdf8;
+      --accent-purple: #bc8cff;
+      --accent-red: #f85149;
+      --accent-gold: #ffce00;
+
+      --font-brand: 'Georgia', 'Times New Roman', Times, serif;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--gh-bg-canvas);
+      color: var(--gh-text-primary);
+      font-family: var(--font-ui);
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    /* ==========================================================================
+       1. Top Bar Mobile-First Sóbria e Elegante
+       ========================================================================== */
+    .top-bar {
+      background: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--gh-border-default);
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 40;
+      flex-shrink: 0;
+      height: 50px;
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .brand-link:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    .brand-logo {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand-title {
+      font-family: var(--font-brand);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gh-text-primary);
+      white-space: nowrap;
+    }
+
+    .brand-title span {
+      color: var(--de-gold);
+    }
+
+    /* Mini Placar e Indicadores no Topo */
+    .header-indicators {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .stat-chip {
+      background-color: var(--gh-bg-subtle);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 6px;
+      padding: 3px 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.76rem;
+      color: var(--gh-text-secondary);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .stat-chip i {
+      font-size: 0.85rem;
+    }
+
+    .stat-chip.points strong {
+      color: var(--accent-gold);
+      font-size: 0.88rem;
+    }
+
+    .stat-chip.combo strong {
+      color: var(--accent-green-bright);
+      font-size: 0.88rem;
+    }
+
+    .stat-chip.timer {
+      display: none;
+    }
+
+    .stat-chip.timer.active {
+      display: flex;
+    }
+
+    .stat-chip.timer strong {
+      color: var(--accent-blue);
+      font-size: 0.88rem;
+    }
+
+    .stat-chip.timer.hurry strong {
+      color: var(--accent-red);
+      animation: pulseAlert 0.5s infinite alternate;
+    }
+
+    @keyframes pulseAlert {
+      from { transform: scale(1); }
+      to { transform: scale(1.15); }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .btn-icon-top {
+      background: transparent;
+      border: none;
+      color: var(--gh-text-secondary);
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.25rem;
+      border-radius: 6px;
+      transition: color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-icon-top:hover,
+    .btn-icon-top:active {
+      color: var(--de-gold);
+      background-color: var(--gh-bg-overlay);
+    }
+
+    @media (max-width: 440px) {
+      .brand-title {
+        display: none;
+      }
+    }
+
+    /* ==========================================================================
+       2. Barra Rápida de Operações (Menos / Mais / Misto)
+       ========================================================================== */
+    .op-tabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background-color: var(--gh-bg-subtle);
+      border-bottom: 1px solid var(--gh-border-muted);
+      flex-shrink: 0;
+    }
+
+    .op-tab-btn {
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-secondary);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .op-tab-btn:hover {
+      border-color: var(--de-gold);
+      color: var(--gh-text-primary);
+    }
+
+    .op-tab-btn.active {
+      background-color: var(--gh-bg-elevated);
+      border-color: var(--de-gold);
+      color: var(--de-gold);
+      box-shadow: 0 0 10px rgba(255, 206, 0, 0.15);
+    }
+
+    .op-tab-btn.active i {
+      color: var(--de-red);
+    }
+
+    /* ==========================================================================
+       3. Palco Central: A Conta Armada
+       ========================================================================== */
+    .game-arena {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* Card da Conta Armada */
+    .board-card {
+      background-color: var(--gh-bg-subtle);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(1, 4, 9, 0.7);
+      padding: 16px 28px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      max-width: 360px;
+      width: 100%;
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28), border-color 0.2s ease;
+    }
+
+    /* Feedback de Acerto e Erro */
+    .board-card.correct-anim {
+      border-color: var(--accent-green-bright);
+      box-shadow: 0 0 28px rgba(63, 185, 80, 0.35);
+      transform: scale(1.025);
+    }
+
+    .board-card.shake-anim {
+      border-color: var(--accent-red);
+      animation: cardShake 0.45s ease-in-out;
+    }
+
+    @keyframes cardShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+    }
+
+    /* Etiqueta de Nível & Operação no Card */
+    .card-top-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 8px;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gh-text-muted);
+      border-bottom: 1px dashed var(--gh-border-muted);
+      padding-bottom: 4px;
+    }
+
+    .card-level-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--de-gold);
+      font-weight: 700;
+    }
+
+    .card-problem-count {
+      font-family: var(--font-mono);
+      color: var(--gh-text-secondary);
+    }
+
+    /* Estrutura da Conta Armada (Grid Vertical) */
+    .armed-problem {
+      display: grid;
+      grid-template-columns: 46px 60px 60px;
+      grid-template-rows: auto auto auto auto;
+      column-gap: 6px;
+      row-gap: 2px;
+      align-items: center;
+      justify-content: center;
+      margin: 6px auto;
+      font-family: var(--font-mono);
+    }
+
+    /* Colunas D e U (Dezena e Unidade) */
+    .col-header {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gh-text-muted);
+      text-align: center;
+      letter-spacing: 0.1em;
+      padding-bottom: 2px;
+    }
+
+    /* Auxiliar de "Vai Um" (Reserva na Soma) ou "Empréstimo" (Menos) */
+    .aux-box {
+      font-size: 0.85rem;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-purple);
+      font-weight: 800;
+    }
+
+    .aux-pill {
+      background: rgba(188, 140, 255, 0.15);
+      border: 1px dashed var(--accent-purple);
+      border-radius: 999px;
+      padding: 0 6px;
+      animation: popAux 0.3s ease;
+    }
+
+    @keyframes popAux {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Sinal da Operação (+ ou -) */
+    .operator-symbol {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--de-red);
+      text-align: center;
+      grid-column: 1 / 2;
+      grid-row: 3 / 4;
+      line-height: 1;
+    }
+
+    /* Dígitos dos Números */
+    .num-digit {
+      font-size: 2.7rem;
+      font-weight: 800;
+      color: var(--gh-text-primary);
+      text-align: center;
+      line-height: 1.1;
+      min-width: 50px;
+    }
+
+    /* Risco de corte didático no empréstimo */
+    .num-digit.crossed {
+      position: relative;
+      color: var(--gh-text-muted);
+    }
+
+    .num-digit.crossed::after {
+      content: '';
+      position: absolute;
+      left: 15%;
+      top: 50%;
+      width: 70%;
+      height: 3px;
+      background-color: var(--accent-red);
+      transform: rotate(-35deg);
+    }
+
+    /* Traço Horizontal da Conta Armada */
+    .armed-divider {
+      grid-column: 1 / 4;
+      height: 4px;
+      background: linear-gradient(
+        90deg,
+        var(--de-black) 0%,
+        var(--de-red) 50%,
+        var(--de-gold) 100%
+      );
+      border-radius: 2px;
+      margin: 4px 0 8px 0;
+    }
+
+    /* Área de Resposta */
+    .answer-row {
+      grid-column: 2 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .answer-slot {
+      min-width: 64px;
+      width: auto;
+      max-width: 140px;
+      padding: 0 10px;
+      height: 60px;
+      border-radius: 8px;
+      background-color: var(--gh-bg-canvas);
+      border: 2px solid var(--gh-border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--gh-text-primary);
+      transition: all 0.18s ease;
+      letter-spacing: 0.05em;
+    }
+
+    .answer-slot.active-focus {
+      border-color: var(--de-gold);
+      box-shadow: 0 0 12px rgba(255, 206, 0, 0.25);
+    }
+
+    .answer-slot.correct {
+      border-color: var(--accent-green-bright);
+      background-color: rgba(63, 185, 80, 0.12);
+      color: var(--accent-green-bright);
+    }
+
+    .answer-slot.wrong {
+      border-color: var(--accent-red);
+      background-color: rgba(248, 81, 73, 0.12);
+      color: var(--accent-red);
+    }
+
+    /* Mensagem Didática / Balão de Dica */
+    .hint-bubble {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--gh-text-secondary);
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-muted);
+      border-radius: 6px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .hint-bubble i {
+      color: var(--de-gold);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       4. Teclado Numérico Virtual Mobile-First
+       ========================================================================== */
+    .keypad-container {
+      width: 100%;
+      max-width: 360px;
+      padding: 6px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+      margin: 0 auto;
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .key-btn {
+      background-color: var(--gh-bg-subtle);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-primary);
+      border-radius: 8px;
+      height: 48px;
+      font-family: var(--font-mono);
+      font-size: 1.45rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      touch-action: manipulation;
+    }
+
+    .key-btn:hover {
+      background-color: var(--gh-bg-elevated);
+      border-color: var(--de-gold);
+      color: var(--de-gold);
+    }
+
+    .key-btn:active {
+      transform: scale(0.94);
+      background-color: var(--gh-bg-overlay);
+    }
+
+    .key-btn.action-btn {
+      font-size: 1.05rem;
+      font-family: var(--font-ui);
+      font-weight: 600;
+    }
+
+    .key-btn.btn-clear {
+      color: var(--accent-red);
+    }
+
+    .key-btn.btn-clear:hover {
+      border-color: var(--accent-red);
+      background-color: rgba(248, 81, 73, 0.1);
+    }
+
+    .key-btn.btn-submit {
+      background: linear-gradient(135deg, #2ea043 0%, #238636 100%);
+      border: 1px solid #3fb950;
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .key-btn.btn-submit:hover {
+      filter: brightness(1.15);
+      border-color: var(--de-gold);
+    }
+
+    .key-btn.btn-submit:active {
+      transform: scale(0.94);
+      filter: brightness(0.95);
+    }
+
+    /* ==========================================================================
+       5. Popups e Feedback Flutuante
+       ========================================================================== */
+    .floating-feedback {
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      font-family: var(--font-brand);
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+      z-index: 60;
+      opacity: 0;
+      text-shadow: 0 4px 14px rgba(0, 0, 0, 0.85);
+      white-space: nowrap;
+    }
+
+    .floating-feedback.show {
+      animation: floatBadge 1.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+    }
+
+    .floating-feedback.correct {
+      color: var(--accent-green-bright);
+    }
+
+    .floating-feedback.wrong {
+      color: var(--accent-red);
+    }
+
+    @keyframes floatBadge {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -30%) scale(0.6);
+      }
+      25% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -65%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -85%) scale(0.9);
+      }
+    }
+
+    /* Canvas de Confetes em Tela Cheia */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 70;
+    }
+
+    /* ==========================================================================
+       6. Menu Gaveta Sanduíche (☰)
+       ========================================================================== */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 4, 9, 0.78);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drawer-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer-content {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 310px;
+      max-width: 86vw;
+      background-color: var(--gh-bg-subtle);
+      border-left: 1px solid var(--gh-border-default);
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 18px;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .drawer-backdrop.active .drawer-content {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gh-border-default);
+    }
+
+    .drawer-title {
+      font-family: var(--font-brand);
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gh-text-primary);
+    }
+
+    .btn-close-drawer {
+      background: transparent;
+      border: none;
+      color: var(--gh-text-secondary);
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .btn-close-drawer:hover {
+      color: var(--de-red);
+    }
+
+    .menu-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .menu-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--de-red);
+    }
+
+    .menu-btn-option {
+      background-color: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-primary);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .menu-btn-option:hover {
+      border-color: var(--de-gold);
+      background-color: var(--gh-bg-elevated);
+      color: var(--de-gold);
+    }
+
+    .menu-btn-option.selected {
+      border-color: var(--de-gold);
+      background-color: var(--gh-bg-elevated);
+      color: var(--de-gold);
+    }
+
+    .menu-btn-option i {
+      font-size: 1rem;
+    }
+
+    .drawer-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--gh-border-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-back-hub {
+      background-color: var(--gh-bg-overlay);
+      border: 1px solid var(--gh-border-default);
+      color: var(--gh-text-primary);
+      border-radius: 6px;
+      padding: 11px;
+      font-family: var(--font-brand);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back-hub:hover {
+      border-color: var(--de-red);
+      color: var(--de-gold);
+      background-color: var(--gh-bg-elevated);
+    }
+
+    /* Modal de Fim de Desafio Contrarrelógio */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 4, 9, 0.82);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background-color: var(--gh-bg-subtle);
+      border: 1px solid var(--de-gold);
+      border-radius: 12px;
+      max-width: 380px;
+      width: 100%;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .modal-title {
+      font-family: var(--font-brand);
+      font-size: 1.45rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--de-gold);
+    }
+
+    .modal-stat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      margin: 8px 0;
+    }
+
+    .modal-stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gh-bg-canvas);
+      border: 1px solid var(--gh-border-default);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      color: var(--gh-text-secondary);
+    }
+
+    .modal-stat-row strong {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--gh-text-primary);
+    }
+
+    .btn-modal-action {
+      background: linear-gradient(135deg, #2ea043 0%, #238636 100%);
+      border: 1px solid #3fb950;
+      color: #ffffff;
+      border-radius: 6px;
+      padding: 12px 20px;
+      font-family: var(--font-brand);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-modal-action:hover {
+      filter: brightness(1.15);
+      border-color: var(--de-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Top Bar Mobile-First -->
+  <header class="top-bar">
+    <a href="index.html" class="brand-link" title="Voltar para PedroPlay">
+      <img
+        src="https://raw.githubusercontent.com/patricschurhaus/pedroplay/main/img/logo.png"
+        onerror="this.onerror=null;this.src='img/logo.png';"
+        alt="Logo PedroPlay"
+        class="brand-logo"
+      />
+      <span class="brand-title">Pedro<span>Play</span></span>
+    </a>
+
+    <div class="header-indicators">
+      <div class="stat-chip points" title="Pontos Acumulados">
+        <i class="bi bi-star-fill" style="color: var(--accent-gold);"></i>
+        <strong id="statPoints">0</strong>
+      </div>
+      <div class="stat-chip combo" title="Acertos Seguidos">
+        <i class="bi bi-fire" style="color: var(--accent-green-bright);"></i>
+        <span>x</span><strong id="statCombo">0</strong>
+      </div>
+      <div class="stat-chip timer" id="timerChip" title="Tempo Restante">
+        <i class="bi bi-stopwatch"></i>
+        <strong id="statTimer">60s</strong>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button
+        class="btn-icon-top"
+        id="btnAudioToggle"
+        type="button"
+        title="Ativar/Desativar Som"
+        aria-label="Som"
+      >
+        <i class="bi bi-volume-up" id="audioIcon"></i>
+      </button>
+
+      <button
+        class="btn-icon-top"
+        id="btnOpenDrawer"
+        type="button"
+        title="Menu e Opções"
+        aria-label="Menu"
+      >
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. Abas Rápidas de Operação (Menos / Mais / Misto) -->
+  <nav class="op-tabs-bar" aria-label="Seleção rápida de operação">
+    <button class="op-tab-btn active" data-op="minus" id="tabMinus">
+      <i class="bi bi-dash-circle-fill"></i>
+      <span>Só Menos (-)</span>
+    </button>
+    <button class="op-tab-btn" data-op="plus" id="tabPlus">
+      <i class="bi bi-plus-circle-fill"></i>
+      <span>Só Mais (+)</span>
+    </button>
+    <button class="op-tab-btn" data-op="mixed" id="tabMixed">
+      <i class="bi bi-shuffle"></i>
+      <span>Misto (+/-)</span>
+    </button>
+  </nav>
+
+  <!-- 3. Palco da Conta Armada -->
+  <main class="game-arena">
+    <div class="board-card" id="boardCard">
+      <div class="card-top-info">
+        <span class="card-level-badge" id="cardLevelBadge">
+          <i class="bi bi-award"></i>
+          <span id="levelLabel">Nível 1 &bull; Fácil</span>
+        </span>
+        <span class="card-problem-count">
+          <span id="solvedCount">0</span> resolvidas
+        </span>
+      </div>
+
+      <!-- Estrutura da Conta Armada -->
+      <div class="armed-problem" id="armedProblem" aria-live="polite">
+        <!-- Linha 1: Cabeçalho das Colunas (D = Dezena, U = Unidade) -->
+        <div></div>
+        <div class="col-header">D</div>
+        <div class="col-header">U</div>
+
+        <!-- Linha 2: Indicador Auxiliar ("Vai Um" / Empréstimo) -->
+        <div></div>
+        <div class="aux-box" id="auxD"></div>
+        <div class="aux-box" id="auxU"></div>
+
+        <!-- Linha 3: Primeiro Número (Topo) -->
+        <div></div>
+        <div class="num-digit" id="topD">3</div>
+        <div class="num-digit" id="topU">8</div>
+
+        <!-- Linha 4: Segundo Número + Sinal da Operação -->
+        <div class="operator-symbol" id="opSymbol">-</div>
+        <div class="num-digit" id="botD">1</div>
+        <div class="num-digit" id="botU">5</div>
+
+        <!-- Linha 5: Traço Divisório -->
+        <div class="armed-divider"></div>
+
+        <!-- Linha 6: Resultado / Slots de Resposta -->
+        <div class="answer-row">
+          <div class="answer-slot active-focus" id="answerSlot">?</div>
+        </div>
+      </div>
+
+      <!-- Balão Didático de Dica -->
+      <div class="hint-bubble" id="hintBubble">
+        <i class="bi bi-lightbulb"></i>
+        <span id="hintText">Digite o resultado e clique em Conferir!</span>
+      </div>
+    </div>
+
+    <!-- Feedback Flutuante de Acerto/Erro -->
+    <div class="floating-feedback" id="floatingBadge">
+      +10 ACERTOU!
+    </div>
+  </main>
+
+  <!-- 4. Teclado Numérico Virtual Mobile-First -->
+  <section class="keypad-container" aria-label="Teclado numérico de resposta">
+    <div class="keypad-grid">
+      <button class="key-btn" data-key="1" type="button">1</button>
+      <button class="key-btn" data-key="2" type="button">2</button>
+      <button class="key-btn" data-key="3" type="button">3</button>
+
+      <button class="key-btn" data-key="4" type="button">4</button>
+      <button class="key-btn" data-key="5" type="button">5</button>
+      <button class="key-btn" data-key="6" type="button">6</button>
+
+      <button class="key-btn" data-key="7" type="button">7</button>
+      <button class="key-btn" data-key="8" type="button">8</button>
+      <button class="key-btn" data-key="9" type="button">9</button>
+
+      <button class="key-btn action-btn btn-clear" id="btnClear" type="button" title="Apagar último número">
+        <i class="bi bi-backspace"></i>
+      </button>
+      <button class="key-btn" data-key="0" type="button">0</button>
+      <button class="key-btn action-btn btn-submit" id="btnSubmit" type="button" title="Conferir resposta">
+        <i class="bi bi-check-lg"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Canvas de Confetes -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- 5. Menu Gaveta Sanduíche (☰) -->
+  <div class="drawer-backdrop" id="drawerBackdrop">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h2 class="drawer-title">Configurações</h2>
+        <button class="btn-close-drawer" id="btnCloseDrawer" type="button" aria-label="Fechar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Operação -->
+      <div class="menu-group">
+        <span class="menu-label">Tipo de Contas</span>
+        <button class="menu-btn-option selected" data-drawer-op="minus" id="drawerOpMinus">
+          <span><i class="bi bi-dash-circle"></i> Só Menos (-)</span>
+          <i class="bi bi-check2"></i>
+        </button>
+        <button class="menu-btn-option" data-drawer-op="plus" id="drawerOpPlus">
+          <span><i class="bi bi-plus-circle"></i> Só Mais (+)</span>
+          <i class="bi bi-check2" style="display:none;"></i>
+        </button>
+        <button class="menu-btn-option" data-drawer-op="mixed" id="drawerOpMixed">
+          <span><i class="bi bi-shuffle"></i> Misto (+ / -)</span>
+          <i class="bi bi-check2" style="display:none;"></i>
+        </button>
+      </div>
+
+      <!-- Dificuldade -->
+      <div class="menu-group">
+        <span class="menu-label">Dificuldade</span>
+        <button class="menu-btn-option selected" data-level="1" id="level1Btn">
+          <span><i class="bi bi-1-circle"></i> Nível 1 &bull; Até 20 (Fácil)</span>
+          <i class="bi bi-check2"></i>
+        </button>
+        <button class="menu-btn-option" data-level="2" id="level2Btn">
+          <span><i class="bi bi-2-circle"></i> Nível 2 &bull; Até 60 (Médio)</span>
+          <i class="bi bi-check2" style="display:none;"></i>
+        </button>
+        <button class="menu-btn-option" data-level="3" id="level3Btn">
+          <span><i class="bi bi-3-circle"></i> Nível 3 &bull; Desafio Mestre</span>
+          <i class="bi bi-check2" style="display:none;"></i>
+        </button>
+      </div>
+
+      <!-- Modo de Jogo -->
+      <div class="menu-group">
+        <span class="menu-label">Modo de Jogo</span>
+        <button class="menu-btn-option selected" id="modeFreeBtn">
+          <span><i class="bi bi-cup-hot"></i> Modo Livre (Sem Tempo)</span>
+          <i class="bi bi-check2"></i>
+        </button>
+        <button class="menu-btn-option" id="modeTimedBtn">
+          <span><i class="bi bi-stopwatch"></i> Desafio de 1 Minuto</span>
+          <i class="bi bi-check2" style="display:none;"></i>
+        </button>
+      </div>
+
+      <!-- Ajuda Didática Passo a Passo -->
+      <div class="menu-group">
+        <span class="menu-label">Didática</span>
+        <button class="menu-btn-option" id="toggleStepHintBtn">
+          <span id="stepHintLabel"><i class="bi bi-lightbulb"></i> Dicas na Tela: Ativadas</span>
+          <i class="bi bi-toggle-on" id="stepHintToggleIcon" style="color: var(--accent-green-bright);"></i>
+        </button>
+      </div>
+
+      <!-- Rodapé do Menu -->
+      <div class="drawer-footer">
+        <a href="index.html" class="btn-back-hub">
+          <i class="bi bi-arrow-left"></i>
+          <span>Voltar ao PedroPlay</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Modal Fim do Desafio Contrarrelógio -->
+  <div class="modal-backdrop" id="modalTimeout">
+    <div class="modal-box">
+      <i class="bi bi-trophy" style="font-size: 2.8rem; color: var(--de-gold);"></i>
+      <h2 class="modal-title">Tempo Esgotado!</h2>
+      <p style="font-size: 0.9rem; color: var(--gh-text-secondary);">
+        Parabéns, Pedro! Você fez um super treino de matemática!
+      </p>
+
+      <div class="modal-stat-list">
+        <div class="modal-stat-row">
+          <span>Contas Resolvidas:</span>
+          <strong id="modalCorrectCount">0</strong>
+        </div>
+        <div class="modal-stat-row">
+          <span>Pontuação Final:</span>
+          <strong id="modalFinalScore" style="color: var(--accent-gold);">0</strong>
+        </div>
+        <div class="modal-stat-row">
+          <span>Maior Combo:</span>
+          <strong id="modalBestCombo" style="color: var(--accent-green-bright);">0</strong>
+        </div>
+      </div>
+
+      <button class="btn-modal-action" id="btnRestartChallenge" type="button">
+        <i class="bi bi-arrow-repeat"></i>
+        <span>Jogar Novamente</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Motor de Áudio Sintetizado Web Audio API para Matemática Kids
+     */
+    class MathAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = localStorage.getItem('math_sound_muted') === 'true';
+        this.updateIcon();
+      }
+
+      initCtx() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        localStorage.setItem('math_sound_muted', this.muted);
+        this.updateIcon();
+        if (!this.muted) this.playTone(523.25, 0.1, 'sine');
+      }
+
+      updateIcon() {
+        const icon = document.getElementById('audioIcon');
+        if (icon) {
+          icon.className = this.muted ? 'bi bi-volume-mute' : 'bi bi-volume-up';
+        }
+      }
+
+      playTone(freq, duration = 0.1, type = 'sine', gainVal = 0.2) {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      playKeyClick() {
+        this.playTone(600, 0.04, 'sine', 0.08);
+      }
+
+      playBackspace() {
+        this.playTone(320, 0.06, 'triangle', 0.1);
+      }
+
+      playCorrect() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        // Acorde alegre ascendente: Dó5 -> Mi5 -> Sol5 -> Dó6
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => {
+            this.playTone(freq, 0.22, 'triangle', 0.18);
+          }, idx * 70);
+        });
+      }
+
+      playWrong() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        // Som didático suave de "tente de novo" (Fá#4 -> Ré4)
+        this.playTone(369.99, 0.16, 'sine', 0.15);
+        setTimeout(() => {
+          this.playTone(293.66, 0.22, 'sine', 0.15);
+        }, 110);
+      }
+
+      playCelebration() {
+        if (this.muted) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const arpeggio = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        arpeggio.forEach((note, i) => {
+          setTimeout(() => {
+            this.playTone(note, 0.35, 'triangle', 0.2);
+          }, i * 90);
+        });
+      }
+    }
+
+    /**
+     * Efeito de Confetes em HTML5 Canvas
+     */
+    class ConfettiEffect {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.animId = null;
+        this.colors = ['#ffce00', '#dd0000', '#ffffff', '#3fb950', '#38bdf8', '#bc8cff'];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      burst() {
+        this.resize();
+        this.particles = [];
+        for (let i = 0; i < 70; i++) {
+          this.particles.push({
+            x: this.canvas.width * (0.35 + Math.random() * 0.3),
+            y: this.canvas.height * 0.45,
+            vx: (Math.random() - 0.5) * 14,
+            vy: -Math.random() * 12 - 3,
+            size: Math.random() * 8 + 4,
+            color: this.colors[Math.floor(Math.random() * this.colors.length)],
+            rotation: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 14,
+            opacity: 1
+          });
+        }
+        if (!this.animId) this.loop();
+      }
+
+      loop() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let active = 0;
+
+        for (const p of this.particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35;
+          p.rotation += p.vRot;
+          p.opacity -= 0.012;
+
+          if (p.opacity > 0 && p.y < this.canvas.height) {
+            active++;
+            this.ctx.save();
+            this.ctx.translate(p.x, p.y);
+            this.ctx.rotate((p.rotation * Math.PI) / 180);
+            this.ctx.globalAlpha = Math.max(0, p.opacity);
+            this.ctx.fillStyle = p.color;
+            this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.4);
+            this.ctx.restore();
+          }
+        }
+
+        if (active > 0) {
+          this.animId = requestAnimationFrame(() => this.loop());
+        } else {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.animId = null;
+        }
+      }
+    }
+
+    /**
+     * Controlador Principal do Jogo de Matemática Kids
+     */
+    class MathGameController {
+      constructor() {
+        this.audio = new MathAudioEngine();
+        this.confetti = new ConfettiEffect('confettiCanvas');
+
+        // Estado do Jogo
+        this.currentOp = localStorage.getItem('pedroplay_math_op') || 'minus'; // 'minus', 'plus', 'mixed'
+        this.level = parseInt(localStorage.getItem('pedroplay_math_level') || '1', 10);
+        this.isTimedMode = false;
+        this.timeRemaining = 60;
+        this.timerInterval = null;
+        this.showStepHints = true;
+
+        this.points = 0;
+        this.combo = 0;
+        this.bestCombo = 0;
+        this.solvedCount = 0;
+        this.currentProblem = null;
+        this.userInput = '';
+        this.isProcessing = false;
+
+        this.initDOM();
+        this.attachEvents();
+        this.applySettingsUI();
+        this.generateNewProblem();
+      }
+
+      initDOM() {
+        this.dom = {
+          statPoints: document.getElementById('statPoints'),
+          statCombo: document.getElementById('statCombo'),
+          statTimer: document.getElementById('statTimer'),
+          timerChip: document.getElementById('timerChip'),
+          boardCard: document.getElementById('boardCard'),
+          levelLabel: document.getElementById('levelLabel'),
+          solvedCount: document.getElementById('solvedCount'),
+          auxD: document.getElementById('auxD'),
+          auxU: document.getElementById('auxU'),
+          topD: document.getElementById('topD'),
+          topU: document.getElementById('topU'),
+          botD: document.getElementById('botD'),
+          botU: document.getElementById('botU'),
+          opSymbol: document.getElementById('opSymbol'),
+          answerSlot: document.getElementById('answerSlot'),
+          hintBubble: document.getElementById('hintBubble'),
+          hintText: document.getElementById('hintText'),
+          floatingBadge: document.getElementById('floatingBadge'),
+          drawerBackdrop: document.getElementById('drawerBackdrop'),
+          modalTimeout: document.getElementById('modalTimeout'),
+          modalCorrectCount: document.getElementById('modalCorrectCount'),
+          modalFinalScore: document.getElementById('modalFinalScore'),
+          modalBestCombo: document.getElementById('modalBestCombo')
+        };
+      }
+
+      attachEvents() {
+        // Áudio e Drawer
+        document.getElementById('btnAudioToggle').addEventListener('click', () => this.audio.toggleMute());
+        document.getElementById('btnOpenDrawer').addEventListener('click', () => this.openDrawer());
+        document.getElementById('btnCloseDrawer').addEventListener('click', () => this.closeDrawer());
+        this.dom.drawerBackdrop.addEventListener('click', (e) => {
+          if (e.target === this.dom.drawerBackdrop) this.closeDrawer();
+        });
+
+        // Abas Rápidas de Operação no Topo
+        const tabs = document.querySelectorAll('.op-tab-btn');
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            const op = tab.getAttribute('data-op');
+            this.setOperation(op);
+          });
+        });
+
+        // Opções do Drawer
+        const drawerOpBtns = document.querySelectorAll('[data-drawer-op]');
+        drawerOpBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const op = btn.getAttribute('data-drawer-op');
+            this.setOperation(op);
+            this.closeDrawer();
+          });
+        });
+
+        const levelBtns = document.querySelectorAll('[data-level]');
+        levelBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const lvl = parseInt(btn.getAttribute('data-level'), 10);
+            this.setLevel(lvl);
+            this.closeDrawer();
+          });
+        });
+
+        document.getElementById('modeFreeBtn').addEventListener('click', () => {
+          this.setTimedMode(false);
+          this.closeDrawer();
+        });
+
+        document.getElementById('modeTimedBtn').addEventListener('click', () => {
+          this.setTimedMode(true);
+          this.closeDrawer();
+        });
+
+        document.getElementById('toggleStepHintBtn').addEventListener('click', () => {
+          this.showStepHints = !this.showStepHints;
+          this.updateHintToggleUI();
+        });
+
+        // Botão Reiniciar do Modal
+        document.getElementById('btnRestartChallenge').addEventListener('click', () => {
+          this.dom.modalTimeout.classList.remove('active');
+          this.setTimedMode(true);
+        });
+
+        // Teclado Virtual
+        const keyBtns = document.querySelectorAll('.keypad-grid .key-btn[data-key]');
+        keyBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-key');
+            this.handleKeyInput(val);
+          });
+        });
+
+        document.getElementById('btnClear').addEventListener('click', () => this.handleBackspace());
+        document.getElementById('btnSubmit').addEventListener('click', () => this.verifyAnswer());
+
+        // Teclado Físico
+        window.addEventListener('keydown', (e) => {
+          if (e.key >= '0' && e.key <= '9') {
+            this.handleKeyInput(e.key);
+          } else if (e.key === 'Backspace') {
+            this.handleBackspace();
+          } else if (e.key === 'Enter') {
+            this.verifyAnswer();
+          } else if (e.key === 'Escape') {
+            this.closeDrawer();
+          }
+        });
+      }
+
+      openDrawer() {
+        this.audio.playKeyClick();
+        this.dom.drawerBackdrop.classList.add('active');
+      }
+
+      closeDrawer() {
+        this.dom.drawerBackdrop.classList.remove('active');
+      }
+
+      setOperation(op) {
+        this.currentOp = op;
+        localStorage.setItem('pedroplay_math_op', op);
+        this.applySettingsUI();
+        this.generateNewProblem();
+        this.audio.playKeyClick();
+      }
+
+      setLevel(lvl) {
+        this.level = lvl;
+        localStorage.setItem('pedroplay_math_level', lvl);
+        this.applySettingsUI();
+        this.generateNewProblem();
+        this.audio.playKeyClick();
+      }
+
+      setTimedMode(isTimed) {
+        this.isTimedMode = isTimed;
+        if (this.timerInterval) clearInterval(this.timerInterval);
+
+        if (this.isTimedMode) {
+          this.timeRemaining = 60;
+          this.points = 0;
+          this.combo = 0;
+          this.solvedCount = 0;
+          this.dom.timerChip.classList.add('active');
+          this.updateScoreboard();
+          this.startTimer();
+        } else {
+          this.dom.timerChip.classList.remove('active');
+        }
+
+        this.applySettingsUI();
+        this.generateNewProblem();
+      }
+
+      startTimer() {
+        this.updateTimerDisplay();
+        this.timerInterval = setInterval(() => {
+          this.timeRemaining--;
+          this.updateTimerDisplay();
+
+          if (this.timeRemaining <= 10) {
+            this.dom.timerChip.classList.add('hurry');
+          } else {
+            this.dom.timerChip.classList.remove('hurry');
+          }
+
+          if (this.timeRemaining <= 0) {
+            clearInterval(this.timerInterval);
+            this.finishTimedChallenge();
+          }
+        }, 1000);
+      }
+
+      updateTimerDisplay() {
+        this.dom.statTimer.textContent = `${this.timeRemaining}s`;
+      }
+
+      finishTimedChallenge() {
+        this.audio.playCelebration();
+        this.confetti.burst();
+
+        this.dom.modalCorrectCount.textContent = this.solvedCount;
+        this.dom.modalFinalScore.textContent = this.points;
+        this.dom.modalBestCombo.textContent = `x${this.bestCombo}`;
+        this.dom.modalTimeout.classList.add('active');
+
+        // Salva recorde local
+        const currentHigh = parseInt(localStorage.getItem('pedroplay_math_highscore') || '0', 10);
+        if (this.points > currentHigh) {
+          localStorage.setItem('pedroplay_math_highscore', this.points);
+        }
+      }
+
+      updateHintToggleUI() {
+        const icon = document.getElementById('stepHintToggleIcon');
+        const label = document.getElementById('stepHintLabel');
+        if (this.showStepHints) {
+          icon.className = 'bi bi-toggle-on';
+          icon.style.color = 'var(--accent-green-bright)';
+          label.innerHTML = '<i class="bi bi-lightbulb"></i> Dicas na Tela: Ativadas';
+          this.dom.hintBubble.style.visibility = 'visible';
+        } else {
+          icon.className = 'bi bi-toggle-off';
+          icon.style.color = 'var(--gh-text-muted)';
+          label.innerHTML = '<i class="bi bi-lightbulb-off"></i> Dicas na Tela: Ocultas';
+          this.dom.hintBubble.style.visibility = 'hidden';
+        }
+      }
+
+      applySettingsUI() {
+        // Abas rápidas
+        document.querySelectorAll('.op-tab-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-op') === this.currentOp);
+        });
+
+        // Drawer Opções de Operação
+        document.querySelectorAll('[data-drawer-op]').forEach((btn) => {
+          const match = btn.getAttribute('data-drawer-op') === this.currentOp;
+          btn.classList.toggle('selected', match);
+          btn.querySelector('.bi-check2').style.display = match ? 'inline-block' : 'none';
+        });
+
+        // Drawer Níveis
+        document.querySelectorAll('[data-level]').forEach((btn) => {
+          const match = parseInt(btn.getAttribute('data-level'), 10) === this.level;
+          btn.classList.toggle('selected', match);
+          btn.querySelector('.bi-check2').style.display = match ? 'inline-block' : 'none';
+        });
+
+        // Rótulo do Nível no Card
+        const levelNames = {
+          1: 'Nível 1 • Até 20 (Fácil)',
+          2: 'Nível 2 • Até 60 (Médio)',
+          3: 'Nível 3 • Desafio Mestre'
+        };
+        this.dom.levelLabel.textContent = levelNames[this.level] || 'Nível 1';
+
+        // Modos Livre vs Timed no Drawer
+        document.getElementById('modeFreeBtn').classList.toggle('selected', !this.isTimedMode);
+        document.getElementById('modeFreeBtn').querySelector('.bi-check2').style.display = !this.isTimedMode ? 'inline-block' : 'none';
+        document.getElementById('modeTimedBtn').classList.toggle('selected', this.isTimedMode);
+        document.getElementById('modeTimedBtn').querySelector('.bi-check2').style.display = this.isTimedMode ? 'inline-block' : 'none';
+
+        this.updateHintToggleUI();
+      }
+
+      /**
+       * Gera uma nova conta armada didática (subtração ou adição)
+       */
+      generateNewProblem() {
+        this.userInput = '';
+        this.updateAnswerSlot();
+        this.dom.boardCard.className = 'board-card';
+        this.dom.auxD.innerHTML = '';
+        this.dom.auxU.innerHTML = '';
+        this.dom.topD.classList.remove('crossed');
+        this.dom.topU.classList.remove('crossed');
+
+        let op = this.currentOp;
+        if (op === 'mixed') {
+          op = Math.random() < 0.5 ? 'minus' : 'plus';
+        }
+
+        let num1, num2, correctAns;
+
+        if (op === 'minus') {
+          // SUBTRAÇÃO ARMADA (Garante que num1 >= num2)
+          if (this.level === 1) {
+            // Nível 1: Até 20, direto
+            num1 = Math.floor(Math.random() * 12) + 8; // 8 a 19
+            num2 = Math.floor(Math.random() * (num1 - 2)) + 1; // 1 a num1-2
+          } else if (this.level === 2) {
+            // Nível 2: Dezenas até 60 sem empréstimo (u1 >= u2)
+            const d1 = Math.floor(Math.random() * 4) + 2; // 2 a 5
+            const u1 = Math.floor(Math.random() * 6) + 3; // 3 a 8
+            const d2 = Math.floor(Math.random() * (d1 - 1)) + 1; // 1 a d1-1
+            const u2 = Math.floor(Math.random() * (u1 + 1)); // 0 a u1
+            num1 = d1 * 10 + u1;
+            num2 = d2 * 10 + u2;
+          } else {
+            // Nível 3: Com empréstimo garantido (u1 < u2)
+            const d1 = Math.floor(Math.random() * 6) + 3; // 3 a 8
+            const u1 = Math.floor(Math.random() * 5); // 0 a 4
+            const d2 = Math.floor(Math.random() * (d1 - 1)) + 1;
+            const u2 = Math.floor(Math.random() * 4) + 5; // 5 a 9 (sempre u1 < u2)
+            num1 = d1 * 10 + u1;
+            num2 = d2 * 10 + u2;
+          }
+          correctAns = num1 - num2;
+        } else {
+          // ADIÇÃO ARMADA
+          if (this.level === 1) {
+            // Nível 1: Somas até 20
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * (19 - num1)) + 1;
+          } else if (this.level === 2) {
+            // Nível 2: Dezenas até 60 sem vai um
+            const d1 = Math.floor(Math.random() * 3) + 1;
+            const u1 = Math.floor(Math.random() * 5); // 0 a 4
+            const d2 = Math.floor(Math.random() * 3) + 1;
+            const u2 = Math.floor(Math.random() * (9 - u1)); // garante u1+u2 <= 9
+            num1 = d1 * 10 + u1;
+            num2 = d2 * 10 + u2;
+          } else {
+            // Nível 3: Com reserva ("vai um") garantida (u1 + u2 >= 10)
+            const d1 = Math.floor(Math.random() * 4) + 1;
+            const u1 = Math.floor(Math.random() * 5) + 5; // 5 a 9
+            const d2 = Math.floor(Math.random() * 4) + 1;
+            const minU2 = 10 - u1;
+            const u2 = Math.floor(Math.random() * (10 - minU2)) + minU2; // garante u1+u2 >= 10
+            num1 = d1 * 10 + u1;
+            num2 = d2 * 10 + u2;
+          }
+          correctAns = num1 + num2;
+        }
+
+        this.currentProblem = {
+          op,
+          num1,
+          num2,
+          correctAns
+        };
+
+        this.renderProblem();
+      }
+
+      renderProblem() {
+        const { op, num1, num2 } = this.currentProblem;
+
+        // Dezenas e Unidades
+        const d1 = Math.floor(num1 / 10);
+        const u1 = num1 % 10;
+        const d2 = Math.floor(num2 / 10);
+        const u2 = num2 % 10;
+
+        this.dom.topD.textContent = d1 > 0 ? d1 : '';
+        this.dom.topU.textContent = u1;
+
+        this.dom.opSymbol.textContent = op === 'minus' ? '-' : '+';
+        this.dom.botD.textContent = d2 > 0 ? d2 : '';
+        this.dom.botU.textContent = u2;
+
+        // Limpa auxiliares
+        this.dom.auxD.innerHTML = '';
+        this.dom.auxU.innerHTML = '';
+        this.dom.topD.classList.remove('crossed');
+
+        // Didática visual de Conta Armada (auxiliares didáticos)
+        if (this.showStepHints) {
+          if (op === 'minus' && u1 < u2 && d1 > 0) {
+            // Mostra o empréstimo: dezena riscada vira d1-1, unidade vira u1+10
+            this.dom.topD.classList.add('crossed');
+            this.dom.auxD.innerHTML = `<span class="aux-pill" title="Emprestou 1">${d1 - 1}</span>`;
+            this.dom.auxU.innerHTML = `<span class="aux-pill" title="Recebeu 10">${u1 + 10}</span>`;
+            this.setHint(`Dica: A unidade pediu 1 emprestado e virou ${u1 + 10}. Quanto é ${u1 + 10} - ${u2}?`);
+          } else if (op === 'plus' && u1 + u2 >= 10) {
+            // Mostra o "vai um" na coluna da dezena
+            this.dom.auxD.innerHTML = `<span class="aux-pill" title="Vai um">+1</span>`;
+            this.setHint(`Dica: ${u1} + ${u2} = ${u1 + u2}. Fica o ${(u1 + u2) % 10} na unidade e sobe 1 na dezena!`);
+          } else if (op === 'minus') {
+            this.setHint(`Comece pela unidade: quanto é ${u1} - ${u2}?`);
+          } else {
+            this.setHint(`Comece pela unidade: quanto é ${u1} + ${u2}?`);
+          }
+        } else {
+          this.setHint('Digite o resultado e clique no botão verde para conferir!');
+        }
+      }
+
+      setHint(text) {
+        this.dom.hintText.textContent = text;
+      }
+
+      handleKeyInput(val) {
+        if (this.isProcessing) return;
+        if (this.userInput.length >= 3) return; // Contas armadas com resposta de até 3 dígitos
+        this.userInput += val;
+        this.audio.playKeyClick();
+        this.updateAnswerSlot();
+      }
+
+      handleBackspace() {
+        if (this.isProcessing) return;
+        if (this.userInput.length > 0) {
+          this.userInput = this.userInput.slice(0, -1);
+          this.audio.playBackspace();
+          this.updateAnswerSlot();
+        }
+      }
+
+      updateAnswerSlot() {
+        if (this.userInput === '') {
+          this.dom.answerSlot.textContent = '?';
+          this.dom.answerSlot.className = 'answer-slot active-focus';
+        } else {
+          this.dom.answerSlot.textContent = this.userInput;
+          this.dom.answerSlot.className = 'answer-slot active-focus';
+        }
+      }
+
+      verifyAnswer() {
+        if (this.isProcessing) return;
+        if (this.userInput === '') {
+          this.setHint('Digite os números no teclado e depois clique no botão verde!');
+          return;
+        }
+
+        const answerNum = parseInt(this.userInput, 10);
+        const { correctAns, op, num1, num2 } = this.currentProblem;
+
+        if (answerNum === correctAns) {
+          // ================= ACERTOU! =================
+          this.isProcessing = true;
+          this.combo++;
+          if (this.combo > this.bestCombo) this.bestCombo = this.combo;
+
+          const earnedPoints = 10 + (this.combo > 1 ? this.combo * 2 : 0);
+          this.points += earnedPoints;
+          this.solvedCount++;
+
+          this.updateScoreboard();
+
+          // Visual de Sucesso
+          this.dom.answerSlot.className = 'answer-slot correct';
+          this.dom.boardCard.classList.add('correct-anim');
+          this.showFloatingBadge(`+${earnedPoints} ACERTOU!`, 'correct');
+
+          this.audio.playCorrect();
+          this.confetti.burst();
+
+          this.setHint('Sensacional, Pedro! Resposta certinha!');
+
+          // Passa para a próxima conta após feedback agradável
+          setTimeout(() => {
+            this.generateNewProblem();
+            this.isProcessing = false;
+          }, 850);
+
+        } else {
+          // ================= ERROU (DIDÁTICO & ACOLHEDOR) =================
+          this.combo = 0;
+          this.updateScoreboard();
+
+          this.dom.answerSlot.className = 'answer-slot wrong';
+          this.dom.boardCard.classList.add('shake-anim');
+          this.showFloatingBadge('TENTE DE NOVO!', 'wrong');
+
+          this.audio.playWrong();
+
+          // Dica específica para ajudar o Pedro a encontrar onde se confundiu
+          const u1 = num1 % 10;
+          const u2 = num2 % 10;
+          if (op === 'minus') {
+            if (u1 < u2) {
+              this.setHint(`Quase! Dica: ${u1 + 10} tira ${u2} sobra quanto nas unidades?`);
+            } else {
+              this.setHint(`Quase! Dica: Quanto é ${u1} menos ${u2}?`);
+            }
+          } else {
+            this.setHint(`Quase! Dica: Some primeiro as unidades ${u1} + ${u2}!`);
+          }
+
+          setTimeout(() => {
+            this.dom.boardCard.classList.remove('shake-anim');
+            this.userInput = '';
+            this.updateAnswerSlot();
+          }, 600);
+        }
+      }
+
+      showFloatingBadge(text, type) {
+        const badge = this.dom.floatingBadge;
+        badge.textContent = text;
+        badge.className = `floating-feedback show ${type}`;
+
+        setTimeout(() => {
+          badge.className = 'floating-feedback';
+        }, 1200);
+      }
+
+      updateScoreboard() {
+        this.dom.statPoints.textContent = this.points;
+        this.dom.statCombo.textContent = this.combo;
+        this.dom.solvedCount.textContent = this.solvedCount;
+      }
+    }
+
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      window.mathGame = new MathGameController();
+    });
+  </script>
+</body>
+</html>

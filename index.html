@@ -599,7 +599,7 @@
         <i class="bi bi-grid-1x2"></i>
         <span>Jogos Disponíveis</span>
       </span>
-      <span><i class="bi bi-keyboard"></i> Atalhos: Teclas 1, 2, 3 e 4</span>
+      <span><i class="bi bi-keyboard"></i> Atalhos: Teclas 1, 2, 3, 4 e 5</span>
     </div>
 
     <div class="games-grid">
@@ -736,6 +736,39 @@
         </div>
       </a>
 
+      <!-- Jogo 5: Matemática Kids -->
+      <a href="matematica.html" class="game-card" data-key="5" data-game="matematica">
+        <div>
+          <div class="card-top">
+            <div class="game-icon-wrap" aria-hidden="true">
+              <i class="bi bi-calculator"></i>
+            </div>
+            <div class="card-badges">
+              <span class="visit-pill" title="Quantas vezes Matemática Kids foi acessado">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="counter-number" id="counter-matematica">0</span>
+                <span>acessos</span>
+              </span>
+              <span class="key-pill" title="Atalho de teclado: Tecla 5">
+                <i class="bi bi-5-square"></i>
+              </span>
+            </div>
+          </div>
+          <p class="card-category">Raciocínio &amp; Contas Armadas</p>
+          <h2 class="card-title">Matemática Kids</h2>
+          <p class="card-desc">
+            Treine contas armadas de menos (-) e de mais (+) com colunas de Dezenas e Unidades, dicas de "vai um" e empréstimo, e teclado virtual para celular e tablet.
+          </p>
+        </div>
+        <div class="card-footer">
+          <span class="play-cta">
+            <i class="bi bi-play-circle"></i>
+            <span>Iniciar Jogo</span>
+          </span>
+          <i class="bi bi-arrow-right play-arrow-icon" aria-hidden="true"></i>
+        </div>
+      </a>
+
     </div>
   </main>
 
@@ -764,7 +797,7 @@
     class VisitCounterManager {
       constructor() {
         this.namespace = 'patricschurhaus_pedroplay_v1';
-        this.keys = ['index', 'aviao', 'uno', 'xadrez', 'basquete'];
+        this.keys = ['index', 'aviao', 'uno', 'xadrez', 'basquete', 'matematica'];
         this.storagePrefix = 'pedroplay_visits_';
       }
 
@@ -784,6 +817,7 @@
         const unoEl = document.getElementById('counter-uno');
         const xadrezEl = document.getElementById('counter-xadrez');
         const basqueteEl = document.getElementById('counter-basquete');
+        const matematicaEl = document.getElementById('counter-matematica');
         const totalGamesEl = document.getElementById('counter-total-games');
 
         const cIndex = this.getLocalCount('index');
@@ -791,14 +825,16 @@
         const cUno = this.getLocalCount('uno');
         const cXadrez = this.getLocalCount('xadrez');
         const cBasquete = this.getLocalCount('basquete');
+        const cMatematica = this.getLocalCount('matematica');
 
         if (indexEl) indexEl.textContent = cIndex.toLocaleString('pt-BR');
         if (aviaoEl) aviaoEl.textContent = cAviao.toLocaleString('pt-BR');
         if (unoEl) unoEl.textContent = cUno.toLocaleString('pt-BR');
         if (xadrezEl) xadrezEl.textContent = cXadrez.toLocaleString('pt-BR');
         if (basqueteEl) basqueteEl.textContent = cBasquete.toLocaleString('pt-BR');
+        if (matematicaEl) matematicaEl.textContent = cMatematica.toLocaleString('pt-BR');
         if (totalGamesEl) {
-          totalGamesEl.textContent = (cAviao + cUno + cXadrez + cBasquete).toLocaleString('pt-BR');
+          totalGamesEl.textContent = (cAviao + cUno + cXadrez + cBasquete + cMatematica).toLocaleString('pt-BR');
         }
       }
 
@@ -829,7 +865,7 @@
 
       async syncAllCounts() {
         this.updateDOM();
-        for (const key of ['aviao', 'uno', 'xadrez', 'basquete']) {
+        for (const key of ['aviao', 'uno', 'xadrez', 'basquete', 'matematica']) {
           try {
             const res = await fetch(
               `https://api.counterapi.dev/v1/${this.namespace}/${key}`,

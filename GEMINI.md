@@ -31,15 +31,16 @@ O projeto **PedroPlay** é a central oficial de jogos web interativos e educativ
 ### Estrutura do Diretório
 ```text
 c:\Users\patri\Documents\Pedro\
-├── index.html     # Central de Jogos "PedroPlay" (Portal principal e contadores de acesso)
-├── avião.html     # Simulador de Cabine: Comissário de Bordo (AeroVoo 702)
-├── uno.html       # UNO Mania Kids: Jogo de Cartas 1v1 contra Robô
-├── xadrez.html    # Xadrez Clássico & Minimalista com IA Multinível e Modo Didático
-├── basquete.html  # Basquete Kids: Arremessos 3D em 1ª Pessoa, Teleporte (1, 2, 3) e Níveis
+├── index.html       # Central de Jogos "PedroPlay" (Portal principal e contadores de acesso)
+├── avião.html       # Simulador de Cabine: Comissário de Bordo (AeroVoo 702)
+├── uno.html         # UNO Mania Kids: Jogo de Cartas 1v1 contra Robô
+├── xadrez.html      # Xadrez Clássico & Minimalista com IA Multinível e Modo Didático
+├── basquete.html    # Basquete Kids: Arremessos 3D em 1ª Pessoa, Teleporte (1, 2, 3) e Níveis
+├── matematica.html  # Matemática Kids: Contas Armadas de Menos (-) e Mais (+) Mobile-First
 ├── img/
-│   └── logo.png   # Logomarca oficial do canal "Alemãozinho Pedro"
-├── .gitignore     # Ignora capturas de tela temporárias na raiz
-└── GEMINI.md      # Documento de Arquitetura, Identidade Visual e Diretrizes do Projeto
+│   └── logo.png     # Logomarca oficial do canal "Alemãozinho Pedro"
+├── .gitignore       # Ignora capturas de tela temporárias na raiz
+└── GEMINI.md        # Documento de Arquitetura, Identidade Visual e Diretrizes do Projeto
 ```
 
 ---
@@ -185,6 +186,35 @@ Jogo de arremessos em primeira pessoa onde a criança vê suas próprias mãos s
 
 ---
 
+### 4.5. Matemática Kids: Contas Armadas — `matematica.html`
+**Título:** *Matemática Kids: Contas Armadas*
+
+Aplicação educativa e interativa com visual sóbrio estilo GitHub Dark Mode projetada especificamente para o Pedro treinar contas armadas de subtração (`-`) e adição (`+`) de forma acolhedora, com colunas alinhadas de Dezenas e Unidades, suporte didático a "vai um" e empréstimo, e teclado numérico virtual nativo para toque.
+
+#### Arquitetura Interna e Classes
+- **`MathAudioEngine`:**
+  - Sintetizador Web Audio API com acordes alegres ascendentes para acertos, tons suaves e didáticos para tentativas incorretas, som tátil para teclado e fanfarra comemorativa de fim de desafio.
+  - Persistência de mudo no `localStorage` (`math_sound_muted`).
+- **`ConfettiEffect`:**
+  - Sistema de partículas em Canvas para celebrar cada acerto e vitória.
+- **`MathGameController` (Controlador Pedagógico e de Estado):**
+  - **Operações Dinâmicas:** Seleção rápida entre *Só Menos* (`-`), *Só Mais* (`+`) e *Modo Misto* (`+ / -`).
+  - **Grid Didático de Conta Armada:**
+    1. *Cabeçalho de Colunas:* Rótulos nítidos de `D` (Dezena) e `U` (Unidade).
+    2. *Caixas Auxiliares Didáticas:* Exibição de reserva ("vai um", `+1`) na adição e de corte da dezena com empréstimo (`d1 - 1` e `u1 + 10`) na subtração.
+    3. *Validação Construtiva:* Quando a criança erra, o jogo balança suavemente a conta (`shake-anim`) e oferece uma dica sob medida baseada nas unidades, permitindo tentar de novo sem frustração.
+  - **3 Níveis de Dificuldade:**
+    - *Nível 1 (Fácil):* Operações até 20 sem complicações.
+    - *Nível 2 (Médio):* Dezenas até 60 sem necessidade de empréstimo ou reserva.
+    - *Nível 3 (Mestre):* Dezenas até 100 com empréstimo garantido na subtração e reserva ("vai um") na adição.
+  - **Modos de Jogo:**
+    - *Modo Livre:* Sem contagem regressiva, permitindo resolver contas no ritmo da criança.
+    - *Desafio de 1 Minuto:* Temporizador de 60 segundos com pontuação acumulada, combos e registro de recorde.
+  - **Teclado Virtual Mobile-First:** Botões grandões de `0` a `9`, `Apagar` e `Conferir`, com suporte simultâneo a teclado físico (`0-9`, `Backspace`, `Enter`).
+  - **Menu Sanduíche (☰):** Centraliza opções de operação, nível, modo de tempo, toggle de dicas na tela e link de retorno para a central PedroPlay.
+
+---
+
 ## 5. Padrões de Estado (`localStorage`)
 
 | Chave `localStorage` | Módulo | Descrição |
@@ -194,11 +224,16 @@ Jogo de arremessos em primeira pessoa onde a criança vê suas próprias mãos s
 | `pedroplay_visits_uno` | `index.html` | Contador de acessos ao jogo `uno.html`. |
 | `pedroplay_visits_xadrez` | `index.html` | Contador de acessos ao jogo `xadrez.html`. |
 | `pedroplay_visits_basquete` | `index.html` | Contador de acessos ao jogo `basquete.html`. |
+| `pedroplay_visits_matematica` | `index.html` | Contador de acessos ao jogo `matematica.html`. |
 | `uno_muted` | `uno.html` | Estado de silenciamento do áudio no UNO (`'true'` / `'false'`). |
 | `chess_sound_muted` | `xadrez.html` | Estado de silenciamento do áudio no Xadrez (`'true'` / `'false'`). |
 | `chess_difficulty` | `xadrez.html` | Nível de dificuldade selecionado (`'super_child'`, `'child'`, `'easy'`, `'medium'`, `'hard'`). |
 | `basketball_sound_muted` | `basquete.html` | Estado de silenciamento do áudio no Basquete (`'true'` / `'false'`). |
 | `pedroplay_basketball_highscore` | `basquete.html` | Recorde máximo de pontos no Basquete. |
+| `math_sound_muted` | `matematica.html` | Estado de silenciamento do áudio na Matemática (`'true'` / `'false'`). |
+| `pedroplay_math_highscore` | `matematica.html` | Recorde máximo de pontos no desafio de Matemática. |
+| `pedroplay_math_op` | `matematica.html` | Operação selecionada (`'minus'`, `'plus'`, `'mixed'`). |
+| `pedroplay_math_level` | `matematica.html` | Nível de dificuldade selecionado (`1`, `2`, `3`). |
 
 ---
 
